@@ -1,5 +1,6 @@
 {
-    "configurations": [{
+    "configurations": [
+        {
             "name": "Mac",
             "includePath": [
                 "/usr/include",
@@ -51,7 +52,6 @@
                 "G:\\mingw\\include\\c++\\3.4.5",
                 "G:/mingw/include/c++/3.4.5",
                 "G:\\mingw\\include\\c++\\3.4.5\\mingw32\\bits"
-
             ],
             "defines": [
                 "_DEBUG",
@@ -74,5 +74,5 @@
             "cppStandard": "c++17"
         }
     ],
-    "version": 3
+    "version": 4
 }

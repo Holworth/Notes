@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>hw3.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/*
+
+School Book style from goldblog.com.ua (c) Zaripov Yura <yur4ik7@ukr.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 15px 0.5em 0.5em 30px;
+  font-size: 11px;
+  line-height:16px;
+}
+
+pre{
+  background:#f6f6ae url(./school-book.png);
+  border-top: solid 2px #d2e8b9;
+  border-bottom: solid 1px #d2e8b9;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color:#005599;
+  font-weight:bold;
+}
+
+.hljs,
+.hljs-subst {
+  color: #3e5915;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-attribute,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-link {
+  color: #2c009f;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion,
+.hljs-meta {
+  color: #e60415;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-name,
+.hljs-selector-id,
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+</head>
+<body>
+<h1 id="%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E4%BD%9C%E4%B8%9A3">数据结构 作业3</h1>
+<p>王华强 2016K8009929035</p>
+<hr>
+<!-- 第5章数组与广义表：5.1, 5.8, 5.11,5.12, , 5.15；				5.19, 5.20, 5.25, 5.27, 5.37 -->
+<h2 id="%E7%AC%AC5%E7%AB%A0%EF%BC%9A">第5章：</h2>
+<h2 id="51-%E5%81%87%E8%AE%BE%E6%9C%89%E4%BA%8C%E7%BB%B4%E6%95%B0%E7%BB%84a6%C3%978%EF%BC%8C%E6%AF%8F%E4%B8%AA%E5%85%83%E7%B4%A0%E7%94%A8%E7%9B%B8%E9%82%BB%E7%9A%846%E4%B8%AA%E5%AD%97%E8%8A%82%E5%AD%98%E5%82%A8%EF%BC%8C%E5%AD%98%E5%82%A8%E5%99%A8%E6%8C%89%E5%AD%97%E8%8A%82%E7%BC%96%E5%9D%80%EF%BC%8C%E5%B7%B2%E7%9F%A5a%E7%9A%84%E8%B5%B7%E5%A7%8B%E5%AD%98%E5%82%A8%E4%BD%8D%E7%BD%AE%EF%BC%88%E5%9F%BA%E5%9C%B0%E5%9D%80%EF%BC%89%E4%B8%BA1000%EF%BC%8C%E8%AE%A1%E7%AE%97%EF%BC%9A">5.1 假设有二维数组A6×8，每个元素用相邻的6个字节存储，存储器按字节编址，已知A的起始存储位置（基地址）为1000，计算：</h2>
+<p>(1) 数组A的体积（即存储量）；</p>
+<p><code>6*6*8=288</code></p>
+<p>(2) 数组A的最后一个元素a57的第一个字节的地址；</p>
+<p><code>1288-6=1282</code></p>
+<p>(3) 按行存储时，元素a14的第一个字节的地址；</p>
+<p><code>1072</code></p>
+<p>(4) 按列存储时，元素a47的第一个字节的地址。</p>
+<p><code>1276</code></p>
+<h2 id="58-%E5%81%87%E8%AE%BE%E4%B8%80%E4%B8%AA%E5%87%86%E5%AF%B9%E8%A7%92%E7%9F%A9%E9%98%B5%E6%8C%89%E4%BB%A5%E4%B8%8B%E6%96%B9%E5%BC%8F%E5%AD%98%E4%BA%8E%E4%B8%80%E7%BB%B4%E6%95%B0%E7%BB%84b4m%E4%B8%AD%EF%BC%9A%E5%86%99%E5%87%BA%E7%94%B1%E4%B8%80%E5%AF%B9%E4%B8%8B%E6%A0%87%EF%BC%88i%EF%BC%8Cj%EF%BC%89%E6%B1%82k%E7%9A%84%E8%BD%AC%E6%8D%A2%E5%85%AC%E5%BC%8F%E3%80%82">5.8 假设一个准对角矩阵按以下方式存于一维数组B[4m]中：写出由一对下标（i，j）求k的转换公式。</h2>
+<p><code>k=(i/2)(下取整)*4+(1-i%2)*2+(1-j%2)</code></p>
+<h2 id="511-%E5%88%A9%E7%94%A8%E5%B9%BF%E4%B9%89%E8%A1%A8%E7%9A%84gethead%E5%92%8Cgettail%E6%93%8D%E4%BD%9C%E5%86%99%E5%87%BA%E5%A6%82%E4%B8%8A%E9%A2%98%E7%9A%84%E5%87%BD%E6%95%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%EF%BC%8C%E6%8A%8A%E5%8E%9F%E5%AD%90banana%E5%88%86%E5%88%AB%E4%BB%8E%E4%B8%8B%E5%88%97%E5%B9%BF%E4%B9%89%E8%A1%A8%E4%B8%AD%E5%88%86%E7%A6%BB%E5%87%BA%E6%9D%A5%E3%80%82">5.11 利用广义表的GetHead和GetTail操作写出如上题的函数表达式，把原子banana分别从下列广义表中分离出来。</h2>
+<p>(1) L1 = (apple, pear, banana, orange);</p>
+<p><code>gethead(gettail(gettail(L1)))</code></p>
+<p>(2) L2 = ((apple, pear), (banana, orange));</p>
+<p><code>gethead(gethead(gettail(L2)))</code></p>
+<p>(3) L3 = (((apple), (pear), (banana), (orange)));</p>
+<p><code>gethead(gethead(gettail(gettail(gethead(L3)))))</code></p>
+<p>(4) L4 = (apple, (pear), ((banana)), (((orange))));</p>
+<p><code>gethead(gethead(gethead(gettail(gettail(L4)))))</code></p>
+<p>(5) L5 = ((((apple))), ((pear)), (banana), orange);</p>
+<p><code>gethead(gethead(gettail(gettail(L5))))</code></p>
+<p>(6) L6 = ((((apple), pear), banana), orange);</p>
+<p><code>gethead(gettail(gethead(L6)))</code></p>
+<p>(7) L7 = (apple, (pear, (banana), orange));</p>
+<p><code>gethead(gethead(gettail(gethead(gettail(L7)))))</code></p>
+<h2 id="512-%E6%8C%89%E6%95%99%E7%A7%91%E4%B9%A655%E8%8A%82%E4%B8%AD%E5%9B%BE58%E6%89%80%E7%A4%BA%E7%BB%93%E7%82%B9%E7%BB%93%E6%9E%84%EF%BC%8C%E7%94%BB%E5%87%BA%E4%B8%8B%E5%88%97%E5%B9%BF%E4%B9%89%E8%A1%A8%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E5%9B%BE%EF%BC%8C%E5%B9%B6%E6%B1%82%E5%AE%83%E7%9A%84%E6%B7%B1%E5%BA%A6%E3%80%82">5.12 按教科书5.5节中图5.8所示结点结构，画出下列广义表的存储结构图，并求它的深度。</h2>
+<p>(1) ((()),a,((b,c),(),d),(((e))))</p>
+<p>深度4</p>
+<p>见附图文件</p>
+<p>(2) ((((a),b)),(((),(d)),(e,f)))</p>
+<p>深度4</p>
+<p>见附图文件</p>
+<p><img src="广义表.svg" alt="广义表.svg"></p>
+<h2 id="515-%E5%86%99%E5%87%BA%E6%B1%82%E7%BB%99%E5%AE%9A%E9%9B%86%E5%90%88%E7%9A%84%E5%B9%82%E9%9B%86%E7%9A%84%E9%80%92%E5%BD%92%E5%AE%9A%E4%B9%89%E3%80%82">5.15 写出求给定集合的幂集的递归定义。</h2>
+<pre class="hljs"><code><div><span class="hljs-function"><span class="hljs-built_in">set</span> <span class="hljs-title">getpowerset</span><span class="hljs-params">(<span class="hljs-built_in">set</span> src)</span>
+</span>{
+    <span class="hljs-keyword">if</span>(src.notempty())
+    {
+        elem=src.head();
+        src.pop_head()
+        yeildset(elem+getpowerset(src));<span class="hljs-comment">//含elem</span>
+        yeildset(getpowerset(src));<span class="hljs-comment">//不含elem</span>
+    }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">yeildset</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-comment">//将当前元素作为一个集合添加到结果集合中</span>
+}
+</div></code></pre>
+
+</body>
+</html>

@@ -47,11 +47,11 @@
 
 (4) L4 = (apple, (pear), ((banana)), (((orange))));
 
-`gethead(gethead(gettail(gettail(L4))))`
+`gethead(gethead(gethead(gettail(gettail(L4)))))`
 
 (5) L5 = ((((apple))), ((pear)), (banana), orange);
 
-`gethead(gettail(gettail(L5)))`
+`gethead(gethead(gettail(gettail(L5))))`
 
 (6) L6 = ((((apple), pear), banana), orange); 
 
@@ -74,6 +74,8 @@
 深度4
 
 见附图文件
+
+![广义表.svg](广义表.svg)
 
 ## 5.15 写出求给定集合的幂集的递归定义。
 

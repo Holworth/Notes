@@ -15,7 +15,7 @@
    viewBox="0 0 400 297"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.1 r15371"
    sodipodi:docname="广义表.svg">
   <defs
      id="defs2">
@@ -36,18 +36,18 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.70710678"
-     inkscape:cx="495.05698"
+     inkscape:cx="388.99096"
      inkscape:cy="566.01358"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1267"
-     inkscape:window-height="991"
-     inkscape:window-x="-8"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -56,7 +56,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -75,7 +75,7 @@
            height="115.96552"
            x="53.033009"
            y="235.10068" /></flowRegion><flowPara
-         id="flowPara4631"></flowPara></flowRoot>    <text
+         id="flowPara4631" /></flowRoot>    <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:4.53051424px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.21236785"
        x="8.8877277"
@@ -90,7 +90,7 @@
          x="8.8877277"
          y="19.529047"
          style="stroke-width:0.21236785"
-         id="tspan4662"></tspan><tspan
+         id="tspan4662" /><tspan
          sodipodi:role="line"
          x="8.8877277"
          y="25.19219"
@@ -111,7 +111,7 @@
          x="7.4380646"
          y="125.18376"
          style="stroke-width:0.21236785"
-         id="tspan4670"></tspan><tspan
+         id="tspan4670" /><tspan
          sodipodi:role="line"
          x="7.4380646"
          y="130.84691"
@@ -650,42 +650,6 @@
            sodipodi:role="line">1</tspan></text>
     </g>
     <g
-       id="g4935"
-       transform="matrix(0.80265015,0,0,0.80265015,5.9619867,33.560443)">
-      <rect
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.15934038;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:29;stroke-opacity:1;paint-order:fill markers stroke"
-         id="rect4925"
-         width="32.613003"
-         height="11.498711"
-         x="24.318466"
-         y="45.496315" />
-      <rect
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-         id="rect4927"
-         width="0.047247026"
-         height="10.819569"
-         x="46.065849"
-         y="45.929314" />
-      <rect
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-         id="rect4929"
-         width="0.047247026"
-         height="10.394345"
-         x="34.49033"
-         y="45.882065" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-weight:normal;font-size:8.21172142px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.38492444"
-         x="26.98633"
-         y="54.377083"
-         id="text4933"><tspan
-           sodipodi:role="line"
-           id="tspan4931"
-           x="26.98633"
-           y="54.377083"
-           style="stroke-width:0.38492444">1</tspan></text>
-    </g>
-    <g
        transform="matrix(0.01390784,0.6766026,-0.6766026,0.01390784,72.375448,34.903037)"
        id="g4943">
       <rect
@@ -711,33 +675,6 @@
          id="rect4941"
          style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
          transform="rotate(136.34038)" />
-    </g>
-    <g
-       id="g4951"
-       transform="matrix(0.01390784,0.6766026,-0.6766026,0.01390784,73.915345,53.858741)">
-      <rect
-         y="50.540623"
-         x="3.0427084"
-         height="0.13229166"
-         width="19.314583"
-         id="rect4945"
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-      <rect
-         transform="rotate(46.026024)"
-         y="19.002407"
-         x="45.148323"
-         height="0.13229166"
-         width="6.7468748"
-         id="rect4947"
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-      <rect
-         transform="rotate(136.34038)"
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-         id="rect4949"
-         width="6.7468748"
-         height="0.13229166"
-         x="18.849688"
-         y="-51.999401" />
     </g>
     <g
        transform="matrix(0.80265015,0,0,0.80265015,184.5341,14.47725)"
@@ -826,89 +763,6 @@
          height="0.13229166"
          width="6.7468748"
          id="rect5027"
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-         transform="rotate(136.34038)" />
-    </g>
-    <g
-       transform="matrix(0.80265015,0,0,0.80265015,150.42448,33.031276)"
-       id="g5055">
-      <rect
-         y="45.496315"
-         x="24.318466"
-         height="11.498711"
-         width="32.613003"
-         id="rect5045"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.15934038;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:29;stroke-opacity:1;paint-order:fill markers stroke" />
-      <rect
-         y="45.929314"
-         x="46.065849"
-         height="10.819569"
-         width="0.047247026"
-         id="rect5047"
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-      <rect
-         y="45.882065"
-         x="34.49033"
-         height="10.394345"
-         width="0.047247026"
-         id="rect5049"
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-      <text
-         id="text5053"
-         y="54.377083"
-         x="26.98633"
-         style="font-style:normal;font-weight:normal;font-size:8.21172142px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.38492444"
-         xml:space="preserve"><tspan
-           style="stroke-width:0.38492444"
-           y="54.377083"
-           x="26.98633"
-           id="tspan5051"
-           sodipodi:role="line">1</tspan></text>
-    </g>
-    <g
-       id="g5089"
-       transform="matrix(0.01390784,0.6766026,-0.6766026,0.01390784,217.59848,52.604291)">
-      <g
-         id="g5083"
-         transform="translate(-1.7540079e-7,1.0432918e-6)">
-        <rect
-           y="50.540623"
-           x="3.0427084"
-           height="0.13229166"
-           width="19.314583"
-           id="rect5077"
-           style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-        <rect
-           transform="rotate(46.026024)"
-           y="19.002407"
-           x="45.148323"
-           height="0.13229166"
-           width="6.7468748"
-           id="rect5079"
-           style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke" />
-        <rect
-           transform="rotate(136.34038)"
-           style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-           id="rect5081"
-           width="6.7468748"
-           height="0.13229166"
-           x="18.849688"
-           y="-51.999401" />
-      </g>
-      <rect
-         style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
-         id="rect5085"
-         width="6.7468748"
-         height="0.13229166"
-         x="45.148323"
-         y="19.002407"
-         transform="rotate(46.026024)" />
-      <rect
-         y="-51.999401"
-         x="18.849688"
-         height="0.13229166"
-         width="6.7468748"
-         id="rect5087"
          style="opacity:1;fill:#000000;fill-opacity:0.5125;stroke:#000000;stroke-width:1.69999993;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:109.60630035;stroke-opacity:1;paint-order:fill markers stroke"
          transform="rotate(136.34038)" />
     </g>
@@ -1484,7 +1338,7 @@
            height="89.095451"
            x="922.06726"
            y="422.48398" /></flowRegion><flowPara
-         id="flowPara5299"></flowPara></flowRoot>    <g
+         id="flowPara5299" /></flowRoot>    <g
        transform="matrix(0.80265015,0,0,0.80265015,6.8518162,104.89459)"
        id="g6185">
       <rect
@@ -1971,7 +1825,7 @@
            height="140.04657"
            x="868.44824"
            y="300.82217" /></flowRegion><flowPara
-         id="flowPara7107"></flowPara></flowRoot>    <g
+         id="flowPara7107" /></flowRoot>    <g
        id="g7336"
        transform="translate(102.21144,37.028265)">
       <g
