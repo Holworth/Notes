@@ -5,7 +5,7 @@
     // result = (a << 5) |( b>>(32-5)); //此语句用嵌入式汇编编写
     // return result；
 // }
-
+#include<stdio.h>
 
 unsigned int shld5(unsigned int a, unsigned int b)
 {
@@ -34,5 +34,5 @@ unsigned int shld5(unsigned int a, unsigned int b)
 
 int main()
 {
-    shld5(10086, 2333);
+    printf("%u",shld5(1u, 2333u));
 }

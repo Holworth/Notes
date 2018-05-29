@@ -69,6 +69,8 @@ William Wang, **zeweiwang@outlook.com**
 
 William Wang, **zeweiwang@outlook.com** 
 
+> todo: add details, add data, add examples
+
 <!-- ref: https://www.forbes.com/sites/darrenheitner/2015/10/15/the-business-of-esports-is-on-pace-to-explode/#23ff0307438a
 
 One year ago, the word 'eSport' had no real significance. A culture of hardcore video game players existed, but they were just that -- people with a serious interest in playing video games for pleasure. Seemingly out of nowhere, the eSports industry started to be taken seriously . Mega-agency WME | IMG is representing professional eSports players and teams. Marketing and media agency rEvolution has made acquisitions in the space and created a new eSports consulting subsidiary rEvXP. Now, award-winning global engagement marketing agency GMR is getting involved in the eSports space with the announcement that it has launched its own eSports consulting practice.
@@ -178,13 +180,21 @@ Besides awards from the match, some players can also get income by selling goods
 
 Yet this lead to a problem. When a player spend too much time on live-streaming or managing his online store, it will undoubtly has a negative effect on his competition skills, and that is the paradox: the temptation of money for players do sometimes hindered the audience to see more splendid match. After all, when you can simply can money from talking with the audience and playing freely, few people will choose to train 12 or more hours for less money.
 
-* todo: retired players. in "future" part
+At the same time, online-streaming also provide professional players a sound way to make a live after their retirement. In recent years, most retired players choosed to stay in the field of esports in the idenitity of a coach, a commenter or a live-streamer, and some of them may also setup company or online shop. Either way, the reputation they get from their professional career would be a great boost to their new career.
 
-##### What's the relationship between players, teams and leagues.
+<!-- * todo: retired players. in "future" part -->
 
-* todo: "teams" have different meaning for different games, while "league" is almost the same as the leagues in traditional sports.
+##### What's the relationship between players, teams, clubs and leagues.
 
-#### Casters
+Like traditional sports, esports also have teams and leagues. In the field of esports, "teams" have different meaning for different games, while "league" is almost the same as the leagues in traditional sports. For single player games, like RTS(Real Time Strategy), players in a team practice with each other, and compete with each other in competitions, while in MOBA(Multiplayer Online Battle Arena) games, players in a team are like a soccer team, corporate with each other to fight against another team. Player are usually not alone, though there do be some independent players, most players have coaches, game analyziers and team managers as their backup. These people, as well as the team sponsers, make up an esport club. In usual, an esport club only have one team belong to it, so the word club is, in most times, used the same as the word team.
+
+Some games have the conception of "league". The league is usually controlled by the game manufacturers, sometimes TV channels or club associations. The function of the league is to setup a rule for the matches, to harmonize different competitions organized by different organizations, and to make sure the clubs have strong constrain on the players. To make it simple, it is just like NBA in professional basketball and NFA in professional American Football.  
+
+<!-- * todo: "teams" have different meaning for different games, while "league" is almost the same as the leagues in traditional sports. -->
+
+<!-- #### Casters
+
+Competitions 
 
 * Live-streaming
 
@@ -196,7 +206,7 @@ The newest and the most widely used way of watch a game. And also the easiest wa
 
 To watch records of the match, and other related videos.
 
-//todo
+//todo -->
 
 #### Audiences
 
@@ -204,24 +214,19 @@ To watch records of the match, and other related videos.
 
 <!-- game manufacturer -->
 
-How audiences support the esports system. //todo
+Audiences are the reason that esports can exist. In fact, it is because of the vast number of audiences and potential audiences that the industrial is liked by capital. Audiences watch the compeitions through Live-streaming, video websites and TV. Meanwhile, they will also follow their favoritee players on twetter or weibo, give out gifts in those players' live-streaming and shop in players' eshops. The following table shows how can a audience support his favorite players and the game: 
 
-* Buy tickets.
-* Online shopping.
-* Watch advertisements.
-* Buy virtual items. (Dota2, for instance)
+> How audiences support the esports system:
 
-### 3. Analyzation: what will esport be like in the future
+1. Buy tickets.
+1. Online shopping.
+1. Sponse to their favorite players or live-streamers
+1. Watch advertisements.
+1. Buy virtual items. (Dota2, for instance)  
 
-> Main part of the article.
+Virtual items is an interesting idea, and it is first invented right in esports. The organizes of the competitions sell virtual decorations can be used in games, and a part of the sell income will be added to the award of the competitions. This business mode has been provided to be parctical in TI series(the Global Invitive Competitions of Data2). Both the funs, the players and the game organizers gain from it.
 
-> Maybe it is better to part it as an independent article? There are too much to discuss. 
-* closer and closer to traditional sports
-* how retired players make their lives (live-streaming, setup companies, become exers)
-* how will the change of game influence the match, how long can a game survive (SC, 1998-now, for ex.)
-* potential market (use TI reward curve)
-
-### 4. Conclusion
+### 3. Conclusion
 
 To surmmrize, we can see that esports has become an industrial just alike traditional professional sports, which is proved to be a feasible way to run. What makes esports more promising than trditional sports is that the market is, unlike traditional professional sports domained by giants like NFL, MLB and NBA, still a piece of virgin land. The industrial is still in its upraising phase now, and the market has not yet solidized. Therefore, along with the growing attention people paid to esports and the decline of people's prejudge of esports, esports is still a valuable lore waiting to be mined. 
 
@@ -261,3 +266,14 @@ ref: https://www.zapmeta.com/?q=sasha+scarlett+hostyn&dzn=&asid=0028450762&where
 
 <!-- ref: https://www.natlawreview.com/article/esports-insights-and-trends-staying-current-emerging-developments-booming-esports-0 -->
  
+---
+
+## Passage 4. Analyzation: what will esport be like in the future
+
+> Main part of the article.
+
+> Maybe it is better to part it as an independent article? There are too much to discuss. 
+* closer and closer to traditional sports
+<!-- * how retired players make their lives (live-streaming, setup companies, become exers) -->
+* how will the change of game influence the match, how long can a game survive (SC, 1998-now, for ex.)
+* potential market (use TI reward curve)

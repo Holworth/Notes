@@ -702,34 +702,3 @@ protected:
   int size_;
 };
 
-int main()
-{
-  LICENSE;
-  Tree<int> tt(99);
-
-  using namespace std;
-  cout << tt.data();
-  L;
-  tt.push_back(66);
-  tt.push_back(33);
-  tt.push_back(22);
-  tt.push_back(11);
-  tt[0]->push_back(1);
-  tt[0]->push_back(2);
-  tt[0]->push_back(3);
-  tt[2]->push_back(1);
-  tt[2]->push_back(1);
-  tt[2]->push_back(1);
-  tt[2]->push_back(2);
-  tt[2]->push_back(3);
-  tt.print();
-  L;
-  DisjointSet D(9);
-  D.merge(1,2);
-  D.merge(3,4);
-  D.merge(5,6);
-  D.merge(3,6);
-  D.print();
-
-  return 0;
-}
