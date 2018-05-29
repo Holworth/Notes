@@ -73,6 +73,11 @@ class Graph
         std::cout << "Called pure virtual func haveedge." << std::endl;
         throw("Called pure virtual func haveedge.");
     }
+    virtual bool existedge(int tail, int head) //查找某个顶点是否存在出边
+    {
+        std::cout << "Called pure virtual func existedge." << std::endl;
+        throw("Called pure virtual func existedge.");
+    }
 
     virtual int degree(int vertex)
     {
@@ -119,7 +124,7 @@ class Graph
 
         return le1.data < le2.data;
     }
-    // int _nvertex;
+    // int nvertex_;
 };
 
 //有向图的邻接矩阵表示
@@ -130,65 +135,70 @@ class GraphArray : public Graph<T>
     GraphArray(int vertex)
     {
         int i = vertex * vertex;
-        _data = new T[i];
-        _mark = new int[i];
-        _exist = new bool[i];
-        _nvertex = vertex;
+        data_ = new T[i];
+        mark_ = new int[i];
+        exist_ = new bool[i];
+        nvertex_ = vertex;
         while (i-- > 0)
         {
-            _mark[i] = 0;
-            _exist[i] = false;
+            mark_[i] = 0;
+            exist_[i] = false;
         }
     }
     ~GraphArray()
     {
-        delete[] _data;
-        delete[] _mark;
-        delete[] _exist;
+        delete[] data_;
+        delete[] mark_;
+        delete[] exist_;
     }
 
     GraphArray<T>(const GraphArray<T> &src)
     {
-        _nvertex = src._nvertex;
-        for (int i = 0; i < _nvertex * _nvertex; i++)
+        nvertex_ = src.nvertex_;
+        for (int i = 0; i < nvertex_ * nvertex_; i++)
         {
-            *(_data + i) = *(src._data + i);
-            *(_mark + i) = *(src._mark + i);
-            *(_exist + i) = *(src._exist + i);
+            *(data_ + i) = *(src.data_ + i);
+            *(mark_ + i) = *(src.mark_ + i);
+            *(exist_ + i) = *(src.exist_ + i);
         }
     }
 
     struct GetedgeResult<T> getedge(int tail, int head)
     {
         struct GetedgeResult<T> result;
-        result.data = *(_data + sizeof(T) * tail * _nvertex + head);
-        result.exist = *(_exist + sizeof(T) * tail * _nvertex + head);
+        result.data = *(data_ + sizeof(T) * tail * nvertex_ + head);
+        result.exist = *(exist_ + sizeof(T) * tail * nvertex_ + head);
         return result;
     }
 
     int
     setedge(int tail, int head, T value)
     {
-        *(_data + tail * _nvertex + head) = value;
-        *(_exist + tail * _nvertex + head) = true;
+        *(data_ + tail * nvertex_ + head) = value;
+        *(exist_ + tail * nvertex_ + head) = true;
+    }
+
+    bool existedge(int tail, int head)
+    {
+        return *(exist_ + tail * nvertex_ + head);
     }
 
     int setedgemark(int tail, int head, int value)
     {
-        *(_mark + tail * _nvertex + head) = value;
+        *(mark_ + tail * nvertex_ + head) = value;
     }
 
     int setedgeexist(int tail, int head, bool value)
     {
-        *(_exist + tail * _nvertex + head) = value;
+        *(exist_ + tail * nvertex_ + head) = value;
     }
 
     bool haveedge(int vertex)
     {
         bool result = false;
-        for (int i = 0; i < _nvertex; i++)
+        for (int i = 0; i < nvertex_; i++)
         {
-            if (*(_exist + vertex * _nvertex + i))
+            if (*(exist_ + vertex * nvertex_ + i))
             {
                 result = true;
                 break;
@@ -199,16 +209,41 @@ class GraphArray : public Graph<T>
 
     int vertex()
     {
-        return _nvertex;
+        return nvertex_;
+    }
+    virtual int indegree(int vertex)
+    {
+        int res = 0;
+        for (int i = 0; i < nvertex_; i++)
+        {
+            if (haveedge(i, vertex))
+                res++;
+        }
+        return res;
+    }
+    virtual int outdegree(int vertex)
+    {
+        int res = 0;
+        for (int i = 0; i < nvertex_; i++)
+        {
+            if (haveedge(vertex, i))
+                res++;
+        }
+        return res;
+    }
+
+    int degree(int vertex)
+    {
+        return indegree(vertex) + outdegree(vertex);
     }
 
     std::vector<std::pair<int, int>> getedge_around(int vertex)
     {
         std::vector<std::pair<int, int>> result;
         std::pair<int, int> p;
-        for (int i = 0; i < _nvertex; i++)
+        for (int i = 0; i < nvertex_; i++)
         {
-            if (*(_exist + vertex * _nvertex + i))
+            if (*(exist_ + vertex * nvertex_ + i))
             {
                 p.first = vertex;
                 p.second = i;
@@ -221,9 +256,9 @@ class GraphArray : public Graph<T>
     virtual std::vector<int> vertex_around(int vertex)
     {
         std::vector<int> result;
-        for (int i = 0; i < _nvertex; i++)
+        for (int i = 0; i < nvertex_; i++)
         {
-            if (*(_exist + vertex * _nvertex + i))
+            if (*(exist_ + vertex * nvertex_ + i))
             {
                 result.push_back(i);
             }
@@ -233,25 +268,25 @@ class GraphArray : public Graph<T>
 
     int zero()
     {
-        for (int i = 0; i < _nvertex * _nvertex; i++)
+        for (int i = 0; i < nvertex_ * nvertex_; i++)
         {
-            *(_data + i) = 0;
-            *(_mark + i) = 0;
+            *(data_ + i) = 0;
+            *(mark_ + i) = 0;
         }
     }
 
     int init()
     {
-        for (int i = 0; i < _nvertex * _nvertex; i++)
+        for (int i = 0; i < nvertex_ * nvertex_; i++)
         {
-            *(_exist + i) = false;
+            *(exist_ + i) = false;
         }
     }
 
-    int _nvertex;
-    T *_data;
-    int *_mark;
-    bool *_exist;
+    int nvertex_;
+    T *data_;
+    int *mark_;
+    bool *exist_;
 };
 
 //有向图的邻接表表示
@@ -279,18 +314,18 @@ class GraphAdjlist : public Graph<T>
   public:
     GraphAdjlist(int nvertix)
     {
-        _data = new struct PointAdjlist<T>[nvertix];
-        _nvertex = nvertix;
+        data_ = new struct PointAdjlist<T>[nvertix];
+        nvertex_ = nvertix;
         while (nvertix-- > 0)
         {
-            _data[nvertix].firstarc = 0;
-            _data[nvertix].data = 0;
-            _data[nvertix].mark = 0;
+            data_[nvertix].firstarc = 0;
+            data_[nvertix].data = 0;
+            data_[nvertix].mark = 0;
         }
     }
     ~GraphAdjlist()
     {
-        delete[] _data;
+        delete[] data_;
     }
     int setedge(int tail, int head, T val)
     {
@@ -299,14 +334,14 @@ class GraphAdjlist : public Graph<T>
         now->tail = tail;
         now->data = val;
         now->mark = 0;
-        now->nextarc = _data[tail].firstarc;
-        _data[tail].firstarc = now;
+        now->nextarc = data_[tail].firstarc;
+        data_[tail].firstarc = now;
     }
 
     struct GetedgeResult<T> getedge(int tail, int head)
     {
         struct GetedgeResult<T> result;
-        struct ArcAdjlist<T> *now = _data[tail].firstarc;
+        struct ArcAdjlist<T> *now = data_[tail].firstarc;
         while (now && now->head != head)
             now = now->nextarc;
         if (now)
@@ -324,16 +359,16 @@ class GraphAdjlist : public Graph<T>
     bool
     haveedge(int vertex)
     {
-        return _data[vertex].firstarc != 0;
+        return data_[vertex].firstarc != 0;
     }
 
     int vertex()
     {
-        return _nvertex;
+        return nvertex_;
     }
 
-    int _nvertex;
-    struct PointAdjlist<T> *_data;
+    int nvertex_;
+    struct PointAdjlist<T> *data_;
 };
 
 //有向图的十字链表表示
@@ -364,19 +399,19 @@ class GraphOrthgonal : public Graph<T>
   public:
     GraphOrthgonal(int nvertix)
     {
-        _data = new struct PointOrthogonal<T>[nvertix];
-        _nvertex = nvertix;
+        data_ = new struct PointOrthogonal<T>[nvertix];
+        nvertex_ = nvertix;
         while (nvertix-- > 0)
         {
-            _data[nvertix].firsthead = 0;
-            _data[nvertix].firsttail = 0;
-            _data[nvertix].data = 0;
-            _data[nvertix].mark = 0;
+            data_[nvertix].firsthead = 0;
+            data_[nvertix].firsttail = 0;
+            data_[nvertix].data = 0;
+            data_[nvertix].mark = 0;
         }
     }
     ~GraphOrthgonal()
     {
-        delete[] _data;
+        delete[] data_;
     }
 
     int setedge(int tail, int head, T val)
@@ -387,11 +422,11 @@ class GraphOrthgonal : public Graph<T>
         p->tail = tail;
         p->head = head;
         p->mark = 0;
-        p->headarc = _data[head].firsthead;
-        p->tailarc = _data[tail].firsttail;
+        p->headarc = data_[head].firsthead;
+        p->tailarc = data_[tail].firsttail;
 
-        _data[tail].firsttail = p;
-        _data[head].firsthead = p;
+        data_[tail].firsttail = p;
+        data_[head].firsthead = p;
     }
 
     struct GetedgeResult<T> getedge(int tail, int head)
@@ -399,7 +434,7 @@ class GraphOrthgonal : public Graph<T>
         struct GetedgeResult<T> result;
         result.exist = true;
 
-        if (auto p = _data[tail].firsttail)
+        if (auto p = data_[tail].firsttail)
         {
             while (p && p->head != head)
             {
@@ -430,16 +465,16 @@ class GraphOrthgonal : public Graph<T>
     bool
     haveedge(int vertex)
     {
-        return _data[vertex].firsttail != 0;
+        return data_[vertex].firsttail != 0;
     }
 
     int vertex()
     {
-        return _nvertex;
+        return nvertex_;
     }
 
-    int _nvertex;
-    struct PointOrthogonal<T> *_data;
+    int nvertex_;
+    struct PointOrthogonal<T> *data_;
 };
 
 //邻接多重表单向图
@@ -470,18 +505,18 @@ class GraphAdjmullist : public Graph<T>
   public:
     GraphAdjmullist(int nvertix)
     {
-        _data = new struct PointAdjmullist<T>[nvertix];
-        _nvertex = nvertix;
+        data_ = new struct PointAdjmullist<T>[nvertix];
+        nvertex_ = nvertix;
         while (nvertix-- > 0)
         {
-            _data[nvertix].firstarc = 0;
-            _data[nvertix].data = 0;
-            _data[nvertix].mark = 0;
+            data_[nvertix].firstarc = 0;
+            data_[nvertix].data = 0;
+            data_[nvertix].mark = 0;
         }
     }
     ~GraphAdjmullist()
     {
-        delete[] _data;
+        delete[] data_;
     }
     int setedge(int tail, int head, T val)
     {
@@ -490,16 +525,16 @@ class GraphAdjmullist : public Graph<T>
         p->head = head;
         p->data = val;
         p->mark = 0;
-        p->headarc = _data[head].firstarc;
-        p->tailarc = _data[tail].firstarc;
-        _data[head].firstarc = p;
-        _data[tail].firstarc = p;
+        p->headarc = data_[head].firstarc;
+        p->tailarc = data_[tail].firstarc;
+        data_[head].firstarc = p;
+        data_[tail].firstarc = p;
     }
 
     struct GetedgeResult<T> getedge(int tail, int head)
     {
         struct GetedgeResult<T> result;
-        struct ArcAdjmullist<T> *now = _data[tail].firstarc;
+        struct ArcAdjmullist<T> *now = data_[tail].firstarc;
         while (now)
         {
 
@@ -531,16 +566,16 @@ class GraphAdjmullist : public Graph<T>
     bool
     haveedge(int vertex)
     {
-        return _data[vertex].firstarc != 0;
+        return data_[vertex].firstarc != 0;
     }
 
     int vertex()
     {
-        return _nvertex;
+        return nvertex_;
     }
 
-    int _nvertex;
-    struct PointAdjmullist<T> *_data;
+    int nvertex_;
+    struct PointAdjmullist<T> *data_;
 };
 
 //图算法定义----------------------------------------------------------------
@@ -603,10 +638,10 @@ std::vector<std::pair<int, int>> Prim(Graph<T> G, int src)
         throw("src out of range");
     std::set<int> S1;
     std::set<int> S2;
-    T distance[G._nvertex];
+    T distance[G.nvertex_];
     std::pair<int, int> p;
     std::vector<std::pair<int, int>> now;
-    char access[G._nvertex]; //0-> no access now 1-> have access now -1-> have been accessed
+    char access[G.nvertex_]; //0-> no access now 1-> have access now -1-> have been accessed
     T min;
     for (int i = 0; i < G.vertex(); i++)
     {
@@ -635,7 +670,7 @@ std::vector<std::pair<int, int>> Prim(Graph<T> G, int src)
     while (!S2.empty())
     {
         int minindex = -1;
-        for (int i = 0; i < G._nvertex; i++)
+        for (int i = 0; i < G.nvertex_; i++)
         {
             if (access[i] == 1)
             {
@@ -686,7 +721,7 @@ std::vector<std::pair<int, int>> Kruskal(Graph<T> G, int src)
     for (int a = 0; a < G.vertex(); a++)
         for (int b = 0; b < G.vertex(); b++)
         {
-            if (G.hasedge(a, b))
+            if (G.haveedge(a, b))
                 P.push(std::pair<int, int>(a, b));
         };
 
@@ -703,39 +738,47 @@ std::vector<std::pair<int, int>> Kruskal(Graph<T> G, int src)
     return result;
 }
 
-template <class T>
-int Tarjan(Graph<T> G, int root=0) //ArticulationPoint
+namespace GRAPH_TARJAN
 {
-    int low(int i)
-    {
-        //todo
-    };
+int low(int i){
+    //todo
+};
 
-    int min(int a, int b)
-    {
-        return (a < b) ? a:b;
-    }
+int min(int a, int b)
+{
+    return (a < b) ? a : b;
+}
+} // namespace GRAPH_TARJAN
+
+template <class T>
+int Tarjan(Graph<T> G, int root = 0) //ArticulationPoint
+{
+
+    using namespace GRAPH_TARJAN;
 
     int sequence[G.vertex()];
-    for (int i = 0; i < G.vertex();i++)
+    for (int i = 0; i < G.vertex(); i++)
     {
         sequence[i] = -1;
     }
     int cnt = 0;
     std::stack<int> S;
+    std::vector<int> result;
     S.push(root);
-    S.push(G.vertrx_around(t));
-    if(S.size()>1)
-        result.push(root);
+    S.push(G.vertrx_around(root));
+    if (S.size() > 1)
+        result.push_back(root);
+
+    //todo-----------------------------------------
     while (!S.empty())
     {
-        sequence[S.top()] = min();
-        if(cnt)>=low(G, S.top())
+        sequence[S.top()] = min(1, 111);
+        if (cnt >= low(G, S.top()))
         {
             result.push_back(S.top());
         }
         cnt++;
-        auto t=S.top();
+        auto t = S.top();
         S.pop();
         S.push(G.vertrx_around(t));
     }
@@ -746,7 +789,6 @@ int Tarjan(Graph<T> G, int root=0) //ArticulationPoint
 template <class T>
 bool isBiconnected(Graph<T> G)
 {
-
 }
 
 template <class T>
@@ -806,9 +848,9 @@ main()
     GraphAdjmullist<int> Q(5);
     Q.setedge(1, 2, 3);
     Q.setedge(0, 1, 2);
-    for (int j = 0; j < Q._nvertex; j++)
+    for (int j = 0; j < Q.nvertex_; j++)
     {
-        auto i = Q._data[j];
+        auto i = Q.data_[j];
         cout << i.firstarc << endl;
     }
     cout << Q.getedge(0, 1).data << endl;
