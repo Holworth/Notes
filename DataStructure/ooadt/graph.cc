@@ -216,7 +216,7 @@ class GraphArray : public Graph<T>
         int res = 0;
         for (int i = 0; i < nvertex_; i++)
         {
-            if (haveedge(i, vertex))
+            if (existedge(i, vertex))
                 res++;
         }
         return res;
@@ -226,7 +226,7 @@ class GraphArray : public Graph<T>
         int res = 0;
         for (int i = 0; i < nvertex_; i++)
         {
-            if (haveedge(vertex, i))
+            if (existedge(vertex, i))
                 res++;
         }
         return res;
@@ -584,7 +584,7 @@ class GraphAdjmullist : public Graph<T>
 
 #include <queue>
 template <class T>
-int BFS(Graph<T> G, int src, void func(T))
+int BFS(Graph<T> &G, int src, void func(T))
 {
     std::queue<int> Q;
     if (src >= G.vertex() || src < 0)
@@ -607,7 +607,7 @@ int BFS(Graph<T> G, int src, void func(T))
 
 #include <stack>
 template <class T>
-int DFS(Graph<T> G, int src, void func(T))
+int DFS(Graph<T> &G, int src, void func(T))
 {
     //先序DFS
     std::stack<int> S;
@@ -631,7 +631,7 @@ int DFS(Graph<T> G, int src, void func(T))
 
 #include <set>
 template <class T>
-std::vector<std::pair<int, int>> Prim(Graph<T> G, int src)
+std::vector<std::pair<int, int>> Prim(Graph<T> &G, int src)
 {
     //src is the point to start Algorithm Prim
     if (src < 0 || src >= G.vertex())
@@ -712,7 +712,7 @@ std::vector<std::pair<int, int>> Prim(Graph<T> G, int src)
 
 #include "tree" //import disjoint set
 template <class T>
-std::vector<std::pair<int, int>> Kruskal(Graph<T> G, int src)
+std::vector<std::pair<int, int>> Kruskal(Graph<T> &G, int src)
 {
     DisjointSet D(G.vertex());
     std::vector<std::pair<int, int>> result;
@@ -721,7 +721,7 @@ std::vector<std::pair<int, int>> Kruskal(Graph<T> G, int src)
     for (int a = 0; a < G.vertex(); a++)
         for (int b = 0; b < G.vertex(); b++)
         {
-            if (G.haveedge(a, b))
+            if (G.existedge(a, b))
                 P.push(std::pair<int, int>(a, b));
         };
 
@@ -740,79 +740,135 @@ std::vector<std::pair<int, int>> Kruskal(Graph<T> G, int src)
 
 namespace GRAPH_TARJAN
 {
-int low(int i){
-    //todo
-};
 
-int min(int a, int b)
+int min(std::vector<int> &V)
 {
-    return (a < b) ? a : b;
+    int min = V[0];
+    for (int i : V)
+    {
+        if (i < min)
+        {
+            min = i;
+        }
+    }
 }
+
+template <class T>
+int low(int a, Graph<T> &G, int *sequence, int *low, int &cnt, std::vector<int> &Q)
+{
+    ++cnt;
+    sequence[a] = cnt;
+    std::vector<int> V;
+    V.push_back(cnt);
+    auto M = G.vertex_around(a);
+    for (auto i : M)
+    {
+        //subnode
+        if (sequence[i] == -1)
+        {
+            V.push_back(low(i, G, sequence, low, cnt, Q));
+            if (sequence[i] >= cnt)
+            {
+                Q.push_back(a);
+            } //this is a articulation point
+        }
+        else
+        {
+            if (sequence[i] >= 0)
+            { //fathernode
+                V.push_back(sequence[i]);
+            }
+        }
+    };
+    low[a] = min(V);
+}
+
 } // namespace GRAPH_TARJAN
 
 template <class T>
-int Tarjan(Graph<T> G, int root = 0) //ArticulationPoint
+int Tarjan(Graph<T> &G, int root = 0) //ArticulationPoint
 {
-
+    //do remember this is a graph without direction.
     using namespace GRAPH_TARJAN;
 
     int sequence[G.vertex()];
+    int low[G.vertex()];
     for (int i = 0; i < G.vertex(); i++)
     {
         sequence[i] = -1;
     }
     int cnt = 0;
-    std::stack<int> S;
     std::vector<int> result;
-    S.push(root);
-    S.push(G.vertrx_around(root));
-    if (S.size() > 1)
-        result.push_back(root);
 
-    //todo-----------------------------------------
-    while (!S.empty())
+    auto W = G.vertex_around(root);
+    if (W.size() > 1)
+        result.push_back(root);
+    for (auto i : W)
     {
-        sequence[S.top()] = min(1, 111);
-        if (cnt >= low(G, S.top()))
-        {
-            result.push_back(S.top());
-        }
-        cnt++;
-        auto t = S.top();
-        S.pop();
-        S.push(G.vertrx_around(t));
+        low(i, G, sequence, low, cnt, result);
     }
+
     return result;
     //todo : low!
 }
 
 template <class T>
-bool isBiconnected(Graph<T> G)
+bool isBiconnected(Graph<T> &G)
 {
+    //the graph is biconnected
+    auto V= Tarjan(G);
+    return V.size() == 0;
 }
 
 template <class T>
-int TopologicalSort(Graph<T> G)
+std::vector<int> TopologicalSort(Graph<T> &G)
 {
+    std::vector<int> V;
     int indegree[G.vertex()];
     for (int i = 0; i < G.vertex(); i++)
     {
         indegree[i] = G.indegree(i);
     }
+    int p = G.vertex();
+    while (p-->0)
+    {
+        for (int i = 0; i < G.vertex(); i++)
+        {
+            if (indegree[i] == 0)
+            {
+                V.push_back(i);
+                auto S=G.vertex_around(i);
+                for(auto i: S)
+                {
+                    indegree[i]--;
+                }
+                break;
+            }
+        }
+
+    }
+    return V;
+}
+
+template <class T>
+bool haveRing(Graph<T> &G)
+{
+    return TopologicalSort(G).size() == G.vertex();
 }
 
 template <class T>
 std::vector<std::pair<int, int>> CriticalPath(Graph<T> G)
 {
+    
 }
 
 template <class T>
-std::vector<int> Dijkstra(Graph<T> G, int src, int dst)
+std::vector<int> Dijkstra(Graph<T> G, int src, int dst)//can not be used to deal witth graph with negative weight
 {
 }
 
 template <class T>
-std::vector<int> Flod(Graph<T> G, int src, int dst)
+std::vector<int> Ford(Graph<T> G, int src, int dst)//can deal with negative weight, and can also find negative circle
 {
 }
 

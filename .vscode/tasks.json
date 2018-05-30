@@ -1,8 +1,17 @@
 {
-    "version": "0.1.0",
+    "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "gcc",
+            "label": "sync",
+            "type": "shell",
+            "command": ".\\sync.bat",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "gcc",
             "command": "gcc",
             "args": [
                 "-g",
@@ -27,7 +36,7 @@
             }
         },
         {
-            "taskName": "g++",
+            "label": "g++",
             "command": "g++",
             "args": [
                 "-g",
