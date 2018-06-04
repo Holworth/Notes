@@ -120,6 +120,18 @@ class Graph
         throw("Vertex_around func undefined.");
     }
 
+    virtual int erase(int tail, int head)
+    {
+        std::cout << "erase func undefined." << std::endl;
+        throw("erase func undefined.");
+    }
+
+    virtual int erase(int vertex)
+    {
+        std::cout << "erase func undefined." << std::endl;
+        throw("erase func undefined.");
+    }
+
     virtual int print()
     {
         std::cout << "No print func assigned, use print array as default." << std::endl;
@@ -148,21 +160,28 @@ class Graph
         }
     }
 
-    friend bool operator<(const std::pair<int, int> e1, const std::pair<int, int> e2)
+    virtual T getvertex(int vertex)
     {
-        auto le1 = edge(e1.first, e1.second);
-        auto le2 = edge(e2.first, e2.second);
-        if (!le1.exist)
-        {
-            return false;
-        }
-        if (!le2.exist)
-        {
-            return true;
-        }
-
-        return le1.data < le2.data;
+        std::cout << "getvertex func undefined." << std::endl;
+        throw("getvertex func undefined.");
     }
+
+    // friend bool
+    // operator<(const std::pair<int, int> e1, const std::pair<int, int> e2)
+    // {
+    //     auto le1 = edge(e1.first, e1.second);
+    //     auto le2 = edge(e2.first, e2.second);
+    //     if (!le1.exist)
+    //     {
+    //         return false;
+    //     }
+    //     if (!le2.exist)
+    //     {
+    //         return true;
+    //     }
+
+    //     return le1.data < le2.data;
+    // }
     // int nvertex_;
 };
 
@@ -344,13 +363,29 @@ class GraphArray : public Graph<T>
         return result;
     }
 
+    virtual int erase(int tail, int head)
+    {
+        *(exist_ + tail * nvertex_ + head) = false;
+    }
+
+    virtual int erase(int vertex)
+    {
+        std::cout << "erase vertex cannot be used for array graph." << std::endl;
+        throw("erase vertex cannot be used for array graph.");
+    }
+
+    T getvertex(int vertex)
+    {
+        return data_[vertex];
+    }
+
     int nvertex_;
     T *data_;
     int *mark_;
     bool *exist_;
 };
 
-//有向图的邻接表表示
+//有向图的邻接表表示--------------------------------------------------------------------
 template <class T>
 struct ArcAdjlist
 {
@@ -388,6 +423,7 @@ class GraphAdjlist : public Graph<T>
     {
         delete[] data_;
     }
+
     int setedge(int tail, int head, T val)
     {
         struct ArcAdjlist<T> *now = new ArcAdjlist<T>;
@@ -423,19 +459,14 @@ class GraphAdjlist : public Graph<T>
         return data_[vertex].firstarc != 0;
     }
 
-    int setedge(int tail, int head)
-    {
-        auto t = new struct ArcAdjlist<T>;
-        t->nextarc = data_[tail].firstarc;
-        t->tail=tail;
-        t->head = head;
-        data_[tail].firstarc = t;
-        return 0;
-    }
-
     int vertex()
     {
         return nvertex_;
+    }
+
+    T getvertex(int vertex)
+    {
+        return data_[vertex].data ;
     }
 
     int nvertex_;
@@ -544,6 +575,11 @@ class GraphOrthgonal : public Graph<T>
         return nvertex_;
     }
 
+    T getvertex(int vertex)
+    {
+        return data_[vertex].data;
+    }
+
     int nvertex_;
     struct PointOrthogonal<T> *data_;
 };
@@ -643,6 +679,11 @@ class GraphAdjmullist : public Graph<T>
     int vertex()
     {
         return nvertex_;
+    }
+
+    T getvertex(int vertex)
+    {
+        return data_[vertex].data;
     }
 
     int nvertex_;

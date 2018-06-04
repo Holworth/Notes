@@ -42,7 +42,12 @@
         "cwctype": "cpp",
         "new": "cpp",
         "typeinfo": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "tree": "cpp",
+        "deque": "cpp",
+        "vector": "cpp",
+        "xstring": "cpp",
+        "xtree": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

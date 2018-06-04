@@ -11,6 +11,17 @@
             }
         },
         {
+            "label": "access-server",
+            "type": "shell",
+            "command": ".\\server-carch.bat"
+            
+        },
+        {
+            "label": "access-server-linux",
+            "type": "shell",
+            "command": ".\\server-carch.sh"
+        },
+        {
             "label": "gcc",
             "command": "gcc",
             "args": [
