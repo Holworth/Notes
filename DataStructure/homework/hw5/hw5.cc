@@ -357,6 +357,7 @@ void Algo7_42(GraphAdjlist<T> *G, int src)
 
 int main()
 {
+    LICENSE;
 
     //7-14
     L;
