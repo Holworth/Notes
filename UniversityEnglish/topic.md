@@ -64,6 +64,10 @@ Maybe?
 
 --
 
+### Esports
+
+--
+
 ### Ask for Siri
 
 * Siri will give a stupid answer, of course .......
@@ -81,6 +85,28 @@ OH, wait. I got a wonderful idea, yet I can not tell you right now. I will tell 
 ![aml.jpg](aml.jpg)
 
 ---
+
+* The two then talk about what other tricks they can use in the dialogue. This may last for one minute.
+
+1. How to Make Someone Feel Like an Old Friend at Once.
+1. How to Never Need to Wonder, “What Do I Say Next?”
+1. How to Give Them the Bad News (and Have Them Like You All the More).
+1. How to Be a Leader in a Crowd, Not a Follower   
+1. News
+1. Entrance
+1. Longer praise/agreement
+
+
+
+---
+
+## The end of the dialogue: Monologue
+
+I think that much is enought for the dialogue. Have you ever watched the famous TV series *the House of Cards*?
+
+No, why mention it?
+
+***
 
 Ok,it is 9:30, can you tell me what the wonderful topic you just thought out?
 
@@ -138,30 +164,7 @@ Emm……I don’t mean that, I think the topic is creative and other groups wil
 
 Yeah, ......
 
-* The two then talk about what other tricks they can use in the dialogue. This may last for one minute.
-
-1. How to Make Someone Feel Like an Old Friend at Once
-1. How to Never Need to Wonder, “What Do I Say Next?”
-1. How to Give Them the Bad News (and Have Them Like You All the More).
-1. How to Be a Leader in a Crowd, Not a Follower   
-
-
-
----
-
-## The end of the dialogue: Monologue
-
-I think that much is enought for the dialogue. Have you ever watched the famous TV series *the House of Cards*?
-
-No, why mention it?
-
-You know the president Underwood in the series will sometimes have an Monologue as if he is talking to the audiences in front of the screen.
-
-I think I got your idea.
-
-So who is going to do this first. Well, ladies first, please.
-
-* The two do a summary of the whole dialogue, and talk about why they finally decided to do this topic.
+***
 
 <!-- 拍这洗头水广告的时候，其实我是拒绝的。因为，你不能让我拍，我就马上去拍，第一我要试一下，因为我不愿意拍完了以后再加一些特技上去，头发“咣”一下，很亮、很柔，这样观众出来一定会骂我，根本没有这样的头发，就证明上面那个是假的。后来我也经过证实他们确实是中药的，我用了大概一个月左右，感觉还不错，后来我在拍的时候也要求他们不要加特技，因为我要让观众看到，我用完之后是这个样子，你们用完之后也会是这个样子！ -->
 
