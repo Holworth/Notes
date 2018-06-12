@@ -2892,3 +2892,48 @@ int main()
 
 # 9. 代码优化
 
+***
+
+# 10. ELF, 链接和库
+
+使用`readelf -h`来取得elf头相关信息.
+
+使用`readelf -S`来读取section table.
+
+使用`readelf -s`来读取symbol table.
+
+使用`hexdump -C`来读取二进制内容.
+
+使用`objdump -s`来取得.data.
+
+使用`objdump -d`来取得.text.
+
+使用`objdump -h`来取得.bss.
+
+`objdump`的功能很丰富, 可以查看目标对象的各种信息.
+
+使用`nm`可以看出示所有可以被外部引用或者引用外部的函数和变量. 其中T表示text；D和d表示data；b表示bss，C表示Common，U表示Undef.
+
+`nm`列出符号清单
+
+`ar`库文件操作
+
+`ps`查看当前进程快照.
+
+`pmap <PID>`查看进程空间.
+
+`ar -rs libmy.a output_str.o my_exit.o`创建静态库.
+
+创建动态链接库:
+
+`gcc -shared -o libvector.so addvec.c multvec.c`
+
+`ld -o libmy.so -shared output_str.o my_exit.o`
+
+`ld -o main -dynamic-linker /lib/ld-linux.so.2   main.o  ./libmy.so`
+
+编译runtime动态链接库
+
+`gcc -rdynamic -o dl_main dl_main.c -ldl`   
+
+## 附:top, free(查看cpu状态和内存状态)
