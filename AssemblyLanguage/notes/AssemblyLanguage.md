@@ -2896,7 +2896,7 @@ int main()
 
 # 10. ELF, 链接和库
 
-使用`readelf -h`来取得elf头相关信息.
+.使用`readelf -h`来取得elf头相关信息.
 
 使用`readelf -S`来读取section table.
 

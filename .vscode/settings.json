@@ -47,7 +47,10 @@
         "deque": "cpp",
         "vector": "cpp",
         "xstring": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "xutility": "cpp",
+        "list": "cpp",
+        "stack": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [
