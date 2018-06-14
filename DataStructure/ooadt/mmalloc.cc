@@ -1,3 +1,8 @@
+//OO_nvertexDT_Code Project
+//https://github.com/L-F-Z/ADT_Code
+//https://github.com/AugustusWillisWang/Notes/tree/master/DataStructure/ooadt
+//Developed by AugustusWillisWang
+
 // #include "dbg.h"
 #include <cstdlib>
 #include <iostream>
