@@ -1,0 +1,4 @@
+    mstack()
+    {
+        point = 0;
+    }

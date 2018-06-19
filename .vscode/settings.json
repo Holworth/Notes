@@ -53,7 +53,8 @@
         "stack": "cpp",
         "ios": "cpp",
         "xiosbase": "cpp",
-        "xtr1common": "cpp"
+        "xtr1common": "cpp",
+        "xlocnum": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

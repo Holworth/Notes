@@ -2937,3 +2937,86 @@ int main()
 `gcc -rdynamic -o dl_main dl_main.c -ldl`   
 
 ## 附:top, free(查看cpu状态和内存状态)
+
+***
+
+# 11. MIPS汇编
+
+参见MIPS汇编指令手册.
+
+在计算机组成原理实验的基础上加以补充.
+
+## LL与SC
+
+用于成对的原子操作. 用这两条指令来硬件实现锁的机制. 
+
+```
+MIPS32 (MIPS II)
+Format: SC rt, offset(base) 
+Purpose:
+To store a word to memory to complete an atomic read-modify-write
+Description: if atomic_update then memory[base+offset] <- rt, rt <- 1 else rt <- 0
+```
+
+## 定点乘法与除法
+
+乘法和除法指令产生乘数两倍长精度的结果，将结果放置在特殊寄存器HI和LO中。
+
+乘法将高位放置在HI，低位放置在LO，除法将商放置在LO，余数放置在HI中。
+
+## 条件转移指令
+
+```
+movn rd, rs, rt   : if(rt != 0) then rd <- rs
+movz
+......
+```
+
+条件转移指令可以把某些简单的分支指令转换为非分支指令，减少了由于分支指令导致的开销
+
+## 预取指令 - Prefetch
+
+两类预取指令，一种是寄存器加偏移量寻址`PREF`，一种是寄存器加寄存器寻址`PREFX`。
+
+预取指令试图把将来很可能要用到的数据预取到cache中的某一级中。
+
+## 协处理器
+
+### 协处理器0 - CP0
+
+> MIPS处理器的系统控制通过CP0来实现，称为系统控制协处理器
+
+> CP0提供处理器控制、内存管理 (MMU和TLB等) 和例外处理功能 
+
+> CP0指令通常是特权态指令，和处理器的实现相关，在处理器手册中进行描述
+
+### 浮点协处理器 - CP1
+
+存在浮点控制和状态寄存器- FCSR.
+
+> Coprocessor control register 31 Is the FCSR.
+> 1. 设置缺省的舍入模式.
+> 1. 选择性的开启浮点例外条件的陷阱(trap)
+> 1. 控制一些非规格化数处理选项.
+> 1. 报告最近执行的指令所引发的IEEE例外，以及累积的IEEE例外.
+> 1. 条件比较指令执行所设置的条件码结果
+
+## 浮点指令
+
+### LOAD, STORE, MOVE
+
+MOVE:在浮点control, float general reg, cpu general reg之间传输.
+
+### 浮点算术指令 XXX.fmt
+
+### 浮点格式转换指令 CVT.X.fmt
+
+浮点转定点/单双精度浮点转换.
+
+## MIPS通用寄存器分配
+
+![mipsreg.png](mipsreg.png)
+
+## MIPS ABI 32
+
+## MIPS ABI 64
