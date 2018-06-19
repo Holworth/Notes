@@ -3013,6 +3013,49 @@ MOVE:在浮点control, float general reg, cpu general reg之间传输.
 
 浮点转定点/单双精度浮点转换.
 
+### 浮点条件分支指令
+
+测试条件码，根据条件码中的值，决定是否跳转。
+浮点条件码是之前的浮点比较指令(C.cond.fmt)设置的。
+
+```
+BC1T offset //跳转若浮点条件码为真
+BC1F offset
+```
+
+## 特权态指令 (内核态)
+
+参见手册.
+
+## SYNC
+
+串行化指令`SYNC`(Synchronize Shared Memory)
+
+在多处理器系统中，load和store访问内存的顺序是非确定的，和处理器执行的顺序可能会不同。
+
+SYNC指令在执行的指令流中创建了一个点，这个点的分割，相关的load和store指令的序是确定的。
+也就是说在SYNC指令之前的load和store完成之后SYNC指令之后的load和store指令才能开始。
+
+## BREAK, SYSCALL, Tcc(TRAP) 例外和中断, 陷阱
+
+systemcall`SYSCALL`和breakpoint'BREAK' 指令，引起无条件例外 
+
+trap`Tcc`指令，基于所比较的结果引发条件例外
+
+## MIPS例外机制
+
+在内核态时，cp0寄存器能通过特殊指令进行访问.
+
+细节参见手册.
+
+## ERET 从例外返回
+
+MIPS对外部例外（中断）和陷阱（包括系统调用）的处理方式略有差别. 中断`ERET`后返回到引发中断的指令, 而TRAP`ERET`之后返回到下一条语句.
+
+
+
+
+
 ## MIPS通用寄存器分配
 
 ![mipsreg.png](mipsreg.png)
@@ -3020,3 +3063,33 @@ MOVE:在浮点control, float general reg, cpu general reg之间传输.
 ## MIPS ABI 32
 
 ## MIPS ABI 64
+
+## 大的常量
+
+lui指令用于存储16位的常量值到寄存器的高16位，和or指令配合使用，就能把32位的常量送到寄存器中
+
+## 大的跳转
+
+在条件分支指令中，分支指令也只能放下16位的偏移，左移2位，和PC相加形成PC相关的目标地址。跳转的范围在±128KB之内
+
+跳转指令jump (j)能规定26位的偏移，跳转的范围在256MB的范围。
+
+如果需要更多的位或者跳转范围，可以采用间接跳转-跳转到寄存器jump-register(jr)指令
+
+## 定点乘法转为移位
+
+## 异或操作的技巧
+
+### 异或判断符号位是否相同
+
+```
+xor $t0 $s0 $s1
+bgez $t0, tgt_offset
+```
+<!-- 
+### 异或进行寄存器交换
+
+```
+
+``` -->
+
