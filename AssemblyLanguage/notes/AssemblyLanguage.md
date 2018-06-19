@@ -3052,8 +3052,50 @@ trap`Tcc`指令，基于所比较的结果引发条件例外
 
 MIPS对外部例外（中断）和陷阱（包括系统调用）的处理方式略有差别. 中断`ERET`后返回到引发中断的指令, 而TRAP`ERET`之后返回到下一条语句.
 
+## MIPS汇编器指示
 
+```
+.text
+indicates that following items are stored in the user text segment, typically instructions
 
+.data
+indicates that following data items are stored in the data segment
+
+.globl sym
+declare that symbol sym is global and can be referenced from other files
+
+.word w1, …, wn
+store n 32-bit quantities in successive memory words
+
+.half h1, …, hn
+store n 16-bit quantities in successive memory halfwords
+
+.byte b1, …, bn
+store n 8-bit quantities in successive memory bytes
+
+.ascii str
+store the string in memory but do not null-terminate it
+
+strings are represented in double-quotes “str”
+special characters, eg. \n, \t, follow C convention
+
+.asciiz str
+store the string in memory and null-terminate it
+
+.float f1, …, fn
+store n floating point single precision numbers in successive memory locations
+
+.double d1, …, dn
+store n floating point double precision numbers in successive memory locations
+
+.space n
+reserves n successive bytes of space
+
+.align n
+align the next datum on a 2n byte boundary.
+For example, .align 2 aligns next value on a word boundary.
+.align 0 turns off automatic alignment of .half, .word, etc. till next .data directive
+```
 
 
 ## MIPS通用寄存器分配
@@ -3062,7 +3104,11 @@ MIPS对外部例外（中断）和陷阱（包括系统调用）的处理方式�
 
 ## MIPS ABI 32
 
+参见手册.
+
 ## MIPS ABI 64
+
+参见手册.
 
 ## 大的常量
 
@@ -3092,4 +3138,16 @@ bgez $t0, tgt_offset
 ```
 
 ``` -->
+## 循环语句实现
+
+## switch case 使用跳转表实现
+
+```
+jumptable: .word case1, case2, case3, case4
+......
+case1:
+case2:
+case3:
+case4:
+```
 
