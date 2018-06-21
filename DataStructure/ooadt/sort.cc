@@ -287,23 +287,38 @@ int merge_sort(T* src, int size)
     merge_sort_atom<T>(src, 0, size - 1,temp);
 }
 
-int main()
+template<class T>
+int radix_sort(T* src, int size)
 {
-    merge_sort<int>(test, 9);
-    printit<int>(test, 9);
-
-    heap_sort<int>(test, 9);
-    printit<int>(test, 9);
-
-    select_sort<int>(test, 9);
-    printit<int>(test, 9);
-
-    quick_sort<int>(test, 9);
-    printit<int>(test, 9);
-
-    bubble_sort<int>(test, 9);
-    printit<int>(test, 9);
-
-    insert_sort2<int>(test, 9);
-    printit<int>(test, 9);
+    // link table radix sort.
+    // use link table to save the data.
+    // use LSD: least significant digit first.
+    // for each possible value of key, set up a link head;
+    // do traverse, add element to according link head
+    // link each link head`
 }
+
+
+
+//test-------------------
+
+// int main()
+// {
+//     merge_sort<int>(test, 9);
+//     printit<int>(test, 9);
+
+//     heap_sort<int>(test, 9);
+//     printit<int>(test, 9);
+
+//     select_sort<int>(test, 9);
+//     printit<int>(test, 9);
+
+//     quick_sort<int>(test, 9);
+//     printit<int>(test, 9);
+
+//     bubble_sort<int>(test, 9);
+//     printit<int>(test, 9);
+
+//     insert_sort2<int>(test, 9);
+//     printit<int>(test, 9);
+// }
