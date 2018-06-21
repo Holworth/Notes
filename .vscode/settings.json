@@ -54,7 +54,9 @@
         "ios": "cpp",
         "xiosbase": "cpp",
         "xtr1common": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "map": "cpp",
+        "set": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [
