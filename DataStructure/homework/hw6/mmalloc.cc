@@ -1,8 +1,13 @@
-#include "graph.cc"
+//OO_nvertexDT_Code Project
+//https://github.com/L-F-Z/ADT_Code
+//https://github.com/AugustusWillisWang/Notes/tree/master/DataStructure/ooadt
+//Developed by AugustusWillisWang
+
+// #include "dbg.h"
+#include <cstdlib>
+#include <iostream>
 
 using namespace std;
-
-//8.13 试完成边界标志法和依首次适配策略进行分配相应的回收释放块的算法。
 
 typedef struct malloc_boundry_struct
 {
@@ -21,45 +26,110 @@ typedef struct malloc_boundry_struct
 
 typedef struct malloc_boundry_struct *Space;
 
+Space init_memory(int size)
+{
+    Space r = (Space)malloc(sizeof(int) * 4 * size);
+    r->last = 0;
+    r->next = 0;
+    r->tag = 0;
+    r->size = size;
+    foot(r)->head = r;
+    foot(r)->tag = 0;
+    return r;
+}
+
+//The memory is divided into a double link table. 
+
+Space malloc_firstmatch(int size, Space &memory)
+{
+    auto now = memory;
+
+    do
+    {
+        if (!now->tag)
+        {
+            int size_remain = now->size - size;
+            if (size_remain >= 3)
+            {
+                //new block
+                Space block_new = now + size;
+                block_new->tag = 0;
+                block_new->size = size_remain;
+                block_new->last = now;
+                block_new->next = now->next;
+                foot(block_new)->head = block_new;
+
+                //malloced block
+                now->size = size;
+                now->tag = 1;
+                now->next = block_new;
+                foot(now)->head = now;
+                foot(now)->tag = 1;
+
+                //return
+                memory = foot(now);
+                return now;
+            }
+            else if (size_remain >= 0)
+            {
+                //just use this block;
+                now->tag = 1;
+                foot(now)->tag = 1;
+                memory = now->next;
+                return now;
+            }
+            continue;
+        }
+        else
+            now = now->next;
+    } while (now != memory);
+    return nullptr;
+    //when using best malloc or worst malloc, a resort with complexity of O(n) should be added.
+}
+
+void* mmalloc(int size,Space &memory)
+{
+    //a size is 4*sizeof(int);
+    return (void *)malloc_firstmatch(size + 2, memory);
+}
+
 Space mfree(Space &memory)
 {
     //case 1: the only block
-    if (memory->last == memory)
+    if(memory->last==memory)
     {
         memory->tag = 0;
         return memory;
     }
 
     //case last is used
-    if (memory->last->tag)
+    if(memory->last->tag)
     {
 
         //case next is used
-        if (memory->next->tag)
-        { //this only
+        if(memory->next->tag)
+        {//this only
             memory->tag = 0;
             return memory;
-        }
-        else
-        //case last is unused
-        { //this and last
+        }else
+        //case last is unused 
+        {//this and last
             memory->last->size += memory->size;
             memory->last->next = memory->next;
 
             foot(memory)->tag = 0;
-            foot(memory)->head = memory->last;
+            foot(memory)->head= memory->last;
 
             memory->next->last = memory->last;
-            memory = memory->last;
-            return memory;
+             memory=memory->last;
+             return memory;
         }
-    }
-    else
+    }else
     //case next is unused
     {
-        if (memory->last->tag)
+        if(memory->last->tag)
         //case last is used
-        { //this and next merged
+        {//this and next merged
             memory->next->next->last = memory;
 
             memory->size += memory->next->size;
@@ -70,10 +140,9 @@ Space mfree(Space &memory)
             foot(memory)->head = memory;
 
             return memory;
-        }
-        else
+        }else
         //case last is unused
-        { //this last and next is merged
+        {//this last and next is merged
             memory->last->size += memory->size;
             memory->last->size += memory->next->size;
 
@@ -90,12 +159,14 @@ Space mfree(Space &memory)
     return nullptr;
 }
 
-#include <vector>
+//8.14 试完成伙伴管理系统的存储回收算法。
 
-struct buddy_node
+#include<vector>
+
+    struct buddy_node
 {
-    struct buddy_node *last;
-    struct buddy_node *next;
+    struct buddy_node* last;
+    struct buddy_node* next;
     int tag;
     int size;
 };
@@ -103,16 +174,16 @@ struct buddy_node
 struct buddy_table
 {
     int size;
-    struct buddy_node *baseptr;
+    struct buddy_node* baseptr;
     vector<struct buddy_node *> list;
 };
 
-#include <algorithm>
-#include <cmath>
+#include<algorithm>
+#include<cmath>
 
 int fastpow(int base, int index)
 {
-    if (!index)
+    if(!index)
         return 1;
     int sigindex = index & 1;
     int temp = base;
@@ -121,19 +192,19 @@ int fastpow(int base, int index)
         index >>= 1;
         temp *= temp;
     }
-    if (sigindex)
+    if(sigindex)
         return temp * base;
     return temp;
 }
 
 struct buddy_table init_buddy_system(int size)
 {
-    auto r = (struct buddy_node *)malloc(fastpow(2, size) * sizeof(buddy_node));
-    if (r)
+    auto r = (struct buddy_node *)malloc(fastpow(2, size)*sizeof(buddy_node));
+    if(r)
     {
         struct buddy_table result;
         result.size = size;
-        while (size-- > 0)
+        while(size-->0)
         {
             result.list.push_back(nullptr);
         }
@@ -147,9 +218,9 @@ struct buddy_table init_buddy_system(int size)
 struct buddy_node *malloc_buddy(int size, struct buddy_table &buddy_table)
 {
     //there is an error in the book's code, the inserting process for the remain block in ti the blank table is wrong.
-    if (size > buddy_table.size)
+    if(size>buddy_table.size)
         return nullptr;
-    if (buddy_table.list[size])
+    if(buddy_table.list[size])
     {
         auto a = buddy_table.list[size];
         if (buddy_table.list[size]->next == buddy_table.list[size])
@@ -162,10 +233,10 @@ struct buddy_node *malloc_buddy(int size, struct buddy_table &buddy_table)
         }
         return a;
     }
-    if (size < buddy_table.size)
+    if(size<buddy_table.size)
     {
         struct buddy_node *result;
-        if (result = malloc_buddy(size, buddy_table))
+        if (result=malloc_buddy(size, buddy_table))
         {
             //use the first half;
             int realsize = fastpow(2, size);
@@ -181,7 +252,7 @@ struct buddy_node *malloc_buddy(int size, struct buddy_table &buddy_table)
             result->next->tag = 0;
 
             //add the other half to the table;
-            if (buddy_table.list[size])
+            if(buddy_table.list[size])
             {
                 result->next->next = buddy_table.list[size];
                 result->next->last = buddy_table.list[size];
@@ -199,7 +270,7 @@ struct buddy_node *malloc_buddy(int size, struct buddy_table &buddy_table)
     return nullptr;
 }
 
-struct buddy_node *merge_buddy(struct buddy_node *tgt, struct buddy_table buddy_table)
+struct buddy_node* merge_buddy(struct buddy_node* tgt, struct buddy_table buddy_table)
 {
     //merge two node with the same size and tag == 0;
     //return the point of merged node;
@@ -213,15 +284,15 @@ struct buddy_node *merge_buddy(struct buddy_node *tgt, struct buddy_table buddy_
     if (p)
     {
         //this is upper half;
-        buddy = tgt + fastpow(2, tgt->size);
+        buddy=tgt+fastpow(2,tgt->size);
     }
     else
     {
         //this is the back half
-        buddy = tgt - fastpow(2, tgt->size);
+        buddy=tgt-fastpow(2,tgt->size);
     }
 
-    if (tgt->tag || buddy->tag)
+    if(tgt->tag||buddy->tag)
     {
         return nullptr;
     }
@@ -239,7 +310,7 @@ struct buddy_node *merge_buddy(struct buddy_node *tgt, struct buddy_table buddy_
     }
 
     //del buddy
-    if (buddy->next == buddy)
+    if(buddy->next == buddy)
     {
         buddy_table.list[buddy->size] = nullptr;
     }
@@ -252,16 +323,15 @@ struct buddy_node *merge_buddy(struct buddy_node *tgt, struct buddy_table buddy_
     //merge
     struct buddy_node *head = (struct buddy_node *)(p - rsize % fastpow(2, tgt->size + 1));
     head->tag = 0;
-    head->size = tgt->size + 1;
+    head->size = tgt->size+1;
 
     //add merge result
-    if (buddy_table.list[head->size])
+    if(buddy_table.list[head->size])
     {
         head->last = buddy_table.list[head->size];
         head->next = buddy_table.list[head->size]->next;
         buddy_table.list[head->size]->next = head;
-    }
-    else
+    }else
     {
         buddy_table.list[head->size] = head;
         head->next = head;
@@ -271,51 +341,24 @@ struct buddy_node *merge_buddy(struct buddy_node *tgt, struct buddy_table buddy_
     return head;
 }
 
-struct buddy_node *free_buddy(struct buddy_node *tgt, struct buddy_table &table)
+struct buddy_node* free_buddy(struct buddy_node* tgt, struct buddy_table& table)
 {
     tgt->tag = 0;
-    while (tgt = merge_buddy(tgt, table))
+    while(tgt=merge_buddy(tgt,table))
     {
         //loop;
     }
     return tgt;
 }
 
-//8.15 设被管理空间的上下界地址分别由变量highbound和lowbound给出，形成一个由同样大小的块组成的“堆”。试写一个算法，将所有tag域的值为0的块按始址递增顺序链接成一个可利用空间表（设块大小域为cellsize）。
-
-// void *highbound;
-// void *lowbound;
-// #define cellsize 1000
-// #define headsize 2
-
-struct block_head
-{
-    // int size;
-    int tag;
-    // struct block_head *last;//
-    struct block_head *next;
-}
-
 int
-algo_8_15(struct block_head *highbound, struct block_head *lowbound, int cellsize)
+main()
 {
-    struct block_head *before = 0;
-    int i = 0;
-    struct block_head *now = (struct block_head *)(lowbound + i * cellsize);
-    while((int)now<highbound)
-    {
-        if(!now->tag)
-        {
-            now->last = before;
-            before = now;
-        }
-        i++;
-    }
-    while(lowbound->tag&&lowbound<highbound)
-    {
-        lowbound += cellsize;
-    }
-    if(lowbound==highbound)
-        return 0;
-    return lowbound;
+    auto memory = init_memory(400);
+    auto p=malloc_firstmatch(200,memory);
+    auto b = init_buddy_system(10);
+
 }
+
+//did not work on garbage collect and storage shrink.
+//have not been tested
