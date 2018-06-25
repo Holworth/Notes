@@ -576,4 +576,61 @@ int insert_bintree(bintree* &root, int val)
 
 ## 9.42 假设Trie树上叶子结点的最大层次为h，同义词放在同一叶子结点中，试写在Trie树中插入一个关键字的算法。
 
+伪代码实现:
+
+使用的函数基于search.cc
+
+```c 
+int add_to_trie(trietree* t, int h, char* word)
+{
+    char* head=word;
+    while(*word!=0&&h>0)
+    {
+        if(t->exist(*word))
+        {
+            t=t->next(*word);
+            h--;
+        }
+    }
+    {
+        t->addword(head);
+    }
+}
+```
+
 ## 9.43 同9.42的假设，试写在Trie树中删除一个关键字的算法。
+
+伪代码实现:
+
+```c 
+int del_in_trie(trietree* &t, int h, char* word, char* wordhead)
+{
+    while(*word!=0&&h>0)
+    {
+        if(t->exist(*word))
+        {
+            if(del_in_trie(t,h-1,word+1,wordhead))
+            {
+                t->delword(wordhead);
+                if(t->empty())
+                {
+                    delete t;
+                    t=0;
+                    return 1;
+                }            
+            }
+        }
+    }
+    if(!*word||h==0)
+    {
+        t->delword(wordhead);
+        if(t->empty())
+        {
+            delete t;
+            t=0;
+            return 1;
+        }
+    }
+    return 0;
+}
+```
