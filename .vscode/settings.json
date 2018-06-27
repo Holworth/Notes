@@ -56,7 +56,8 @@
         "xtr1common": "cpp",
         "xlocnum": "cpp",
         "map": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "xlocale": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [
