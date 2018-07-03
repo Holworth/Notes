@@ -3172,3 +3172,149 @@ case2:
 case3:
 case4:
 ```
+
+***
+
+# 12. MAKEFILE
+
+文件名：Makefile
+
+RULE
+
+* Target : 编译目标，通常是文件名
+* Prerequisites：Target所依赖的文件
+* Recipe：编译动作 : Put a tap character at the beginning of every recipe line
+* Variable:可重复替换的字符串, 如`CC=gcc`, 使用时使用`$(CC)`
+
+```makefile
+target...: prerequisites ...
+    command（指令）
+```
+
+执行:`make`->生成makefile的第一个target
+
+```
+make -f file  goal
+make -f my.mk all
+```
+
+```
+CC = gcc
+a.o:a.c
+	$(CC) -c -o  $@  $<
+```
+
+> 反斜杠（\）是换行符的意思。这样比较便于Makefile的易读
+
+> 在定义好依赖关系后，后续的那一行定义了如何生成目标文件的操作系统命令，一定要以一个Tab键作为开头。记住，make并不管命令是怎么工作的，他只管执行所定义的命令。make会比较targets文件和prerequisites文件的修改日期，如果prerequisites文件的日期要比targets文件的日期要新，或者target不存在的话，那么，make就会执行后续定义的命令
+
+```
+每个Makefile中都应该写一个清空目标文件（.o和执行文件）的规则，这不仅便于重编译，也很利于保持文件的清洁。一般的风格都是：
+
+       clean:
+
+           rmedit $(objects)
+
+更为稳健的做法是：
+
+       .PHONY : clean
+
+       clean:
+
+               -rmedit $(objects)
+
+前面说过，.PHONY意思表示clean是一个“伪目标”。而在rm命令前面加了一个小减号的意思就是，也许某些文件出现问题，但不要管，继续做后面的事。当然，clean的规则不要放在文件的开头，不然，这就会变成make的默认目标，相信谁也不愿意这样。不成文的规矩是——“clean从来都是放在文件的最后”
+```
+
+* Makefile中只有行注释，和UNIX的Shell脚本一样，其注释是用“#”字符，这个就像C/C++中的“//”一样。如果你要在你的Makefile中使用“#”字符，可以用反斜框进行转义，如：“\#”
+
+* 在Makefile使用include关键字可以把别的Makefile包含进来，这很像C语言的#include，被包含的文件会原模原样的放在当前文件的包含位置。include的语法是：
+
+    include<filename>
+
+***
+
+# 13. Ld script
+
+将链接时的命令集中在一个文件中执行
+
+    ld -T ld.script
+
+参考 https://sourceware.org/binutils/docs/ld/index.html
+
+***
+
+# 14. 中断和启动
+
+## IRET—Interrupt Return
+
+指令格式（Intel）
+
+    IRET
+
+语义:从中断处理程序返回被中断的程序
+
+    POP eip, cs, eflags
+
+中断处理程序:
+```
+Inthandler：
+	保存寄存器
+	中断处理程序主体
+	恢复寄存器
+	iret
+```
+
+## CLI：clear interrupt flag
+
+指令格式： 
+    
+    CLI
+
+语义：禁止中断, 中断标志置1
+
+## STI：set interrupt flag
+
+指令格式：
+
+    STI
+
+语义：允许中断, 中断标志置0
+
+## 修改int 0x30中断向量
+
+```x86asm
+next:
+        cli # 中断标志置1
+        xorw    %bx, %bx
+        movw    %bx, %ds
+        movw    $0x0c0, %bx # bx记录中断表位置30
+        movw    $inthandler - _boot, (%bx) # 将新的中断处理程序的偏移地址写入中断表
+        movw    %ax, 2(%bx) # ?
+        sti # 中断标志置0
+```
+
+## .org 补齐大小
+
+```
+msg1:
+        .asciz "Setup.S\r\n"
+
+        /* Pad setup to the proper size */
+        .org    (SETUPSECS*512)
+```
+
+***
+
+# 15. 期末拾遗
+
+## 间接地址跳转或调用加*
+
+    CALL		*%eax
+    JMP		*(%eax)
+
+## CMOV节省指令条数
+
+## Linux ABI32 函数调用
+
+如果调用函数没有保存寄存器, 第一个参数的位置在`4(%esp)`
