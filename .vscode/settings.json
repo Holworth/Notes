@@ -57,7 +57,8 @@
         "xlocnum": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "xlocale": "cpp"
+        "xlocale": "cpp",
+        "xlocmon": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

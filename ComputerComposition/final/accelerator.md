@@ -132,8 +132,9 @@ Example: ReLU(Rectified Linear Unit) function
 <!-- 面向不同平台优化访存 -->
 
 <!-- 1-2min -->
+<!-- (rolling,tiling) -->
 
-1. Optimize memory access
+1. Optimize memory access 
 1. Lower the amount of calculation
 
 > 这里应该是一段屎一样的代码
@@ -269,6 +270,7 @@ weight buffer:
 > Exploiting the locality of outputs
 > 1. Dedicated registers
 > 1. Circular  buffer
+
 ---
 
 ## Appendix
