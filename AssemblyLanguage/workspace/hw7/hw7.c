@@ -113,5 +113,5 @@ int readint2(char* the_buffer)
 int main()
 {
     printf("%d\n", readint());
-    printf("%d\n", readint2());
+    printf("%d\n", readint2(buffer));
 }
