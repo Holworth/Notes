@@ -103,10 +103,10 @@ __asm__(
 int readint2(char* the_buffer)
 { 
     __asm__(
-        "movl $0,%%rax\n"
-        "movl $1,%%rdi\n"
-        "movl %0,%%rsi\n"
-        "movl $16,%%rdx\n"
+        "mov $0,%%rax\n"
+        "mov $1,%%rdi\n"
+        "mov %0,%%rsi\n"
+        "mov $16,%%rdx\n"
         "syscall\n"::"r" (the_buffer)
         :"rax","rdx","rdi","rsi"
     );
