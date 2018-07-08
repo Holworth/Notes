@@ -85,10 +85,10 @@ __asm__(
     "#not end yet\n"
     "accumulate:\n"
     "inc %ecx\n"
-    "push %rcx\n"
-    "mov $10,%rcx\n"
-    "imul %rcx\n"
-    "pop %rcx\n"
+    "push %ecx\n"
+    "mov $10,%ecx\n"
+    "imul %ecx\n"
+    "pop %ecx\n"
     "#%eax*=10\n"
     "add (%ecx),%eax\n"
     "sub $'0',%eax\n"
@@ -102,10 +102,10 @@ __asm__(
 int readint2(char* the_buffer)
 { 
     __asm__(
-        "mov $3,%%eax\n"
-        "mov $1,%%ebx\n"
-        "mov %0,%%ecx\n"
-        "mov $16,%%edx\n"
+        "movl $3,%%eax\n"
+        "movl $1,%%ebx\n"
+        "movl %0,%%ecx\n"
+        "movl $16,%%edx\n"
         "int $0x80\n"::"r" (the_buffer)
         :"eax","ebx","ecx","edx"
     );
