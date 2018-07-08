@@ -95,6 +95,7 @@ __asm__(
     "sub $'0',%rax\n"
     "jmp numstart\n"
     "end:\n"
+    "ret\n"
     // "pop %edi\n"
     // "pop %esi\n"
     // "pop %ebx\n"
