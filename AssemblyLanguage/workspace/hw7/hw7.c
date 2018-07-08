@@ -53,8 +53,8 @@ __asm__(
 "mov buffer,%ecx\n"
 "#buffer* is in ecx\n"
 "mov %eax, %ebx\n"
-"mov $0 %eax\n"
-"mov $0 %edx\n"
+"mov $0,%eax\n"
+"mov $0,%edx\n"
 "#%ebx as str length\n"
 "#%esi as sign\n"
 "mov $0,%esi\n"
@@ -85,7 +85,7 @@ __asm__(
 "#not end yet\n"
 "accumulate:\n"
 "inc %ecx\n"
-"mul $10\n"
+"imul $10\n"
 "#%eax*=10\n"
 "add (%ecx),%eax\n"
 "sub $'0',%eax\n"
@@ -104,7 +104,7 @@ int readint2(char* the_buffer)
         "mov %0,%%ecx"
         "mov $16,%%edx\n"
         "int $0x80\n"::"r" (the_buffer)
-        "eax","ebx","ecx","edx"
+        :"eax","ebx","ecx","edx"
     );
     return atoi(the_buffer);
 }

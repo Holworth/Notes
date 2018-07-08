@@ -53,8 +53,8 @@ int $0x80
 mov buffer,%ecx
 #buffer* is in ecx
 mov %eax, %ebx
-mov $0 %eax
-mov $0 %edx
+mov $0,%eax
+mov $0,%edx
 #%ebx as str length
 #%esi as sign
 mov $0,%esi
@@ -87,7 +87,7 @@ ja end
 #not end yet
 accumulate:
 inc %ecx
-mul $10
+imul $10
 #%eax*=10
 add (%ecx),%eax
 sub $'0',%eax
