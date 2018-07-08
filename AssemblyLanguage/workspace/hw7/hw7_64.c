@@ -68,6 +68,7 @@ __asm__(
     "je positive\n"
     "cmp $'-',%dl\n"
     "je negative\n"
+    "jmp numstart\n"
     "positive:\n"
     "mov $1,%rsi\n"
     "inc %rcx\n"
