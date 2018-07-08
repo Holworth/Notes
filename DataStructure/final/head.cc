@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <cstdlib>
 
 using namespace std;
 
@@ -12,9 +13,12 @@ using namespace std;
 #define MAXCOST 50000     //50000 RMB
 #define MAXSWITCH 10      //10 switches
 
+#define FAILED -2
+#define RETURNED -1
+#define NORMALLY_ENDED 0
+
 enum weekdays
 {
-    daily,
     mon,
     tue,
     wen,
@@ -64,7 +68,8 @@ class Time
         hour_ = src.hour_;
         min_ = src.min_;
     }
-    Time operator=(Time src)
+
+    Time operator=(Time &src)
     {
         type_ = src.type_;
         day_ = src.day_;
@@ -75,22 +80,52 @@ class Time
 
     int operator-(Time &b)
     {
+        int min_a;
+        int min_b;
         if (type_ == daily)
         {
-            if (b.type_ == daily)
+            if (b.type_ == daily) //daily-daily
             {
+                min_a = hour_ * 60 + min_;
+                min_b = b.hour_ * 60 + min_;
+                if (min_a > min_b)
+                    return min_a - min_b;
+                else
+                    return min_a + 60 * 24 - min_b;
             }
             else
             {
+                //daily-weekly
+                //the same as above
+                min_a = hour_ * 60 + min_;
+                min_b = b.hour_ * 60 + min_;
+                if (min_a > min_b)
+                    return min_a - min_b;
+                else
+                    return min_a + 60 * 24 - min_b;
             }
         }
         else
         {
             if (b.type_ == daily)
             {
+                //weekly - daily
+                //the same as above
+                min_a = hour_ * 60 + min_;
+                min_b = b.hour_ * 60 + min_;
+                if (min_a > min_b)
+                    return min_a - min_b;
+                else
+                    return min_a + 60 * 24 - min_b;
             }
-            else
+            else //weekly-weekly
             {
+                min_a = day_ * 60 * 24 + hour_ * 60 + min_;
+                min_b = b.day_ * 60 * 24 + b.hour_ * 60 + min_;
+                if (min_a > min_b)
+                    return min_a - min_b;
+                else
+                    return min_a + 7 * 60 * 24 - min_b;
             }
         }
     }
@@ -133,7 +168,12 @@ class Time
         }
     }
 
-    time_type type_;
+    friend ostream &operator<<(ostream &out, Time &time);
+    friend istream &operator>>(istream &in, Time &time);
+    int interactive_input();
+
+    // time_type type_;
+    int type_;
 
     int day_;
     int hour_;
@@ -143,10 +183,15 @@ class Time
 class Trans
 {
   public:
+    Trans()
+    {
+        next_ = 0;
+    }
+
     Trans(int src, int tgt, type_of_trans type, Time &time_leave, Time &time_arrive, double cost, string nor)
     {
         src_ = src;
-        src_ = tgt;
+        tgt_ = tgt;
         cost_ = cost;
         time_leave_ = time_leave;
         time_arrive_ = time_arrive;
@@ -155,11 +200,24 @@ class Trans
         nor_ = nor;
     }
 
+    //io functions
+    // string str();
+
+    friend ostream &operator<<(ostream &out, class Trans trans);
+    friend istream &operator>>(istream &in, class Trans trans);
+
+    inline bool is_suitable_way(int way);
+
+    int interactive_input();
+
+    //data struct
+
     // class City *psrc_; //出发城市指针
     // class City *ptgt_; //到达城市指针
     int src_; //出发城市
     int tgt_; //到达城市
-    type_of_trans type_;
+    // type_of_trans type_;
+    int type_;
 
     int duration_;
     double cost_;
@@ -197,13 +255,61 @@ class City
             {
                 //Already exists.
                 cout << "This run/flight already exists! Add run/flight failed\n";
-                return -1;
+                return -2;
             }
             ptrans = ptrans->next_;
             pptrans = &ptrans->next_;
         }
         (*pptrans) = new Trans(src, tgt, type, time_leave, time_arrive, cost, nor);
         return 0;
+    }
+
+    int add_path(Trans *t)
+    {
+        class Trans *ptrans = trans_;
+        class Trans **pptrans = &trans_;
+        while (ptrans)
+        {
+            //Check if the path already exists.
+            //TODO
+            if (ptrans->nor_ == t->nor_)
+            {
+                //Already exists.
+                cout << "This run/flight already exists! Add run/flight failed\n";
+                return FAILED;
+            }
+            ptrans = ptrans->next_;
+            pptrans = &ptrans->next_;
+        }
+        (*pptrans) = t;
+        return 0;
+    }
+
+    int delete_path(string nor = "")
+    {
+        if (nor == "")
+        {
+            cout << "Please input the Number of Flight/Run (NOR):";
+            cin >> nor;
+        }
+        class Trans *ptrans = trans_;
+        class Trans **pptrans = &trans_;
+        while (ptrans)
+        {
+            //Check if the path already exists.
+            //TODO
+            if (ptrans->nor_ == nor)
+            {
+                //Already exists.
+                (*pptrans) = ptrans->next_;
+                delete ptrans;
+                return 0;
+            }
+            ptrans = ptrans->next_;
+            pptrans = &ptrans->next_;
+        }
+        cout << "Run/Flight " << nor << " does not exist\n";
+        return -1;
     }
 };
 
@@ -226,7 +332,7 @@ int add_city(string name = "")
             if (!city_list[i].deleted_)
             {
                 cout << "City " << name << " already exists. Add city failed.\n";
-                return -1;
+                return FAILED;
             }
             else
             {
@@ -324,9 +430,56 @@ int add_path(string src_s, string tgt_s, type_of_trans type, Time &time_leave, T
     return city_list[src].add_path(src, tgt, type, time_leave, time_arrive, cost, nor);
 }
 
-int delete_path(string nor)
+int add_path()
 {
-    //TODO
+    Trans *temp = new Trans;
+    if (temp->interactive_input() == RETURNED)
+    {
+        delete temp;
+        return RETURNED;
+    }
+    else
+    {
+        if (city_list[temp->src_].add_path(temp) == FAILED)
+        {
+            delete temp;
+            return FAILED;
+        }
+    }
+    return 0;
+}
+
+int delete_path(string nor = "")
+{
+    if (nor == "")
+    {
+        cout << "Please input the Number of Flight/Run (NOR):";
+        cin >> nor;
+    }
+    int size = city_list.size();
+    for (int i = 0; i < size; i++)
+    {
+        if (!city_list[i].deleted_)
+        {
+            class Trans *ptrans = city_list[i].trans_;
+            class Trans **pptrans = &city_list[i].trans_;
+            while (ptrans)
+            {
+                //Check if the path already exists.
+                if (ptrans->nor_ == nor)
+                {
+                    //Already exists.
+                    (*pptrans) = ptrans->next_;
+                    delete ptrans;
+                    return 0;
+                }
+                ptrans = ptrans->next_;
+                pptrans = &ptrans->next_;
+            }
+        }
+    }
+    cout << "Run/Flight " << nor << " does not exist\n";
+    return -1;
 }
 
 int delete_path(string src_s, string tgt_s, string nor)
@@ -342,10 +495,13 @@ int delete_path(string src_s, string tgt_s, string nor)
             {
                 (*pp) = p->next_;
                 delete p;
+                return 0;
             }
             pp = &p->next_;
             p = p->next_;
         }
+        cout << "Run/Flight " << nor << " does not exist\n";
+        return -1;
     }
     else
     {
