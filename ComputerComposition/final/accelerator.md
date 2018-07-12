@@ -1,4 +1,4 @@
-# Brief introduction for DNN acceleration
+# Brief introduction  DNN acceleration
 
 深度神经网络及其加速技术概论
 
@@ -279,12 +279,28 @@ weight buffer:
 
 1. SIMD 单指令流多数据流
 1. Amdahl’s law effect
+1. eDRAM
 
 <!-- 利用Amdahl定律，可以计算出通过改进计算机某一部分而能获得的性能增益。Amdahl定律表明，使用某种快速执行模式获得的性能改进受限于可使用此种快速执行方式的时间比例 -->
 
 --
 
 ## 内存传输: 制约加速效果的瓶颈
+
+--
+
+## 前沿进展及补充
+
+DianNao及后续工作
+
+* DaDianNao
+* ShiDianNao
+* DianNaoYu
+
+<!-- * 近传感器加速芯片 -->
+<!-- * Cambricon -->
+
+CUDA(GPUacc)
 
 ---
 

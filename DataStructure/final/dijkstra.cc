@@ -1,9 +1,9 @@
 #include "head.cc"
-#include<iostream>
+#include <iostream>
 
 using namespace std;
 
-inline bool Trans::is_suitable_way(int way)
+inline bool Trans::is_suitable_way(int way)//检查交通工具类别（列车、飞机）是否满足用户要求
 {
     // 1. Train only
     // 2. Plane only
@@ -23,10 +23,10 @@ inline bool Trans::is_suitable_way(int way)
     }
 }
 
-class Dijkstra
+class Dijkstra//最短路径算法计算引擎
 {
   public:
-    Dijkstra()
+    Dijkstra()//按城市列表大小初始化算法所需孔间
     {
         size = city_list.size();
         duration_ = new int[size];
@@ -53,6 +53,12 @@ class Dijkstra
     int update_data()
     {
         size = city_list.size();
+        delete[] duration_;
+        delete[] cost_;
+        delete[] switch_;
+        delete[] last_;
+        delete[] trans_;
+        delete[] accessed;        
         duration_ = new int[size];
         cost_ = new double[size];
         switch_ = new int[size];
@@ -76,14 +82,18 @@ class Dijkstra
 
     ~Dijkstra()
     {
-        delete[] switch_;
-        delete[] cost_;
         delete[] duration_;
+        delete[] cost_;
+        delete[] switch_;
+        delete[] last_;
+        delete[] trans_;
+        delete[] accessed;
     }
 
-    int fastest();
-    int cheapest();
-    int coziest();
+    int fastest();//从上车到下车的最快路径
+    int fastest_advanced();//考虑从当前时间到到达目的地的最快路径。
+    int cheapest();//耗费最少路径
+    int coziest();//换乘最少路径
     int interactive_lookup();
     int show_result();
 
@@ -112,9 +122,8 @@ class Dijkstra
     int mode;
 };
 
-int Dijkstra::cheapest()
+int Dijkstra::cheapest()//选取价格最低的路线
 {
-    //TODO
     //The 1st step;
     class Trans *ptrans = city_list[src].trans_;
 
@@ -125,8 +134,8 @@ int Dijkstra::cheapest()
             cost_[ptrans->tgt_] = ptrans->cost_;
             trans_[ptrans->tgt_] = ptrans;
             last_[ptrans->tgt_] = ptrans->src_;
-            ptrans = ptrans->next_;
         }
+        ptrans = ptrans->next_;
     }
 
     accessed[src] = 1;
@@ -149,14 +158,14 @@ int Dijkstra::cheapest()
                 }
             }
         }
-        if (min == -1)
+        if (min_position == -1)
         {
             //There is no other path
             break;
         }
-
+        accessed[min_position] = 1;
         //Relaxation
-        ptrans = city_list[min].trans_;
+        ptrans = city_list[min_position].trans_;
 
         while (ptrans)
         {
@@ -182,13 +191,17 @@ int Dijkstra::fastest()
 
     while (ptrans)
     {
-        if ((!city_list[ptrans->tgt_].deleted_) && (ptrans->is_suitable_way(way)))
+        if ((!accessed[ptrans->tgt_]) && (!city_list[ptrans->tgt_].deleted_) && (ptrans->is_suitable_way(way)))
         {
-            duration_[ptrans->tgt_] = ptrans->duration_;
-            trans_[ptrans->tgt_] = ptrans;
-            last_[ptrans->tgt_] = ptrans->src_;
-            ptrans = ptrans->next_;
+            if(ptrans->duration_<duration_[ptrans->tgt_])
+            {
+                duration_[ptrans->tgt_] = ptrans->duration_;
+                trans_[ptrans->tgt_] = ptrans;
+                last_[ptrans->tgt_] = ptrans->src_;
+            }
+
         }
+        ptrans = ptrans->next_;
     }
 
     accessed[src] = 1;
@@ -211,20 +224,21 @@ int Dijkstra::fastest()
                 }
             }
         }
-        if (min == -1)
+        if (min_position == -1)
         {
             //There is no other path
             break;
         }
+        accessed[min_position] = 1;
 
         //Relaxation
-        ptrans = city_list[min].trans_;
+        ptrans = city_list[min_position].trans_;
 
         while (ptrans)
         {
             if ((!accessed[ptrans->tgt_]) && (!city_list[ptrans->tgt_].deleted_) && (ptrans->is_suitable_way(way)))
             {
-                if ((ptrans->duration_ + duration_[min_position] + (ptrans->time_leave_ - ptrans[min].time_arrive_)) < duration_[ptrans->tgt_]) //considered the time used for transfer
+                if ((ptrans->duration_ + duration_[min_position] + (ptrans->time_leave_ - ptrans[min_position].time_arrive_)) < duration_[ptrans->tgt_]) //considered the time used for transfer
                 {
                     duration_[ptrans->tgt_] = ptrans->duration_ + duration_[min_position];
                     trans_[ptrans->tgt_] = ptrans;
@@ -235,6 +249,77 @@ int Dijkstra::fastest()
         }
     }
 }
+
+int Dijkstra::fastest_advanced()
+{
+    //TODO: have bug: can only be used for the same day flight/train
+    //The 1st step;
+    Time* access_time=new Time[size];
+    access_time[src] = time_now();
+    class Trans *ptrans = city_list[src].trans_;
+
+    while (ptrans)
+    {
+        if ((!accessed[ptrans->tgt_]) && (!city_list[ptrans->tgt_].deleted_) && (ptrans->is_suitable_way(way)))
+        {
+            if(ptrans->duration_<duration_[ptrans->tgt_])
+            {
+                duration_[ptrans->tgt_] = ptrans->duration_;
+                trans_[ptrans->tgt_] = ptrans;
+                last_[ptrans->tgt_] = ptrans->src_;
+            }
+
+        }
+        ptrans = ptrans->next_;
+    }
+
+    accessed[src] = 1;
+
+    // Loop for n-1 times
+    for (int i = 1; i < size; i++)
+    {
+        //TODO: use priority path
+        //Find the minest
+        int min = MAXDURATION - 1;
+        int min_position = -1;
+        for (int a = 0; a < size; a++)
+        {
+            if ((!accessed[a]) && (!city_list[a].deleted_) && (ptrans->is_suitable_way(way)))
+            {
+                if (duration_[a] < min)
+                {
+                    min = duration_[a];
+                    min_position = a;
+                }
+            }
+        }
+        if (min_position == -1)
+        {
+            //There is no other path
+            break;
+        }
+        accessed[min_position] = 1;
+
+        //Relaxation
+        ptrans = city_list[min_position].trans_;
+
+        while (ptrans)
+        {
+            if ((!accessed[ptrans->tgt_]) && (!city_list[ptrans->tgt_].deleted_) && (ptrans->is_suitable_way(way)))
+            {
+                if ((ptrans->duration_ + duration_[min_position] + (ptrans->time_leave_ - ptrans[min_position].time_arrive_)) < duration_[ptrans->tgt_]) //considered the time used for transfer
+                {
+                    duration_[ptrans->tgt_] = ptrans->duration_ + duration_[min_position];
+                    trans_[ptrans->tgt_] = ptrans;
+                    last_[ptrans->tgt_] = ptrans->src_;
+                }
+            }
+            ptrans = ptrans->next_;
+        }
+    }
+}
+
+
 
 int Dijkstra::coziest()
 {
@@ -269,7 +354,7 @@ int Dijkstra::coziest()
                             switch_[ptrans->tgt_] = i;
                             last_[ptrans->tgt_] = a;
                             trans_[ptrans->tgt_] = ptrans;
-                            duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + (ptrans->time_leave_ - trans_[a]->time_arrive_);
+                            duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + ((accessed[a]&&(a!=src))?(ptrans->time_leave_ - trans_[a]->time_arrive_):0);
                             cost_[ptrans->tgt_] = cost_[ptrans->tgt_] + ptrans->cost_;
                         }
                         else
@@ -284,13 +369,13 @@ int Dijkstra::coziest()
                                 {
                                 case 1:
                                     // 1. Print the fastest path
-                                    if (duration_[ptrans->tgt_] > duration_[a] + ptrans->duration_ + (ptrans->time_leave_ - trans_[a]->time_arrive_))
+                                    if (duration_[ptrans->tgt_] > duration_[a] + ptrans->duration_ + (accessed[a]&&(a!=src))?(ptrans->time_leave_ - trans_[a]->time_arrive_):0)
                                     {
                                         accessed[ptrans->tgt_] = 1;
                                         switch_[ptrans->tgt_] = i;
                                         last_[ptrans->tgt_] = a;
                                         trans_[ptrans->tgt_] = ptrans;
-                                        duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + (ptrans->time_leave_ - trans_[a]->time_arrive_);
+                                        duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + (accessed[a]&&(a!=src))?(ptrans->time_leave_ - trans_[a]->time_arrive_):0;
                                         cost_[ptrans->tgt_] = cost_[ptrans->tgt_] + ptrans->cost_;
                                     }
                                     break;
@@ -302,7 +387,7 @@ int Dijkstra::coziest()
                                         switch_[ptrans->tgt_] = i;
                                         last_[ptrans->tgt_] = a;
                                         trans_[ptrans->tgt_] = ptrans;
-                                        duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + (ptrans->time_leave_ - trans_[a]->time_arrive_);
+                                        duration_[ptrans->tgt_] = duration_[a] + ptrans->duration_ + ((accessed[a]&&(a!=src))?(ptrans->time_leave_ - trans_[a]->time_arrive_):0);
                                         cost_[ptrans->tgt_] = cost_[ptrans->tgt_] + ptrans->cost_;
                                     }
                                     break;
@@ -363,14 +448,14 @@ int Dijkstra::show_result()
     {
         //cheapest
         // cheapest();
-        cout << "Least duration is required." << endl;
+        cout << "Least cost is required." << endl;
         // if (duration_[tgt] > (MAXDURATION - 1))
         if (accessed[tgt] == 0)
         {
             cout << "Such path does not exist" << endl;
             return -1;
         }
-        cout << "Total time duration:" << duration_[tgt] << endl;
+        cout << "Total cost:" << cost_[tgt] << endl;
     }
 
     //use stack to reverse output
@@ -403,6 +488,8 @@ int Dijkstra::show_result()
         switch_sum++;
         duration_sum += S.top()->duration_;
         last_arrive = S.top()->time_arrive_;
+        show_path(S.top());
+        S.pop();
     }
     //endl
     cout << "------------------------------" << endl
@@ -515,7 +602,7 @@ re_way:
     //Call function
     if (need_coziest == 2)
     {
-        coziest();
+        coziest();//use flood algorithm to calc 
     }
     else
     {

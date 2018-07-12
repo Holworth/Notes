@@ -6,6 +6,7 @@
 #include <vector>
 #include <stack>
 #include <cstdlib>
+#include "ttime.cc"
 
 using namespace std;
 
@@ -17,167 +18,11 @@ using namespace std;
 #define RETURNED -1
 #define NORMALLY_ENDED 0
 
-enum weekdays
-{
-    mon,
-    tue,
-    wen,
-    thu,
-    fri,
-    sat,
-    sun
-};
 
 enum type_of_trans
 {
     train,
     plane
-};
-
-enum time_type
-{
-    daily,
-    weekly,
-    monthly
-};
-
-class Time
-{
-  public:
-    Time()
-    {
-        //Do nothing
-    }
-    Time(int hour, int min)
-    {
-        hour_ = hour;
-        min_ = min;
-        type_ = daily;
-    }
-    Time(weekdays day, int hour, int min)
-    {
-        day_ = day;
-        hour_ = hour;
-        min_ = min;
-        type_ = weekly;
-    }
-    Time(Time &src)
-    {
-        type_ = src.type_;
-        day_ = src.day_;
-        hour_ = src.hour_;
-        min_ = src.min_;
-    }
-
-    Time operator=(Time &src)
-    {
-        type_ = src.type_;
-        day_ = src.day_;
-        hour_ = src.hour_;
-        min_ = src.min_;
-        return *this;
-    }
-
-    int operator-(Time &b)
-    {
-        int min_a;
-        int min_b;
-        if (type_ == daily)
-        {
-            if (b.type_ == daily) //daily-daily
-            {
-                min_a = hour_ * 60 + min_;
-                min_b = b.hour_ * 60 + min_;
-                if (min_a > min_b)
-                    return min_a - min_b;
-                else
-                    return min_a + 60 * 24 - min_b;
-            }
-            else
-            {
-                //daily-weekly
-                //the same as above
-                min_a = hour_ * 60 + min_;
-                min_b = b.hour_ * 60 + min_;
-                if (min_a > min_b)
-                    return min_a - min_b;
-                else
-                    return min_a + 60 * 24 - min_b;
-            }
-        }
-        else
-        {
-            if (b.type_ == daily)
-            {
-                //weekly - daily
-                //the same as above
-                min_a = hour_ * 60 + min_;
-                min_b = b.hour_ * 60 + min_;
-                if (min_a > min_b)
-                    return min_a - min_b;
-                else
-                    return min_a + 60 * 24 - min_b;
-            }
-            else //weekly-weekly
-            {
-                min_a = day_ * 60 * 24 + hour_ * 60 + min_;
-                min_b = b.day_ * 60 * 24 + b.hour_ * 60 + min_;
-                if (min_a > min_b)
-                    return min_a - min_b;
-                else
-                    return min_a + 7 * 60 * 24 - min_b;
-            }
-        }
-    }
-
-    void print()
-    {
-        if (type_ == weekly)
-        {
-            switch (day_)
-            {
-            case mon:
-                cout << "Mon ";
-                break;
-            case tue:
-                cout << "Tue ";
-                break;
-            case wen:
-                cout << "Wen ";
-                break;
-            case thu:
-                cout << "Thu ";
-                break;
-            case fri:
-                cout << "Fri ";
-                break;
-            case sat:
-                cout << "Sat ";
-                break;
-            case sun:
-                cout << "Sun ";
-                break;
-            }
-        }
-        if (type_ == monthly)
-            cout << day_ << " this month. ";
-        // if(type_==daily)
-        {
-            cout << hour_ << ":" << min_;
-            return;
-        }
-    }
-
-    friend ostream &operator<<(ostream &out, Time &time);
-    friend istream &operator>>(istream &in, Time &time);
-    int interactive_input();
-
-    // time_type type_;
-    int type_;
-
-    int day_;
-    int hour_;
-    int min_;
 };
 
 class Trans
@@ -186,12 +31,14 @@ class Trans
     Trans()
     {
         next_ = 0;
+        nor_ = "";
     }
 
-    Trans(int src, int tgt, type_of_trans type, Time &time_leave, Time &time_arrive, double cost, string nor)
+    Trans(int src, int tgt, int type, Time &time_leave, Time &time_arrive, double cost, string nor)
     {
         src_ = src;
         tgt_ = tgt;
+        type_ = type;
         cost_ = cost;
         time_leave_ = time_leave;
         time_arrive_ = time_arrive;
@@ -203,8 +50,8 @@ class Trans
     //io functions
     // string str();
 
-    friend ostream &operator<<(ostream &out, class Trans trans);
-    friend istream &operator>>(istream &in, class Trans trans);
+    friend ostream &operator<<(ostream &out, class Trans &trans);
+    friend istream &operator>>(istream &in, class Trans &trans);
 
     inline bool is_suitable_way(int way);
 
@@ -239,10 +86,10 @@ class City
         deleted_ = 0;
     }
     string name_;
-    class Trans *trans_;
+    class Trans *trans_=0;
     int deleted_ = 0;
 
-    int add_path(int src, int tgt, type_of_trans type, Time &time_leave, Time &time_arrive, double cost, string nor)
+    int add_path(int src, int tgt, int type, Time time_leave, Time time_arrive, double cost, string nor)
     //Added a path start from this city.
     {
         class Trans *ptrans = trans_;
@@ -257,8 +104,8 @@ class City
                 cout << "This run/flight already exists! Add run/flight failed\n";
                 return -2;
             }
+            pptrans = &(ptrans->next_);
             ptrans = ptrans->next_;
-            pptrans = &ptrans->next_;
         }
         (*pptrans) = new Trans(src, tgt, type, time_leave, time_arrive, cost, nor);
         return 0;
@@ -266,6 +113,10 @@ class City
 
     int add_path(Trans *t)
     {
+        if((t->src_==-1)||(t->tgt_==-1))
+        {
+            return FAILED;
+        }
         class Trans *ptrans = trans_;
         class Trans **pptrans = &trans_;
         while (ptrans)
@@ -278,8 +129,8 @@ class City
                 cout << "This run/flight already exists! Add run/flight failed\n";
                 return FAILED;
             }
+            pptrans = &(ptrans->next_);
             ptrans = ptrans->next_;
-            pptrans = &ptrans->next_;
         }
         (*pptrans) = t;
         return 0;
@@ -305,8 +156,8 @@ class City
                 delete ptrans;
                 return 0;
             }
+            pptrans = &(ptrans->next_);
             ptrans = ptrans->next_;
-            pptrans = &ptrans->next_;
         }
         cout << "Run/Flight " << nor << " does not exist\n";
         return -1;
@@ -399,7 +250,7 @@ int hash_city(string name)
 //hash city name to hash value
 {
     int size = city_list.size();
-    for (int i = 0; i++; i < size)
+    for (int i = 0; i<size; i++)
     {
         if (city_list[i].name_ == name)
         {
@@ -417,7 +268,7 @@ int hash_city(string name)
     return -1;
 }
 
-int add_path(string src_s, string tgt_s, type_of_trans type, Time &time_leave, Time &time_arrive, double cost, string nor)
+int add_path(string src_s, string tgt_s, int type, Time time_leave, Time time_arrive, double cost, string nor)
 {
     int src = hash_city(src_s);
     if (src == -1)
@@ -473,8 +324,8 @@ int delete_path(string nor = "")
                     delete ptrans;
                     return 0;
                 }
+                pptrans = &(ptrans->next_);
                 ptrans = ptrans->next_;
-                pptrans = &ptrans->next_;
             }
         }
     }
@@ -497,7 +348,7 @@ int delete_path(string src_s, string tgt_s, string nor)
                 delete p;
                 return 0;
             }
-            pp = &p->next_;
+            pp = &(p->next_);
             p = p->next_;
         }
         cout << "Run/Flight " << nor << " does not exist\n";
@@ -509,17 +360,8 @@ int delete_path(string src_s, string tgt_s, string nor)
     }
 }
 
-int show_path(class Trans *src)
-{
-    cout << "------------------------------" << endl
-         << ((src->type_ == train) ? "TRAIN" : "FLIGHT") << endl
-         << "Depart from " << city_list[src->src_].name_ << " at: ";
-    src->time_leave_.print();
-    cout << endl
-         << "Arrive in " << city_list[src->tgt_].name_ << " at: ";
-    src->time_arrive_.print();
-    cout << endl
-         << "Duration: " << src->duration_ << "min.  Cost: " << src->cost_ << "yuan." << endl;
-}
+int show_path(class Trans *src);
+
+int show_path();
 
 #endif
