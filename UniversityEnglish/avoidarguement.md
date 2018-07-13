@@ -106,6 +106,7 @@ Of course, the term is now commonly used to describe some type of disinformation
 
 But, what the heck, we're adding it anyway, because even if Trump didn't coin it, he definitely put it on the map.
 
+Just last week, the president surprised some senior aides by announcing tariffs of 25 percent and 10 percent on imports of steel and aluminum, respectively. While not shocking in terms of ideology — Trump has been vocally protectionist for decades — he short-circuited the process for announcing such a major policy. Senior aides told reporters no announcement was imminent. The White House was unable to give details of the proposal, because there none had cleared the complex legal and interagency process that typically precedes a rollout. Lawmakers allied with the administration but caught unawares reached out to reporters for any scraps of information about a decision that, critics warn, could trigger a trade war.
 
 //---------------------------------------------------------
 
