@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<!-- saved from url=(0076)file:///C:/Users/autum/AppData/Local/Temp/mume118614-15156-qxrdj0.kvo4c.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <title>report</title>
+      
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="./report_files/katex.min.css">
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+      <style> 
+      /**
+ * prism.js Github theme based on GitHub's theme.
+ * @author Sam Clarke
+ */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #333;
+  background: none;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.4;
+
+  -moz-tab-size: 8;
+  -o-tab-size: 8;
+  tab-size: 8;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: .8em;
+  overflow: auto;
+  /* border: 1px solid #ddd; */
+  border-radius: 3px;
+  /* background: #fff; */
+  background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: .1em;
+  border-radius: .3em;
+  white-space: normal;
+  background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+  color: #969896;
+}
+
+.token.cdata {
+  color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+  color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+  color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+  color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+  color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+  color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+  color: #795da3;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+  font-weight: bold;
+  color: #1d3e81;
+}
+
+.token.list {
+  color: #ed6a43;
+}
+
+.token.inserted {
+  background-color: #eaffea;
+  color: #55a532;
+}
+
+.token.deleted {
+  background-color: #ffecec;
+  color: #bd2c00;
+}
+
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+  color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+  color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+  color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+  color: #63a35c;
+}
+
+code.language-yaml {
+  color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+  color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+  color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+  color: #795da3;
+}
+
+.language-makefile .token.variable {
+  color: #183691;
+}
+
+.language-makefile .token.builtin {
+  color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+  color: #0086b3;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{padding:0 1.6em;margin-top:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li{margin-bottom:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{list-style-type:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  150px);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+ 
+      </style>
+    </head>
+    <body for="html-export">
+      <div class="mume markdown-preview   ">
+      <h1 class="mume-header" id="%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A">数据结构实验报告</h1>
+
+<p>王华强 UCAS 1613 2016K8009929035</p>
+<p>这是数据结构小组(刘蕴哲,蔡昕,王华强)作业的一部分.</p>
+<hr>
+<h2 class="mume-header" id="%E4%B8%80-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90">一. 需求分析</h2>
+
+<p>题目要求:</p>
+<ul>
+<li>设计列车/航班数据的输入输出方法, 实现手动输入输出和输出到文件/从文件读取</li>
+<li>设计最优路线, 满足时间最优或价格最优原则</li>
+<li>(选做)设计换乘次数最少的路线</li>
+</ul>
+<p>需求实现如下:</p>
+<ol>
+<li>对城市列表, 列车时刻表和航班时刻表提供两种输入方式, 分别是由用户交互式输入和由文本文件导入, 文本文件的格式参见输入输出实现部分.</li>
+<li>城市定义: 以城市拼音名称字符串来代表城市. 对于用户输入的数据, 要求不同的城市所对应的拼音名称不同.</li>
+<li>列车/航班时刻表说明: 考虑列车发车的真实时间(包括日期), 注意列车和航班并不是每天都有的, 可能是按周次开行或者是某一天的临时列车/航班. 算法提供对各种不同类型的支持. 对于一次列车/航班, 有效的数据包括: 列车/航班号, 出发地, 到达地, 出发时间, 到达时间, 价格. 其中列车号/航班号不会重复.</li>
+<li>输出结果: 提供保存当前城市列表, 保存当前列车/航班列表功能. 提供由用户交互式输入需求生成最优路线设计的功能. 输出的最优路线包括其中用到的所有列车/航班的详细信息.</li>
+<li>测试数据1: 人为构造的包含各种特殊情况的数据集, 测试数据2: 来自携程的真实数据集.</li>
+</ol>
+<p>相比题目要求, 额外的设计如下:</p>
+<ul>
+<li>设计了列车/航班数据的输入输出方法, 实现手动输入输出和输出到文件/从文件读取重载了相关的操作符方便第三方调用</li>
+<li>设计了最优路线算法, 满足时间最优或价格最优原则. 时间最优算法考虑了几种不同的情况</li>
+<li>设计了换乘次数最少的路线, 并考虑了同样换乘次数下的最优路线</li>
+<li>实现了自动从12306查询车次信息的接口</li>
+<li>实现了满足实际需求的算法</li>
+</ul>
+<hr>
+<h2 class="mume-header" id="%E4%BA%8C-%E6%A6%82%E8%A6%81%E8%AE%BE%E8%AE%A1">二. 概要设计</h2>
+
+<p>抽象数据类型<code>图</code>的定义参见 <strong>数据结构题集,P154</strong>.</p>
+<p>设计要点如下:</p>
+<h3 class="mume-header" id="%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%891%E7%BA%BF%E8%B7%AF%E5%9B%BE%E9%83%A8%E5%88%86">数据结构定义（1）线路图部分</h3>
+
+<ul>
+<li>邻接表表示城市和线路</li>
+<li>城市使用std::vector实现</li>
+<li>线路放置在邻接表中</li>
+<li>保存每条线路的起止时间，价格等等数据</li>
+<li>插入路线，城市的操作与基本实现类似</li>
+<li>删除城市操作，直接设置删除标记</li>
+<li>删除路线：直接正常删除</li>
+<li>设计更新数据库操作来处理删除标记</li>
+</ul>
+<h3 class="mume-header" id="%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%892-%E5%9F%8E%E5%B8%82%E5%AE%9A%E4%B9%89%E9%83%A8%E5%88%86">数据结构定义（2） 城市定义部分</h3>
+
+<p>如何将城市名(字符串)映射到线路图邻接表中的对应单元(数组下标)？有下面的两个方案:</p>
+<ul>
+<li>可选方案1： 使用键树</li>
+<li>可选方案2： 使用哈希</li>
+</ul>
+<p>同时注意到,城市的删除操作对这两种操作都有影响.</p>
+<hr>
+<h2 class="mume-header" id="%E4%B8%89-%E8%AF%A6%E7%BB%86%E8%AE%BE%E8%AE%A1">三. 详细设计</h2>
+
+<p>整体算法如下:</p>
+<p>使用键树实现城市名称字符串向城市的数据表示的映射. 使用邻接表来保存全国交通图. 使用迪杰特斯拉最短路径算法及其优化(最优时间/价格), 洪水算法(最少换乘)实现路径设计. 使用正则匹配从html文件中自动获取交通信息.</p>
+<p>程序分为以下几个部分:</p>
+<p>数据结构定义</p>
+<pre class="language-text">* 城市顶点定义
+* 时间信息定义
+* 列车信息定义
+* 交通图(有向图)结构定义
+</pre>
+<p>输入输出函数</p>
+<pre class="language-text">* 文件读写函数定义
+* 交互式输入输出定义
+</pre>
+<p>最优路径算法</p>
+<pre class="language-text">* 适用于最短时间的算法
+* 适用于价格最低的算法
+* 适用于换乘次数最少的算法
+</pre>
+<p>配套服务函数</p>
+<pre class="language-text">* 从12306/携程获取飞机/火车信息的程序
+</pre>
+<p>涉及的数据类型如下:</p>
+<h3 class="mume-header" id="1-%E5%AE%9A%E4%B9%89%E6%97%B6%E9%97%B4%E7%B1%BB%E5%9E%8B-%E7%94%A8%E4%BA%8E%E8%A1%A8%E7%A4%BA%E5%88%97%E8%BD%A6%E9%A3%9E%E6%9C%BA%E5%87%BA%E5%8F%91%E5%8F%8A%E5%88%B0%E8%BE%BE%E7%9A%84%E6%97%B6%E9%97%B4">1. 定义时间类型, 用于表示列车/飞机出发及到达的时间</h3>
+
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Time</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">public</span><span class="token operator">:</span>
+
+<span class="token comment">//数据对象: 列车/航班出到站的时间 T:={时间类型,(日期),小时,分钟};</span>
+
+    <span class="token keyword">int</span> type_<span class="token punctuation">;</span><span class="token comment">//数据类型, 可以为"每日"类型, 用于存储每天重复的列车信息. 也可以为"给定日期"类型, 用于存储算法进行中的时间以及只在指定日期发车的列车信息</span>
+    <span class="token keyword">int</span> day_<span class="token punctuation">;</span><span class="token comment">//日</span>
+    <span class="token keyword">int</span> hour_<span class="token punctuation">;</span><span class="token comment">//小时</span>
+    <span class="token keyword">int</span> min_<span class="token punctuation">;</span><span class="token comment">//分钟</span>
+    
+<span class="token comment">//数据关系:</span>
+
+    <span class="token comment">//时间比较操作</span>
+    <span class="token keyword">bool</span> <span class="token keyword">operator</span><span class="token operator">&lt;</span><span class="token punctuation">(</span>Time<span class="token operator">&amp;</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">bool</span> <span class="token keyword">operator</span><span class="token operator">&gt;</span><span class="token punctuation">(</span>Time<span class="token operator">&amp;</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//比较两个时间, 判断时间1和2"可能"的前后关系是否存在.</span>
+    <span class="token comment">//特殊比较规则: 只进行两个"含日期"的时间相比较.</span>
+    
+<span class="token comment">//基本操作:</span>
+
+    <span class="token comment">//设置时间信息</span>
+    <span class="token function">Time</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Time</span><span class="token punctuation">(</span><span class="token keyword">int</span> hour<span class="token punctuation">,</span> <span class="token keyword">int</span> min<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Time</span><span class="token punctuation">(</span>weekdays day<span class="token punctuation">,</span> <span class="token keyword">int</span> hour<span class="token punctuation">,</span> <span class="token keyword">int</span> min<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//初始条件: 输入如函数的输入参数所示</span>
+    <span class="token comment">//操作结果: 初始化时间结构, 并按照输入参数设置时间类型</span>
+
+    <span class="token comment">//从已有的时间为时间结构赋值(复制构造函数)</span>
+    <span class="token function">Time</span><span class="token punctuation">(</span><span class="token keyword">const</span> Time <span class="token operator">&amp;</span>src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    Time <span class="token keyword">operator</span><span class="token operator">=</span><span class="token punctuation">(</span><span class="token keyword">const</span> Time <span class="token operator">&amp;</span>src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//初始条件: 输入如函数的输入参数所示</span>
+    <span class="token comment">//操作结果: 初始化时间结构, 并按照输入参数设置时间类型</span>
+    <span class="token comment">//直接复制源节点的时间信息</span>
+
+    <span class="token comment">//时间加减操作</span>
+    <span class="token comment">//初始条件: 见函数参数, int类型的时间间隔单位为min</span>
+    <span class="token keyword">int</span> <span class="token keyword">operator</span><span class="token operator">-</span><span class="token punctuation">(</span>Time <span class="token operator">&amp;</span>b<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//return the gap between two time points</span>
+    <span class="token comment">//计算两个时间点间的时间差</span>
+    <span class="token comment">//操作结果: 返回两个时间点之间的时间间隔</span>
+    Time <span class="token keyword">operator</span><span class="token operator">+</span><span class="token punctuation">(</span><span class="token keyword">int</span> b<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//计算一个时间点经过一段时间之后所到达的时间点</span>
+    <span class="token comment">//操作结果:返回一个时间结构</span>
+
+    <span class="token comment">//时间打印操作</span>
+    <span class="token keyword">void</span> <span class="token function">print</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//操作结果: 用用户友好的方式打印时间结构.</span>
+
+    <span class="token comment">//文件操作运算符</span>
+    <span class="token keyword">friend</span> ostream <span class="token operator">&amp;</span><span class="token keyword">operator</span><span class="token operator">&lt;&lt;</span><span class="token punctuation">(</span>ostream <span class="token operator">&amp;</span>out<span class="token punctuation">,</span> Time <span class="token operator">&amp;</span>time<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">friend</span> istream <span class="token operator">&amp;</span><span class="token keyword">operator</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>istream <span class="token operator">&amp;</span>in<span class="token punctuation">,</span> Time <span class="token operator">&amp;</span>time<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//将时间结构与空格间隔的字符串相互转换</span>
+    
+    <span class="token comment">//交互式输入函数</span>
+    <span class="token keyword">int</span> <span class="token function">interactive_input</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//操作结果: 在屏幕上显示提示, 使得用户可以交互式的输入时间</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</pre><h3 class="mume-header" id="2-%E5%AE%9A%E4%B9%89%E8%B7%AF%E5%BE%84%E7%B1%BB%E5%9E%8B-%E7%94%A8%E4%BA%8E%E4%BF%9D%E5%AD%98%E4%B8%80%E6%AC%A1%E8%88%AA%E7%8F%AD%E5%88%97%E8%BD%A6%E7%9A%84%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF-%E5%B9%B6%E4%BD%9C%E4%B8%BA%E9%82%BB%E6%8E%A5%E8%A1%A8%E9%93%BE%E8%A1%A8%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9">2. 定义路径类型, 用于保存一次航班/列车的相关信息, 并作为邻接表链表中的节点.</h3>
+
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">Trans</span>
+<span class="token comment">//边类型:作为邻接表中链表的节点，用于保存一个列车／航班的相关信息．</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">public</span><span class="token operator">:</span>
+
+<span class="token comment">//数据对象:</span>
+
+    <span class="token keyword">int</span> src_<span class="token punctuation">;</span> <span class="token comment">//出发城市</span>
+    <span class="token keyword">int</span> tgt_<span class="token punctuation">;</span> <span class="token comment">//到达城市</span>
+    <span class="token keyword">int</span> type_<span class="token punctuation">;</span><span class="token comment">//当前边的类型: 飞机或者火车</span>
+
+    <span class="token keyword">int</span> duration_<span class="token punctuation">;</span><span class="token comment">//当前边从出发到抵达的时间. 在边的结构被建立的时候自动进行计算.</span>
+    <span class="token keyword">double</span> cost_<span class="token punctuation">;</span><span class="token comment">//当前边的票价</span>
+    <span class="token keyword">class</span> <span class="token class-name">Time</span> time_leave_<span class="token punctuation">;</span><span class="token comment">//出发时间</span>
+    <span class="token keyword">class</span> <span class="token class-name">Time</span> time_arrive_<span class="token punctuation">;</span><span class="token comment">//到达时间</span>
+
+    string nor_<span class="token punctuation">;</span> <span class="token comment">//number of runs/flights 列车号/航班号</span>
+
+    <span class="token keyword">class</span> <span class="token class-name">Trans</span> <span class="token operator">*</span>next_<span class="token punctuation">;</span><span class="token comment">//单向链表指针, 指向下一个边节点</span>
+
+<span class="token comment">//数据关系:</span>
+
+    <span class="token comment">//查询用户要求, 判断当前的航班/列车是否满足用户要求</span>
+    <span class="token keyword">inline</span> <span class="token keyword">bool</span> <span class="token function">is_suitable_way</span><span class="token punctuation">(</span><span class="token keyword">int</span> way<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//前提条件: 用户已经输入了要求(使用何种交通工具)</span>
+    <span class="token comment">//返回结果: 若当前的边(列车/航班)满足要求则返回true, 否则返回false</span>
+
+<span class="token comment">//基本操作:</span>
+
+    <span class="token comment">//构造函数</span>
+    <span class="token function">Trans</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">Trans</span><span class="token punctuation">(</span><span class="token keyword">int</span> src<span class="token punctuation">,</span> <span class="token keyword">int</span> tgt<span class="token punctuation">,</span> <span class="token keyword">int</span> type<span class="token punctuation">,</span> Time <span class="token operator">&amp;</span>time_leave<span class="token punctuation">,</span> Time <span class="token operator">&amp;</span>time_arrive<span class="token punctuation">,</span> <span class="token keyword">double</span> cost<span class="token punctuation">,</span> string nor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//操作结果: 按输入的参数构造函数</span>
+
+    <span class="token comment">//文件运算符重载</span>
+    <span class="token keyword">friend</span> ostream <span class="token operator">&amp;</span><span class="token keyword">operator</span><span class="token operator">&lt;&lt;</span><span class="token punctuation">(</span>ostream <span class="token operator">&amp;</span>out<span class="token punctuation">,</span> <span class="token keyword">class</span> <span class="token class-name">Trans</span> <span class="token operator">&amp;</span>trans<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">friend</span> istream <span class="token operator">&amp;</span><span class="token keyword">operator</span><span class="token operator">&gt;&gt;</span><span class="token punctuation">(</span>istream <span class="token operator">&amp;</span>in<span class="token punctuation">,</span> <span class="token keyword">class</span> <span class="token class-name">Trans</span> <span class="token operator">&amp;</span>trans<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//操作结果: 实现Trans结构与以空格为间隔的字符串之间的相互装换</span>
+
+    <span class="token comment">//交互式输入函数</span>
+    <span class="token keyword">int</span> <span class="token function">interactive_input</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//返回结果: 显示提示信息, 用户按提示信息依次输入一次列车/航班的各个属性</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+</pre><h3 class="mume-header" id="3-%E5%AE%9A%E4%B9%89%E5%9F%8E%E5%B8%82%E7%B1%BB%E5%9E%8B-%E7%94%A8%E4%BA%8E%E4%BF%9D%E5%AD%98%E5%9F%8E%E5%B8%82%E7%9A%84%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF%E4%BB%A5%E5%8F%8A%E4%BD%9C%E4%B8%BA%E9%82%BB%E6%8E%A5%E8%A1%A8%E7%9A%84%E8%A1%A8%E5%A4%B4">3. 定义城市类型, 用于保存城市的相关信息以及作为邻接表的表头</h3>
+
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token keyword">class</span> <span class="token class-name">City</span>
+<span class="token comment">//城市类型, 用于保存城市的相关信息以及作为邻接表的表头</span>
+<span class="token punctuation">{</span>
+  <span class="token keyword">public</span><span class="token operator">:</span>
+<span class="token comment">//数据对象:</span>
+
+    string name_<span class="token punctuation">;</span><span class="token comment">//城市名称</span>
+    <span class="token keyword">class</span> <span class="token class-name">Trans</span> <span class="token operator">*</span>trans_<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span><span class="token comment">//指向链表首节点的指针(指向边界点的指针)</span>
+    <span class="token keyword">int</span> deleted_ <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span><span class="token comment">//删除标记</span>
+
+<span class="token comment">//数据关系:</span>
+
+    <span class="token comment">//不涉及数据关系</span>
+
+<span class="token comment">//基本操作:</span>
+
+    <span class="token comment">//构造函数</span>
+    <span class="token function">City</span><span class="token punctuation">(</span>string name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//操作结果: 初始化一个新的城市.</span>
+
+    <span class="token comment">//添加一个从此城市出发的路线(边)</span>
+    <span class="token keyword">int</span> <span class="token function">add_path</span><span class="token punctuation">(</span><span class="token keyword">int</span> src<span class="token punctuation">,</span> <span class="token keyword">int</span> tgt<span class="token punctuation">,</span> <span class="token keyword">int</span> type<span class="token punctuation">,</span> Time time_leave<span class="token punctuation">,</span> Time time_arrive<span class="token punctuation">,</span> <span class="token keyword">double</span> cost<span class="token punctuation">,</span> string nor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token function">add_path</span><span class="token punctuation">(</span>Trans <span class="token operator">*</span>t<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//前提条件: 城市已经被初始化, 添加的路线是从此城市出发的路线</span>
+    <span class="token comment">//返回结果: 若所有参数合法, 城市存在, 则在链表中添加新的路径. 若已经存在相同的路径, 则什么都不做并返回错误码</span>
+
+    <span class="token comment">//删除边(路径)</span>
+    <span class="token keyword">int</span> <span class="token function">delete_path</span><span class="token punctuation">(</span>string nor <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">//函数输入: 航班号/列车号/无(由用户交互式输入航班号/列车号))</span>
+    <span class="token comment">//返回结果: 按照输入的航班号删除对应的路线</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+
+</pre><h3 class="mume-header" id="3-%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F%E8%AE%BE%E8%AE%A1">3. 全局变量设计:</h3>
+
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token comment">//邻接表表头, 作为全局变量存在, 使用std::vector作为数据结构来实现随机访问和O(1)的添加元素操作</span>
+vector<span class="token operator">&lt;</span>City<span class="token operator">&gt;</span> city_list<span class="token punctuation">;</span>
+</pre><h3 class="mume-header" id="4-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C%E5%87%BD%E6%95%B0%E8%AE%BE%E8%AE%A1">4. 数据库操作函数设计</h3>
+
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token comment">//添加城市函数</span>
+<span class="token keyword">int</span> <span class="token function">add_city</span><span class="token punctuation">(</span>string name <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//返回结果: 若城市不存在(或有删除标记), 则添加(恢复)</span>
+
+<span class="token comment">//删除城市函数</span>
+<span class="token keyword">int</span> <span class="token function">delete_city</span><span class="token punctuation">(</span>string name <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">//返回结果: 若城市名有效, 则将城市标记为"删除"状态. 在之后的算法中不考虑这个城市以及所有相关的路线, 并且在整理数据库操作时有"删除"状态的边会被删除.</span>
+
+<span class="token comment">//显示当前的所有城市, 描述略</span>
+<span class="token keyword">int</span> <span class="token function">show_city</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//城市哈希</span>
+<span class="token comment">//函数输入: 城市名称字符串</span>
+<span class="token comment">//返回结果: 若城市存在, 则返回它在邻接表表头中的对应位置. 否则返回-1</span>
+<span class="token comment">//注意这里有多种实现方式. 使用键树的实现需要#include"search.cc"并使用其中的键树trie树函数.</span>
+<span class="token keyword">int</span> <span class="token function">hash_city</span><span class="token punctuation">(</span>string name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//添加路径函数</span>
+<span class="token comment">//前提条件: 参数合法</span>
+<span class="token comment">//返回结果: 若涉及的城市有不在城市列表中的, 则将这个城市添加到城市列表中. 之后进行判断:如果这个路径(边)没有被添加过, 则将其添加到邻接表中</span>
+<span class="token keyword">int</span> <span class="token function">add_path</span><span class="token punctuation">(</span>string src_s<span class="token punctuation">,</span> string tgt_s<span class="token punctuation">,</span> <span class="token keyword">int</span> type<span class="token punctuation">,</span> Time time_leave<span class="token punctuation">,</span> Time time_arrive<span class="token punctuation">,</span> <span class="token keyword">double</span> cost<span class="token punctuation">,</span> string nor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//交互式添加路径</span>
+<span class="token comment">//调用上面的添加路径函数, 条件结果均一致</span>
+<span class="token keyword">int</span> <span class="token function">add_path</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//删除路径函数</span>
+<span class="token comment">//输入参数: 待删除路径的航班号/列车号</span>
+<span class="token comment">//返回结果: 删除对应路径并返回0, 若路径不存在则返回错误码</span>
+<span class="token keyword">int</span> <span class="token function">delete_path</span><span class="token punctuation">(</span>string nor <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//与上面的函数类似</span>
+<span class="token keyword">int</span> <span class="token function">delete_path</span><span class="token punctuation">(</span>string src_s<span class="token punctuation">,</span> string tgt_s<span class="token punctuation">,</span> string nor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//显示一条路径</span>
+<span class="token keyword">int</span> <span class="token function">show_path</span><span class="token punctuation">(</span><span class="token keyword">class</span> <span class="token class-name">Trans</span> <span class="token operator">*</span>src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">//显示当前数据库中的所有路径</span>
+<span class="token keyword">int</span> <span class="token function">show_path</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+</pre><h3 class="mume-header" id="5-%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E5%87%BD%E6%95%B0%E8%AE%BE%E8%AE%A1">5. 输入输出函数设计</h3>
+
+<p>输入输出使用<code>std::iostream</code>实现，这里略去不表. 具体说明可以参考代码中的注释.</p>
+<h3 class="mume-header" id="6-%E6%A0%B8%E5%BF%83%E7%AE%97%E6%B3%95%E8%AE%BE%E8%AE%A1-%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95">6. 核心算法设计: 最短路径算法</h3>
+
+<hr>
+<h2 class="mume-header" id="%E5%9B%9B-%E6%A0%B8%E5%BF%83%E7%AE%97%E6%B3%95%E4%BC%98%E5%8C%96%E8%AF%B4%E6%98%8E">四. 核心算法优化说明</h2>
+
+<h3 class="mume-header" id="1-%E7%AE%97%E6%B3%95%E8%AF%B4%E6%98%8E-%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84%E7%AE%97%E6%B3%95">1. 算法说明 最短路径算法</h3>
+
+<p>常见的最短路径算法实现如下:</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token function">Dijkstra</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+<span class="token comment">//分配空间</span>
+    设置两个集合 <span class="token string">"已经发现最短路径的点"</span> 和 <span class="token string">"待判定的点"</span><span class="token punctuation">;</span>
+    设置数组保存每个点的权值<span class="token punctuation">;</span><span class="token comment">//这个权值可以按要求设置为价格或者时间</span>
+
+<span class="token comment">//初始化步骤</span>
+    将起点A放入 <span class="token string">"已经发现最短路径的点"</span>集合中，A点的权值为<span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">//因为A-&gt;A=0</span>
+    与起点A相连的所有点的权值设置为A到点的距离，连接不到的设置为无穷<span class="token punctuation">;</span>
+    找出其中最小权值的B放入 <span class="token string">"已经发现最短路径的点"</span>集合中 <span class="token comment">//此时A-&gt;B必为最小距离。</span>
+
+<span class="token comment">//松弛操作</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>没有找到所有点的最短距离<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    更新B<span class="token punctuation">;</span>
+    与B点相连的所有点的权值设置为B<span class="token operator">-</span><span class="token operator">&gt;</span>点的距离<span class="token punctuation">;</span>
+    找出其中最小权值的C点放入集合中<span class="token punctuation">;</span> <span class="token comment">//此时C的权值必定为其最小距离</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">//结束步骤</span>
+读取目标城市的权值<span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>权值<span class="token operator">==</span>无穷<span class="token punctuation">)</span>没有到达<span class="token punctuation">;</span>
+    <span class="token keyword">else</span>
+    返回目标城市的权值<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre><p>可以输出路径的最短路径算法:</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token function">Dijkstra</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+<span class="token comment">//分配空间</span>
+设置两个集合 <span class="token string">"已经发现最短路径的点"</span> 和 <span class="token string">"待判定的点"</span><span class="token punctuation">;</span>
+设置数组保存每个点的权值<span class="token punctuation">;</span><span class="token comment">//这个权值可以按要求设置为价格或者时间</span>
+设置数组<span class="token punctuation">,</span> 保存每个点 <span class="token string">"上一个顶点"</span><span class="token punctuation">;</span>
+设置数组<span class="token punctuation">,</span> 保存每个点 <span class="token string">"到达此城市所用的列车/航班的指针"</span><span class="token punctuation">;</span>
+<span class="token comment">//初始化步骤</span>
+将起点A放入 <span class="token string">"已经发现最短路径的点"</span>集合中，A点的权值为<span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">//因为A-&gt;A=0</span>
+与起点A相连的所有点的权值设置为A到点的距离，连接不到的设置为无穷<span class="token punctuation">;</span>
+找出其中最小权值的B放入 <span class="token string">"已经发现最短路径的点"</span>集合中 <span class="token comment">//此时A-&gt;B必定为最小距离</span>
+<span class="token comment">//松弛操作</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>没有找到所有点的最短距离<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    更新B点<span class="token punctuation">;</span>
+    与B点相连的所有点的权值设置为B<span class="token operator">-</span><span class="token operator">&gt;</span>点的距离<span class="token punctuation">;</span>
+    找出其中最小权值的C点放入集合中<span class="token punctuation">;</span> <span class="token comment">//此时C的权值必定为其最小距离</span>
+<span class="token punctuation">}</span>
+<span class="token comment">//结束步骤</span>
+读取目标城市的权值<span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>权值<span class="token operator">==</span>无穷<span class="token punctuation">)</span>没有到达<span class="token punctuation">;</span>
+<span class="token keyword">else</span>
+<span class="token punctuation">{</span>
+    设置栈来翻转路线顺序<span class="token punctuation">,</span> 原有路线是从终点到起点的<span class="token punctuation">;</span>
+    所有边进栈<span class="token punctuation">,</span> 之后依次出栈并输出<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+    返回目标城市的权值<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+</pre><p>使用优先队列改进最短路径算法:</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp"><span class="token function">Dijkstra</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+<span class="token comment">//分配空间</span>
+设置集合 <span class="token string">"待判定的点"</span><span class="token punctuation">;</span>
+设置优先队列保存所有 <span class="token string">"已经发现最短路径的点"</span><span class="token punctuation">;</span>
+设置数组保存每个点的权值<span class="token punctuation">;</span><span class="token comment">//这个权值可以按要求设置为价格或者时间</span>
+设置数组<span class="token punctuation">,</span> 保存每个点 <span class="token string">"上一个顶点"</span><span class="token punctuation">;</span>
+设置数组<span class="token punctuation">,</span> 保存每个点 <span class="token string">"到达此城市所用的列车/航班的指针"</span><span class="token punctuation">;</span>
+<span class="token comment">//初始化步骤</span>
+将起点A放入 <span class="token string">"已经发现最短路径的点"</span>优先队列中，A点的权值为<span class="token number">0</span><span class="token punctuation">;</span> <span class="token comment">//因为A-&gt;A=0</span>
+与起点A相连的所有点的权值设置为A到点的距离，连接不到的设置为无穷<span class="token punctuation">;</span>
+直接取出最小权值的B放入 <span class="token string">"已经发现最短路径的点"</span>集合中<span class="token punctuation">,</span> 这里的复杂度为<span class="token number">1</span><span class="token punctuation">;</span> <span class="token comment">//（此时A-&gt;B必定为最小距离）。</span>
+<span class="token comment">//松弛操作</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>没有找到所有点的最短距离<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    更新B点<span class="token punctuation">,</span> B为当前优先队列中权值最小的点 <span class="token operator">:</span> <span class="token function">O</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    与B点相连的所有点的权值设置为B<span class="token operator">-</span><span class="token operator">&gt;</span>点的距离<span class="token punctuation">;</span>
+    找出其中最小权值的C点放入优先队列中<span class="token punctuation">,</span>更新优先队列的复杂度为<span class="token function">O</span><span class="token punctuation">(</span>logn<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">//（此时C的权值必定为其最小距离）。</span>
+<span class="token punctuation">}</span>
+<span class="token comment">//结束步骤</span>
+读取目标城市的权值<span class="token punctuation">;</span>
+<span class="token keyword">if</span><span class="token punctuation">(</span>权值<span class="token operator">==</span>无穷<span class="token punctuation">)</span>没有到达<span class="token punctuation">;</span>
+<span class="token keyword">else</span>
+<span class="token punctuation">{</span>
+    设置栈来翻转路线顺序<span class="token punctuation">,</span> 原有路线是从终点到起点的<span class="token punctuation">;</span>
+    所有边进栈<span class="token punctuation">,</span> 之后依次出栈并输出<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+返回目标城市的权值<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre><h3 class="mume-header" id="2-%E7%AE%97%E6%B3%95%E8%AF%B4%E6%98%8E-flood-%E7%AE%97%E6%B3%95">2. 算法说明 Flood 算法</h3>
+
+<p>伪代码如下</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp">设置可以到达的顶点集合Reach和未遍历的顶点集合Totest<span class="token punctuation">;</span>
+设置计数器i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
+出发点src加入Reach<span class="token punctuation">;</span>
+<span class="token keyword">while</span><span class="token punctuation">(</span>没有遍历所有顶点<span class="token operator">&amp;&amp;</span>没有找到目标点<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    i<span class="token operator">++</span><span class="token punctuation">;</span>
+    探测Reach里所有点周围的顶点是否可以到达<span class="token punctuation">;</span>
+    记录可到达顶点的相关信息<span class="token punctuation">(</span>花费<span class="token punctuation">,</span>时间<span class="token punctuation">,</span>上一个顶点<span class="token punctuation">,</span>etc<span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    若目标点tgt在周围<span class="token punctuation">,</span>则停止算法并返回当前路径<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</pre><h3 class="mume-header" id="3-%E7%AE%97%E6%B3%95%E8%AF%B4%E6%98%8E-floyd-%E7%AE%97%E6%B3%95">3. 算法说明 Floyd 算法</h3>
+
+<p>基本的Floyd算法如下:</p>
+<pre data-role="codeBlock" data-info="cpp" class="language-cpp">初始化任意两点之间距离为无穷<span class="token punctuation">;</span>
+遍历所有边<span class="token punctuation">,</span> 设置两点之间距离为边的权值<span class="token punctuation">;</span>
+<span class="token comment">//注意这里的算法因为"发车时间"因素有较大变化, 将在下文讨论</span>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> k<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>k<span class="token operator">&lt;</span>city<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>k<span class="token operator">++</span><span class="token punctuation">)</span><span class="token comment">//中转站</span>
+    <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> a<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>a<span class="token operator">&lt;</span>city<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>a<span class="token operator">++</span><span class="token punctuation">)</span><span class="token comment">//出发站</span>
+        <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> b<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>b<span class="token operator">&lt;</span>city<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>b<span class="token operator">++</span><span class="token punctuation">)</span><span class="token comment">//到达站</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">if</span><span class="token punctuation">(</span>距离<span class="token punctuation">(</span>a<span class="token operator">-</span><span class="token operator">&gt;</span>b<span class="token punctuation">)</span><span class="token operator">&lt;</span><span class="token punctuation">(</span>距离<span class="token punctuation">(</span>a<span class="token operator">-</span><span class="token operator">&gt;</span>k<span class="token punctuation">)</span><span class="token operator">+</span>距离<span class="token punctuation">(</span>k<span class="token operator">-</span><span class="token operator">&gt;</span>b<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                距离<span class="token punctuation">(</span>a<span class="token operator">-</span><span class="token operator">&gt;</span>b<span class="token punctuation">)</span><span class="token operator">=</span><span class="token punctuation">(</span>距离<span class="token punctuation">(</span>a<span class="token operator">-</span><span class="token operator">&gt;</span>k<span class="token punctuation">)</span><span class="token operator">+</span>距离<span class="token punctuation">(</span>k<span class="token operator">-</span><span class="token operator">&gt;</span>b<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+</pre><hr>
+<h2 class="mume-header" id="%E4%BA%94-%E8%AE%BE%E8%AE%A1%E5%92%8C%E8%B0%83%E8%AF%95%E5%88%86%E6%9E%90">五. 设计和调试分析</h2>
+
+<h3 class="mume-header" id="%E4%BD%BF%E7%94%A8%E5%A0%86%E6%8E%92%E5%BA%8F%E6%9D%A5%E6%94%B9%E8%BF%9B%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84dijkstra%E7%AE%97%E6%B3%95">使用堆排序来改进最短路径(Dijkstra)算法</h3>
+
+<p>上文已经描述了使用堆排序的Dijkstra算法伪代码. 这里介绍其原理并给出分析.</p>
+<h3 class="mume-header" id="%E8%80%83%E8%99%91%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E4%BD%BF%E7%94%A8floyd%E7%AE%97%E6%B3%95">考虑是否需要使用Floyd算法</h3>
+
+<p>由于实现了城市和列车的插入删除操作, 每次这样的操作都对应需要更新Floyd算法所生成的最短路径列表. 尽管如此, 在查询频繁且路线表基本固定的情况下, 使用Floyd算法会是比较好的选择. 使用<code>Floyd</code>算法所需的函数库放在主目录下<code>floyd</code>文件夹内. 若要使用此算法直接替换即可.</p>
+<p>默认的主程序使用<code>Dijkstra</code>算法.</p>
+<h3 class="mume-header" id="%E5%AE%9E%E9%99%85%E9%97%AE%E9%A2%98%E5%AF%B9%E7%AE%97%E6%B3%95%E7%9A%84%E7%BA%A6%E6%9D%9F">实际问题对算法的约束</h3>
+
+<h4 class="mume-header" id="%E6%9C%80%E7%9F%AD%E6%97%B6%E9%97%B4%E7%AE%97%E6%B3%95%E7%9A%84%E5%A4%84%E7%90%86%E6%8E%A2%E7%A9%B6">最短时间算法的处理探究</h4>
+
+<ul>
+<li>换乘时间问题: 如何处理等车时间, 这种情况下算法是否仍让成立?</li>
+<li>出发时间问题: 考虑从现在出发的最短时间还是从上车出发的最短时间?</li>
+<li>成环问题: 对于相同的到达时间, 是否会选出非最优路径?</li>
+</ul>
+<h4 class="mume-header" id="%E6%9C%80%E5%B0%91%E6%8D%A2%E4%B9%98%E7%AE%97%E6%B3%95%E7%9A%84%E5%A4%84%E7%90%86%E6%8E%A2%E7%A9%B6">最少换乘算法的处理探究</h4>
+
+<p>计算最小换乘问题, 有两种可行的算法</p>
+<ul>
+<li>洪水算法</li>
+<li>为之前的算法添加权值</li>
+</ul>
+<p>两种处理思路的比较</p>
+<h3 class="mume-header" id="%E4%BD%BF%E7%94%A8%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%80%BB%E7%BB%93">使用的数据结构总结</h3>
+
+<ul>
+<li>邻接表(交通图)</li>
+<li>键树/哈希(城市字符串映射)</li>
+<li>"链表"(交通图邻接表表头)--&gt;使用std::vector实现</li>
+<li>栈(逆向输出Dijkstra算法结果)--&gt;使用</li>
+<li>优先队列:使用堆或红黑树实现(Dijkstra算法改进)</li>
+<li>图(Dijkstra算法,Floyd算法)</li>
+</ul>
+<h3 class="mume-header" id="%E4%BD%BF%E7%94%A8%E7%9A%84%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93">使用的优化总结</h3>
+
+<ul>
+<li>12306(携程)接口</li>
+<li>删除城市操作使用删除标记+定时整理</li>
+<li>使用键树/哈希处理城市名</li>
+<li>使用优先队列的最短路径算法</li>
+<li>时间类, 城市类, PATH类和完善的接口定义</li>
+</ul>
+<hr>
+<h2 class="mume-header" id="%E5%85%AD-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C">六. 用户手册</h2>
+
+<h3 class="mume-header" id="%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83">编译环境</h3>
+
+<p>源码在Windows10下由<code>g++ -std=c++11</code>编译通过, 采用<code>c++11</code>标准.</p>
+<h3 class="mume-header" id="%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83">运行环境</h3>
+
+<p>预编译的版本在<code>Windows10 x64</code>下编译并测试通过. 主程序为<code>main.exe</code>.</p>
+<p>信息获取脚本在<code>python3.6</code>下运行通过.</p>
+<h3 class="mume-header" id="%E8%BF%90%E8%A1%8C%E8%AF%B4%E6%98%8E">运行说明</h3>
+
+<p>主程序有完整的运行提示, 按主程序的提示操作即可.</p>
+<hr>
+<h2 class="mume-header" id="%E4%B8%83-%E6%B5%8B%E8%AF%95%E8%AF%B4%E6%98%8E">七. 测试说明</h2>
+
+<p>主程序涉及到外部文件的读写, 数据文件格式如下:</p>
+<h3 class="mume-header" id="1-%E6%95%B0%E6%8D%AE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F">1. 数据文件格式</h3>
+
+<h4 class="mume-header" id="11-%E5%9F%8E%E5%B8%82%E6%96%87%E4%BB%B6">1.1 城市文件</h4>
+
+<p>默认名称为<code>city.csv</code></p>
+<pre data-role="codeBlock" data-info="" class="language-"><code>BJ
+SH
+</code></pre><p>每个城市单独一行, 没有重复.</p>
+<h4 class="mume-header" id="12-%E8%B7%AF%E5%BE%84%E6%96%87%E4%BB%B6">1.2 路径文件</h4>
+
+<p>默认名称为<code>run.csv</code></p>
+<pre data-role="codeBlock" data-info="" class="language-"><code>BJ SH 1 D1 0 0 2010015283 12 30 0 6553272 14 50 120 30
+BJ GZ 1 F1 1 1 -1163005939 8 0 1 -1163005939 23 0 900 1999
+SH GZ 0 K83 1 1 -1163005939 9 0 1 -1163005939 12 13 180 66
+</code></pre><p>对照表如下:</p>
+<pre data-role="codeBlock" data-info="" class="language-"><code>出发城市名 到达城市名 飞机/火车 车号 每日/每周 出发时间 到达时间 时间间隔 票价  
+</code></pre><p>其中时间部分格式如下</p>
+<pre data-role="codeBlock" data-info="" class="language-"><code>1 -1163005939 9 0
+时间类型 日 小时 分钟
+#注意若时间类型为'日',日一项没有实际意义. 只有时间类型为'周'时才有意义;
+</code></pre><h3 class="mume-header" id="2-%E6%B5%8B%E8%AF%95%E8%AF%B4%E6%98%8E">2. 测试说明</h3>
+
+<p>主程序有完整的运行提示, 按主程序的提示操作即可.</p>
+<hr>
+<h2 class="mume-header" id="%E5%85%AB-%E9%99%84%E5%BD%95">八. 附录</h2>
+
+<h3 class="mume-header" id="1-%E7%9B%AE%E5%BD%95%E8%AF%B4%E6%98%8E">1. 目录说明</h3>
+
+<pre data-role="codeBlock" data-info="" class="language-"><code>/doc           文档目录
+/src           源码目录
+/dst           预编译的可执行文件
+/test          测试用数据集
+/src/floyd     使用floyd算法所需的库文件
+</code></pre><h3 class="mume-header" id="2-%E6%BA%90%E7%A0%81%E6%96%87%E4%BB%B6%E6%B8%85%E5%8D%95">2. 源码文件清单</h3>
+
+<ul>
+<li><a href="http://main.cc/">main.cc</a> //主程序</li>
+<li><a href="http://head.cc/">head.cc</a> //数据结构定义, 邻接表实现</li>
+<li><a href="http://ttime.cc/">ttime.cc</a> //时间操作相关函数, 实现了换乘时间的计算方法</li>
+<li><a href="http://io.cc/">io.cc</a> //文件io相关函数实现，用户界面实现,负责文件读写和交互式输入输出</li>
+<li><a href="http://search.cc/">search.cc</a> //使用键树所用到的外部库</li>
+<li><a href="http://dijkstra.cc/">dijkstra.cc</a> //算法核心, 使用经过改造的最短路径算法</li>
+<li><a href="http://api.py/">api.py</a> //12306接口(没有整合到主程序中,请自行调整输出字符串的格式)</li>
+</ul>
+<hr>
+<p>Huaqiang Wang (c) 2018.7</p>
+<p>Licensed under WTFPL.</p>
+
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+    
+    
+  </body></html>
