@@ -29,7 +29,7 @@
                 "${file}",
                 "-o",
                 "${file}.exe"
-            ], // 编译命令参数
+            ], // 编译命令参数`r
             "problemMatcher": {
                 "owner": "c",
                 "fileLocation": [
