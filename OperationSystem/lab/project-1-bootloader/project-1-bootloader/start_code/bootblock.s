@@ -3,7 +3,7 @@
 
 main:
 	# 1) task1 call BIOS print string "It's bootblock!"
-	mov $a0, msg
+	la  $a0, msg
 	j   printstr
 	# 2) task2 call BIOS read kernel in SD card and jump to kernel start
 
