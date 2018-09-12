@@ -1,3 +1,4 @@
+# ALIYUN
 
 deb http://mirrors.aliyun.com/ubuntu/ trusty main restricted universe multiverse
 deb http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted universe multiverse
@@ -9,3 +10,13 @@ deb-src http://mirrors.aliyun.com/ubuntu/ trusty-security main restricted univer
 deb-src http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted universe multiverse
 deb-src http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse
 deb-src http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse
+
+# USTC
+deb https://mirrors.ustc.edu.cn/ubuntu/ xenial main restricted universe multiverse
+# deb-src https://mirrors.ustc.edu.cn/ubuntu/ xenial main main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+# deb-src https://mirrors.ustc.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+# deb-src https://mirrors.ustc.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb https://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
+# deb-src https://mirrors.ustc.edu.cn/ubuntu/ xenial-security main restricted universe multiverse
