@@ -5,7 +5,7 @@ echo "Last modified: 2018.9.8."
 echo "更新源"
 
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak #备份
-sudo cat alisrc >> /etc/apt/sources.list #修改
+sudo cat alisrc.18.04 >> /etc/apt/sources.list #修改
 sudo apt-get update #更新列表
 
 # MIPS交叉编译工具链
