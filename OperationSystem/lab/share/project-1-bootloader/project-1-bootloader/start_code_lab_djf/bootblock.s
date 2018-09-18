@@ -2,34 +2,24 @@
 .global main
 
 main:
-	# 1) task1 call BIOS print string "It's bootblock!"
+        # 1) task1 call BIOS print string "It's bootblock!"
+#print string
+la $a0, msg
+jal 0x8007b980
+        # 2) task2 call BIOS read kernel in SD card and jump to kernel start
+la $a0, 0xa0800200
+li $a1, 0x200   #offset in sd card <- 0x200
+li $a2, 0x200   #size <- 0x200
 
-	la  $a0, msg
-#	jal 0x8007b980
-	jal printstr
-	nop
+j stop
 
-	# 2) task2 call BIOS read kernel in SD card and jump to kernel start
+jal 0x8007b1cc  #read_sd_card
 
-	lw  $a0, kernel
-	lw  $a1, kernel_sd_position
-	lw  $a2, kernel_size_t
-#	lb  $a2, 0x800001FF
-	jal read_sd_card
-
-#bonus question:
-#	lw  $ra, kernel
-#	j   read_sd_card
-
-#normally:
-	lw  $a0, kernel
-	j   $a0
-	nop
+jal 0xa0800200
 
 # while(1) --> stop here
 stop:
 	j stop
-	nop
 
 .data
 
@@ -52,9 +42,3 @@ kernel : .word 0xa0800200
 
 # 5. kernel main address (jmp here to start kernel main!)
 kernel_main : .word 0xa0800200
-
-# 6. kernel sd position
-kernel_sd_position : .word 512
-
-# 7. kernel size (temp)
-kernel_size_t: .word 512
