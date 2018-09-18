@@ -10,8 +10,8 @@
 1. DONE: REGfile重写 9.16
 1. DONE: 流水线逻辑, 旁路逻辑设计 9.17
 1. DONE: CPU架构图 书上已有, 改为原图上修改添加控制信号
-1. TODO: 控制信号整理(excel) in-progress
-1. TODO: 基本架构代码实现
+1. TODO: 控制信号整理(excel) in-progress 9.18 之前多周期已经实现过的迁移完成
+1. TODO: 基本架构代码实现 in-progress
 1. TODO: 测试
 1. TODO: 优化设计
 ***
@@ -263,3 +263,29 @@ ref: 计算机组成与设计-硬件软件接口 P233
 * ALU CONTROL ALU译码逻辑设计
 
 TODO: 还是没有决定到底是使用ID+bubble还是EX+bubble
+
+## 控制逻辑设计 9.18
+
+TODO:
+
+add
+addi
+sub
+div
+divu
+mult
+multu
+lui
+bgtz
+bgezal
+bltzal
+mfhi
+mflo
+mthi
+mtlo
+
+eret
+mfc0
+mtc0
+break
+syscall

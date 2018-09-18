@@ -16,14 +16,14 @@ main:
 	lw  $a2, kernel_size_t
 #	lb  $a2, 0x800001FF
 	jal read_sd_card
+	nop
 
 #bonus question:
 #	lw  $ra, kernel
 #	j   read_sd_card
 
 #normally:
-	lw  $a0, kernel
-	j   $a0
+	jal   kernel
 	nop
 
 # while(1) --> stop here
@@ -54,7 +54,7 @@ kernel : .word 0xa0800200
 kernel_main : .word 0xa0800200
 
 # 6. kernel sd position
-kernel_sd_position : .word 512
+kernel_sd_position : .word 0x00000200
 
 # 7. kernel size (temp)
-kernel_size_t: .word 512
+kernel_size_t: .word 0x00000200
