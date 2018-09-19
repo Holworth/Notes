@@ -70,6 +70,8 @@ ddata是在运行时创建的指针, 保存在栈中. 指针指向的空间由`m
 
 使用查看符号表/静态符号表命令
 
+sudo tar –zxvf ./gcc-4.3-ls232.tar.gz –C / 
+
 ```
 objdump -t
 objdump -T

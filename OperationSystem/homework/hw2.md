@@ -27,3 +27,16 @@ ref: https://www.cnblogs.com/yiyide266/p/5538079.html
 syscall
 
 它在<内核源码目录>/kernel/entry.S，Entry(system_call)的下一行。
+
+```
+cat `locate unistd_64` > log.log
+```
+
+```
+    eval 'sub __NR_gettimeofday () {96;}' unless defined(&__NR_gettimeofday);
+```
+
+http://man7.org/linux/man-pages/man2/gettimeofday.2.html
+
+
+Linux AW-OMEN 4.4.0-17713-Microsoft #1000-Microsoft Fri Jul 06 15:51:00 PST 2018 x86_64 x86_64 x86_64 GNU/Linux
