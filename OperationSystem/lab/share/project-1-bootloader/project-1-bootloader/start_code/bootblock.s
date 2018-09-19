@@ -28,7 +28,7 @@ main:
 #	j   read_sd_card
 
 #normally:
-	jal   kernel
+	jal   0xa0800200
 	nop
 
 # while(1) --> stop here
