@@ -3,18 +3,6 @@
 
 # Usage: Combine this with Reveal.js on Github
 
-# ## Usage:
-
-# ```
-# git clone https://github.com/hakimel/reveal.js
-# python ./mdppy.py yourfile.md
-# # Then move yourfile.md.html to root dir of reveal.js
-# ```
-
-# ***
-
-# Huaqiang Wang (c) 2018
-
 # TODO: title
 # TODO: theme
 # TODO: vertical-slides
@@ -46,24 +34,42 @@ def convertline(line):
     #在此处添加针对语法的特殊处理
     #对于单行语法    
     if "---" in line:
-        add(r'''
-        </textarea>
-        </section>
-        </section>
-        <section>
-        <section data-markdown>
-        <textarea data-template>
-        ''')
-        return 0
+        if insection==1:
+            add(r'''
+            </textarea>
+            </section>
+            </textarea>
+            </section>
+            <section data-markdown>
+            <textarea data-template>
+            ''')
+            return 0
+        else:
+            add(r'''
+                    </textarea>
+                    </section>
+                    <section data-markdown>
+                        <textarea data-template>
+                        ''')
+            return 0
     else: 
         if "--" in line:
-            add(r'''
-                </textarea>
-                </section>
-                <section data-markdown>
-                <textarea data-template>
-                ''')
-            return 0
+            if insection==0:
+                insection=1
+                add(r'''
+                    </textarea>
+                    <section data-markdown>
+                    <textarea data-template>
+                    ''')
+                return 0
+            else:
+                add(r'''
+                    </textarea>
+                    </section>
+                    <section data-markdown>
+                    <textarea data-template>
+                    ''')
+                return 0
 
     #对于块语法
         # if "@" in line:
@@ -158,7 +164,6 @@ add(r'''<!doctype html>
                         <a href="?transition=zoom#/transitions">Zoom</a>
                     </p>
                 </section>
-                <section>
                 <section data-markdown>
                     <textarea data-template>
 ''')
@@ -173,7 +178,6 @@ while True:
 #写文件尾
 add(r'''                        
                     </textarea>
-                </section>
                 </section>
                 
             </div>
@@ -206,17 +210,17 @@ output.write(paper)
 output.close()
 file.close()
 
-# #结束后调用命令行命令
-# # os.system('pdflatex output.tex %DOC%')
+#结束后调用命令行命令
+# os.system('pdflatex output.tex %DOC%')
 
-# # log=subprocess.call(r"pdflatex output.tex %DOC%",shell=True)
-# # print(log)
-# command="xcopy reveal.js .\\"+file_to_open+"_ppt"+" /S /Y"
-# print(outputfilename)
-# command2="xcopy "+outputfilename+" "+".\\"+file_to_open+"_ppt"+" /Y"
-# print(command2)
-# subprocess.call(command)
-# subprocess.call(command2)
+# log=subprocess.call(r"pdflatex output.tex %DOC%",shell=True)
+# print(log)
+command="xcopy reveal.js .\\"+file_to_open+"_ppt"+" /S /Y"
+print(outputfilename)
+command2="xcopy "+outputfilename+" "+".\\"+file_to_open+"_ppt"+" /Y"
+print(command2)
+subprocess.call(command)
+subprocess.call(command2)
 print("Convert finished.")
 input()
 

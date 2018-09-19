@@ -15,17 +15,21 @@ main:
 #	lw  $a1, kernel_sd_position
 #	lw  $a2, kernel_size_t
 #	lb  $a2, 0x800001FF
+
 	li  $a0, 0xa0800200
+#	li  $a0, 0xa0800000
 	li  $a1, 0x00000200
 	li  $a2, 0x00000200
+
+#normal way
 
 	jal 0x8007b1cc
 #	jal read_sd_card
 	nop
 
 #bonus question:
-#	lw  $ra, kernel
-#	j   read_sd_card
+#	lw  $ra, 0xa0800000
+#	j   0x8007b1cc
 
 #normally:
 	jal   0xa0800200
