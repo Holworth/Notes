@@ -5,8 +5,8 @@ main:
 	# 1) task1 call BIOS print string "It's bootblock!"
 
 	la  $a0, msg
-#	jal 0x8007b980
-	jal printstr
+	jal 0x8007b980
+#	jal printstr
 	nop
 
 	# 2) task2 call BIOS read kernel in SD card and jump to kernel start
@@ -15,7 +15,8 @@ main:
 	lw  $a1, kernel_sd_position
 	lw  $a2, kernel_size_t
 #	lb  $a2, 0x800001FF
-	jal read_sd_card
+	jal 0x8007b1cc
+#	jal read_sd_card
 	nop
 
 #bonus question:
