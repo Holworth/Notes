@@ -11,10 +11,14 @@ main:
 
 	# 2) task2 call BIOS read kernel in SD card and jump to kernel start
 
-	lw  $a0, kernel
-	lw  $a1, kernel_sd_position
-	lw  $a2, kernel_size_t
+#	lw  $a0, kernel
+#	lw  $a1, kernel_sd_position
+#	lw  $a2, kernel_size_t
 #	lb  $a2, 0x800001FF
+	li  $a0, 0xa0800200
+	li  $a1, 0x00000200
+	li  $a2, 0x00000200
+
 	jal 0x8007b1cc
 #	jal read_sd_card
 	nop
