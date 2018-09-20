@@ -60,7 +60,8 @@
         "xlocale": "cpp",
         "xlocmon": "c",
         "xmemory0": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "stdc++.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [
