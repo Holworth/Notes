@@ -1,7 +1,6 @@
-//top.v
+//A 5-level pipelined MIPs32 CPU 
 //Huaqiang Wang (c) 2018
-
-//A 5 level pipelined MIPs32 CPU 
+//top.v
 
 module mycpu_top(
     input            clk,
@@ -26,7 +25,8 @@ module mycpu_top(
     output  [31:0]   debug_wb_rf_wdata
 );
 
-//wire define
+//const wire define
+//---------------------------------
 
 assign inst_sram_en=1'b1;
 assign inst_sram_wen=4'b0000;
@@ -38,9 +38,70 @@ assign data_sram_en=1'b1;
 // assign data_sram_wen=MEM_write;//TODO
 //......
 
-//pipeline design
+//----------------------------------------------
+//Import modules
+//----------------------------------------------
 
-//stage IF
+//regfile
+//---------------------------------
+
+wire [4:0] regfile_waddr;
+wire [4:0] regfile_raddr1;
+wire [4:0] regfile_raddr2;
+wire regfile_wen;
+wire [31:0] regfile_wdata;
+wire [31:0] regfile_rdata1;
+wire [31:0] regfile_rdata2;
+
+reg_file regfile(
+	clk,
+	!resetn,
+	regfile_waddr,
+	regfile_raddr1,
+	regfile_raddr2,
+	regfile_wen,
+	regfile_wdata,
+	regfile_rdata1,
+	regfile_rdata2
+);
+
+//special regs
+//---------------------------------
+
+reg [31:0]HI;
+reg [31:0]LO;
+
+//alu
+//---------------------------------
+
+    wire [31:0] A,
+    wire [31:0] B,
+    wire [15:0] ALUop,
+    wire Overflow,
+    wire CarryOut,
+    wire Zero,
+    wire reg [31:0] Result
+
+alu alu(
+    A,
+    B,
+    ALUop,
+    Overflow,
+    CarryOut,
+    Zero,
+    Result
+);
+
+//mul&div
+//---------------------------------
+
+//TODO
+
+//------------------------------------------
+//Pipeline design
+//------------------------------------------
+
+//stage IF-----------------------------
 //IF control
 reg IF_ID_valid;//data in this stage is valid
 reg IF_ID_data;//TODO
@@ -59,6 +120,12 @@ assign IF_ID_allowout=IF_ID_readygo&&ID_EX_allowin;
 wire [31:0] IF_PC_in;
 wire [31:0] IF_inst_in;
 reg [31:0] IF_PC_reg;
+
+//Wires used for PC jumping
+wire PC_new;
+wire jump;
+wire PC_4;
+assign PC_4=IF_PC_reg+4;
 
 assign IF_inst_in=inst_sram_rdata;
 
@@ -147,7 +214,7 @@ always@(posedge clk)begin
 end
 
 
-//stage ID
+//stage ID----------------------------
 //ID control
 reg ID_EX_valid;//data in this stage is valid
 reg ID_EX_data;//TODO
@@ -167,8 +234,59 @@ assign ID_EX_allowout=ID_EX_readygo&&ID_EX_allowin;
 wire [31:0] ID_inst_in;
 assign ID_inst_in=IF_ID_inst_reg;
 
+//ID speical wire:
+
+//Additional Data Wire in ID
+
+wire [31:0]Offset00Ext={ID_inst_in[15]?14'b11_1111_1111_1111:14'b0,ID_inst_in[15:0],2'b00};
+wire [31:0]ImmUnsignedExt={16'b0,ID_inst_in[15:0]};
+wire [31:0]ImmSignedExt={ID_inst_in[15]?16'hffff:16'b0,ID_inst_in[15:0]};
+wire [31:0]LongJmp={PCReg[31:28],ID_inst_in[25:0],2'b00};
+
+//Additional Data Reg in ID/EX
+
+reg [31:0]Offset00Ext_reg;
+reg [31:0]ImmUnsignedExt_reg;
+reg [31:0]ImmSignedExt_reg;
+reg [31:0]LongJmp_reg;
+reg [31:0]LastPC_4;
+
+//d-ff with resetn
+always@(posedge clk)begin
+    if(!resetn)begin
+        Offset00Ext_reg<=32'b0;
+        ImmUnsignedExt_reg<=32'b0;
+        ImmSignedExt_reg<=32'b0;
+        LongJmp_reg<=32'b0;
+    end
+    else begin
+        Offset00Ext_reg<=Offset00Ext;
+        ImmUnsignedExt_reg<=ImmUnsignedExt;
+        ImmSignedExt_reg<=ImmSignedExt;
+        LongJmp_reg<=LongJmp;
+    end
+end
+
+always@(posedge clk)begin
+    if(!resetn)begin
+        LastPC_4<=32'b0;
+    end
+    else if(PC_write)
+        LastPC_4<=PC_4;
+    end
+end
+
+
+//Jump address calc in ID
+wire [31:0]jaddr_c;
+wire [31:0]jaddr_ac;
+wire jump_short;
+wire jump_long;
+wire jump_ac;
+
+
 //ID_EX data
-control_reg ID_EX_reg();
+pipe_reg ID_EX_reg();
 
 //ID data flow
 always@(posedge clk)begin
@@ -183,7 +301,7 @@ always@(posedge clk)begin
     end
 end
 
-//stage EX
+//stage EX--------------------------------------
 //EX control
 reg EX_MEM_valid;//data in this stage is valid
 reg EX_MEM_data;//TODO
@@ -201,7 +319,7 @@ assign EX_MEM_allowout=EX_MEM_readygo&&EX_MEM_allowin;
 //EX data
 
 //EX_MEM data
-control_reg EX_MEM_reg();
+pipe_reg EX_MEM_reg();
 
 //EX data flow
 always@(posedge clk)begin
@@ -216,7 +334,7 @@ always@(posedge clk)begin
     end
 end
 
-//stage MEM
+//stage MEM----------------------------------------
 //MEM control
 reg MEM_WB_valid;//data in this stage is valid
 reg MEM_WB_data;//TODO
@@ -234,7 +352,7 @@ assign MEM_WB_allowout=MEM_WB_readygo&&MEM_WB_allowin;
 //MEM data
 
 //MEM_WB data
-control_reg MEM_WB_reg();
+pipe_reg MEM_WB_reg();
 
 //MEM data flow
 always@(posedge clk)begin
@@ -249,8 +367,9 @@ always@(posedge clk)begin
     end
 end
 
-//stage WB
+//stage WB-----------------------------------
 
 //Reserved
+//---------------------------------
 
 endmodule

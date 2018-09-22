@@ -1,4 +1,4 @@
-module control_reg(
+module pipe_reg(
     input clk,
     input resetn
 );

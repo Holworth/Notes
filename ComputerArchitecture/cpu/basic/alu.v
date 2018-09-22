@@ -25,6 +25,9 @@
 `define ALUOP_SRL  16'b0000_0010_0000_0000
 `define ALUOP_SRA  16'b0000_0100_0000_0000
 `define ALUOP_LUI  16'b0000_1000_0000_0000
+`define ALUOP_A    16'b0001_0000_0000_0000
+`define ALUOP_B    16'b0010_0000_0000_0000
+
 
 module alu(
     input [`DATA_WIDTH - 1:0] A,
@@ -67,13 +70,13 @@ module alu(
     wire [63:0]shift_left_64;
     wire [63:0]shift_right_64;
 
-    assign shift_left_64={A,32'b0};
-    assign shift_right_64={32'b0,A};
-    assign shift_aright_64={32{A[31]},A};
+    assign shift_left_64={B,32'b0};
+    assign shift_right_64={32'b0,B};
+    assign shift_aright_64={32{B[31]},B};
     
-    assign result_sll=(shift_left_64<<B[4:0])[63:32];
-    assign result_srl=(shift_right_64>>B[4:0])[31:0];
-    assign result_sra=(shift_aright_64>>B[4:0])[31:0];
+    assign result_sll=(shift_left_64<<A[4:0])[63:32];
+    assign result_srl=(shift_right_64>>A[4:0])[31:0];
+    assign result_sra=(shift_aright_64>>A[4:0])[31:0];
 
     //LUI逻辑
 
@@ -94,7 +97,9 @@ module alu(
         (32{ALUop==`ALUOP_SLL}&result_sll)|
         (32{ALUop==`ALUOP_SRL}&result_srl)|
         (32{ALUop==`ALUOP_SRA}&result_sra)|
-        (32{ALUop==`ALUOP_LUI}&result_lui)
+        (32{ALUop==`ALUOP_LUI}&result_lui)|
+        (32{ALUop==`ALUOP_A}&A)|
+        (32{ALUop==`ALUOP_B}&B)
         ;
 
 endmodule

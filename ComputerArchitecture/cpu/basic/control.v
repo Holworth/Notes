@@ -4,62 +4,80 @@
 `include "define.v"
 
 module control(
-	input rst,
-	input clk,
-	input [31:0]InstructionReg,
-    input Branch,
-    input SpecialJump,
-	output reg PCwrite,
-	output reg MEMread,
-	output reg MEMwrite,
-	output reg REGwrite,
-	output reg Awrite,
-	output reg Bwrite,
-	output reg Instructionwrite,
-	output reg REGwritesrcbyAC, //Decided wire REGwrite is controlled by: 0: Control 1: ALUControl
-	// output Branch,//(wire: enable branch)
-	output reg ALUin1,// PC A
-	output reg [2:0]ALUin2, //B 0 4 (8) ImmSignedExt ImmUnsignedExt Offset00Ext
-	output reg ALUopsrc, //ALUopAC ALUopC
-    output reg ALUwrite,
-	output reg [1:0]PCsrc,// ALU A LongJump
-	output reg [3:0]REGwritesrc,// (:REGwritesrcbyAC) ALUout MEM MEMb MEMub MEMh MEMuh IMM160 MEMl MEMr A Shifter
-	output reg MEMwritesrc,// B ALUout
-	output reg [2:0]RegDst,// Ins20_16 Ins15_11 31 movn movz  
-	output reg LorD,// PC ALUout
-	input [5:0]BranchCond,// (5)
-    output [12:0]ExtenderControl,
-	// output reg [2:0]LoadControl,//(3)  lb lbu lh lhu lui lw lwl lwr
-	// output reg [2:0]StoreControl,//(3)  sb sh sw swl swr
-	// output reg [2:0]ShiftControl,//(3) sll sllv sra srav srl srlv
-
-	// output reg ALUmode,
-	output reg [2:0]ALUopC,
-	output R,
-	output reg [2:0]REGwriteaddrsrc,
-
-    //prj3 added
-    output reg Inst_Req_Valid,//
-	input Inst_Req_Ack,//
-
-	//Instruction response channel
-	input Inst_Valid,//
-	output reg Inst_Ack,//
-
-	//Memory request channel
-	input Mem_Req_Ack,//
-
-	//Memory data response channel
-	input Read_data_Valid,//
-	output reg Read_data_Ack,//
-
-    output reg Read_data_write,
-
-    output [15:0]CountNextState,
-
-    //for mul
-    output  MUL
-    
+    input [31:0]inst,
+    input [31:0]A,
+    input [31:0]B,
+    output jump_short,
+    output jump_long,
+    output [3:0]alu_b_src,
+    output [15:0] aluop,
+    output [3:0]mem_wen,
+    output reg_a_valid,
+    output reg_b_valid,
+    output mem_read,
+    output reg_write,
+    output [15:0]reg_write_src,
+    output [3:0]reg_write_tgt
 );
+
+assign inst2016=inst[20:16];
+assign opcode=inst[31:26];
+
+//decoder
+//----------------------------------
+
+assign beq_op= opcode==6'b000100;
+assign bgez_op= (opcode==6'b000001)&(inst2016==00001);
+assign blez_op= (opcode==6'b000110)&(inst2016==00000);
+assign bltz_op= opcode==6'b000001;
+assign bne_op= opcode==6'b000101;
+assign addiu_op= opcode==6'b001001;
+assign andi_op= opcode==6'b001100;
+assign lb_op= opcode==6'b100000;
+assign lbu_op= opcode==6'b100100;
+assign lh_op= opcode==6'b100001;
+assign lhu_op= opcode==6'b100101;
+assign lui_op= opcode==6'b001111;
+assign lw_op= opcode==6'b100011;
+assign lwl_op= opcode==6'b100010;
+assign lwr_op= opcode==6'b100110;
+assign ori_op= opcode==6'b001101;
+assign sb_op= opcode==6'b101000;
+assign sh_op= opcode==6'b101001;
+assign sw_op= opcode==6'b101011;
+assign swl_op= opcode==6'b101011;
+assign swr_op= opcode==6'b101110;
+assign xori_op= opcode==6'b001110;
+assign j_op= opcode==6'b000010;
+assign jal_op= opcode==6'b000011;
+assign slti_op= opcode==6'b001010;
+assign sltiu_op= opcode==6'b001011;
+assign addi_op= opcode==6'b001000;
+assign bgtz_op= (opcode==6'b000111)&(inst2016==00000);
+assign bgezal_op= (opcode==6'b000001)&(inst2016==10001);
+assign bltzal_op= (opcode==6'b000001)&(inst2016==10000);
+assign r_op= opcode==6'b000000;
+
+assign jump_short=
+beq_op&(A==B)|
+bgez_op&(!A[31])|
+blez_op&(A[31]|(A==0))|
+bltz_op&(A[31])|
+bne_op&(A!=B)|
+bgtz_op&((!A[31])&(A!=0))|
+bgezal_op&(!A[31])|
+bltzal_op&(A[31]);
+
+    output jump_long,
+    output [3:0]alu_b_src,
+    output [15:0] aluop,
+    output [3:0]mem_wen,
+    output reg_a_valid,
+    output reg_b_valid,
+    output mem_read,
+    output reg_write,
+    output [15:0]reg_write_src,
+    output [3:0]reg_write_tgt
+
 
 endmodule
