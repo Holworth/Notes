@@ -1,25 +1,32 @@
-module regfile(
-    input clk,
-    input [ 4:0] raddr1,
-    output [31:0] rdata1,
-    input [ 4:0] raddr2,
-    output [31:0] rdata2,
-    input we,
-    input [ 4:0] waddr,
-    input [31:0] wdata
+//reg.v
+//Huaqiang Wang (c) 2018
+
+
+`timescale 10 ns / 1 ns
+
+`define DATA_WIDTH 32
+`define ADDR_WIDTH 5
+
+
+module reg_file(
+	input clk,
+	input rst,
+	input [`ADDR_WIDTH - 1:0] waddr,
+	input [`ADDR_WIDTH - 1:0] raddr1,
+	input [`ADDR_WIDTH - 1:0] raddr2,
+	input wen,
+	input [`DATA_WIDTH - 1:0] wdata,
+	output [`DATA_WIDTH - 1:0] rdata1,
+	output [`DATA_WIDTH - 1:0] rdata2
 );
 
-reg [31:0] rf[31:0];
-
-// WRITE
-always @(posedge clk) begin
-    if (we) rf[waddr]<= wdata;
-end
-
-// READ OUT 1
-assign rdata1 = (raddr1==5’b0) ? 32’b0 : rf[raddr1];
-
-// READ OUT 2
-assign rdata2 = (raddr2==5’b0) ? 32’b0 : rf[raddr2];
+	reg [`DATA_WIDTH-1:0]rf[`DATA_WIDTH - 1:0];
+	assign rdata1=(raddr1==0)?32'd0:rf[raddr1];
+	assign rdata2=(raddr2==0)?32'd0:rf[raddr2];
+	always@(posedge clk)
+	begin
+	  if(wen)rf[waddr]<=wdata;
+	end
 
 endmodule
+

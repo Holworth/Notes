@@ -1,17 +1,27 @@
 //Define.v
 //Huaqiang Wang (c) 2018
 
+//GLOBAL-------------------------------
+
+`define DATA_WIDTH 32
+`define ADDR_WIDTH 5
+
 //ALU--------------------------------
 
-`define op_add =  12'd11;
-`define op_sub =  12'd10;
-`define op_slt =  12'd9;
-`define op_sltu =  12'd8;
-`define op_and =  12'd7;
-`define op_nor =  12'd6;
-`define op_or =  12'd5;
-`define op_xor =  12'd4;
-`define op_sll =  12'd3;
-`define op_srl =  12'd2;
-`define op_sra =  12'd1;
-`define op_lui =  12'd0;
+`define ALUOP_AND  16'b0000_0000_0000_0001
+`define ALUOP_OR   16'b0000_0000_0000_0010
+`define ALUOP_ADD  16'b0000_0000_0000_0100
+`define ALUOP_SUB  16'b0000_0000_0000_1000
+`define ALUOP_SLT  16'b0000_0000_0001_0000
+`define ALUOP_XOR  16'b0000_0000_0010_0000
+`define ALUOP_NOR  16'b0000_0000_0100_0000
+`define ALUOP_SLTU 16'b0000_0000_1000_0000
+`define ALUOP_SLL  16'b0000_0001_0000_0000
+`define ALUOP_SRL  16'b0000_0010_0000_0000
+`define ALUOP_SRA  16'b0000_0100_0000_0000
+`define ALUOP_LUI  16'b0000_1000_0000_0000
+
+//IF-------------------------------
+
+`define IF_STAGE_0=1'b0;
+`define IF_STAGE_1=1'b1;
