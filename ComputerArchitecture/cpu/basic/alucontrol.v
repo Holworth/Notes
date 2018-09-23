@@ -8,8 +8,10 @@ module alucontrol(
     output [4:0]reg_write_src,//5
     output [3:0]reg_write_tgt,//4
     output jmp,//1
-    output alu_a_src//1
-    //36 bit in total
+    output alu_a_src,//1
+    output reg_a_valid,
+    output reg_b_valid
+    //38 bit in total
 );
 
 assign function_op=inst[5:0];
@@ -252,5 +254,50 @@ assign regw_tgt_nop=jr_sop;
 assign jmp=jalr_sop|jr_sop;
 
 assign alu_a_src = sll_sop|sra_sop;
+
+assign reg_a_valid=
+    addu_sop|
+    and_sop|
+    jalr_sop|
+    jr_sop|
+    nor_sop|
+    or_sop|
+    sllv_sop|
+    slt_sop|
+    sltu_sop|
+    srav_sop|
+    srlv_sop|
+    subu_sop|
+    xor_sop|
+    add_sop|
+    sub_sop|
+    div_sop|
+    divu_sop|
+    mult_sop|
+    multu_sop|
+    mthi_sop|
+    mtlo_sop;
+
+assign reg_b_valid=
+    addu_sop|
+    and_sop|
+    nor_sop|
+    or_sop|
+    sllv_sop|
+    slt_sop|
+    sltu_sop|
+    srav_sop|
+    srlv_sop|
+    subu_sop|
+    xor_sop|
+    add_sop|
+    sll_sop|
+    sra_sop|
+    srl_sop|
+    sub_sop|
+    div_sop|
+    divu_sop|
+    mult_sop|
+    multu_sop;
 
 endmodule

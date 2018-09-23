@@ -93,14 +93,15 @@
 `define r	6'b000000
 
 //reg_write------------------
-`define regw_rd 5'b0001
-`define regw_r20 5'b0010
-`define regw_r21 5'b0100
+`define regw_rd 5'b00001
+`define regw_r20 5'b00010 //not used
+`define regw_r21 5'b00100 //not used
 `define regw_hi 5'b01000
 `define regw_lo 5'b10000
 `define regw_nop 5'b00000
 
 //reg_write_src--------------------
+//ie: reg_write_fsrc[4:0]
 `define regw_src_alu 5'b00001 
 `define regw_src_pc 5'b00010 
 `define regw_src_rs 5'b00100 
@@ -108,6 +109,7 @@
 `define regw_src_lo 5'b10000 
 
 //reg_write_tgt-------------------
+//ie:reg_write_ftgt[3:0]
 `define regw_tgt_rd 4'b0001 
 `define regw_tgt_hi 4'b0010 
 `define regw_tgt_lo 4'b0100 
@@ -127,4 +129,35 @@
 `define alu_b_src_immsigned 4'b0001;
 `define alu_b_src_a_immunsigned 4'b0010;
 `define alu_b_src_PC_8 4'b0100;
+`define alu_b_src_reg 4'b1000;
 //reserved
+
+//mem_wen_pick-----------------------
+`define sw 5'b00001
+`define sh 5'b00010
+`define sb 5'b00100
+`define swl 5'b01000
+`define swr 5'b10000
+
+//reg_write_src------------------------
+`define regw_fsrc_alu    16'b0000_0000_0000_0001 
+`define regw_fsrc_pc     16'b0000_0000_0000_0010 
+`define regw_fsrc_rs     16'b0000_0000_0000_0100 
+`define regw_fsrc_hi     16'b0000_0000_0000_1000 
+`define regw_fsrc_lo     16'b0000_0000_0001_0000 
+`define regw_fsrc_imm16  16'b0000_0000_0010_0000 
+`define regw_fsrc_pc8    16'b0000_0000_0100_0000 
+`define regw_fsrc_memb   16'b0000_0000_1000_0000 
+`define regw_fsrc_membu  16'b0000_0001_0000_0000 
+`define regw_fsrc_memh   16'b0000_0010_0000_0000 
+`define regw_fsrc_memhu  16'b0000_0100_0000_0000 
+`define regw_fsrc_meml   16'b0000_1000_0000_0000 
+`define regw_fsrc_memr   16'b0001_0000_0000_0000 
+
+//reg_write_ftgt-------------------
+`define regw_ftgt_rd     6'b000001 
+`define regw_ftgt_hi     6'b000010 
+`define regw_ftgt_lo     6'b000100 
+`define regw_ftgt_nop    6'b001000 
+`define regw_ftgt_rt     6'b010000 
+`define regw_ftgt_31     6'b100000 

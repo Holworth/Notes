@@ -35,8 +35,6 @@ assign inst_sram_wdata=32'b0;
 
 assign data_sram_en=1'b1;
 
-// assign data_sram_wen=MEM_write;//TODO
-//......
 
 //----------------------------------------------
 //Import modules
@@ -71,7 +69,7 @@ reg_file regfile(
 reg [31:0]HI;
 reg [31:0]LO;
 
-//alu
+//ALU
 //---------------------------------
 
     wire [31:0] A,
@@ -95,7 +93,7 @@ alu alu(
 //mul&div
 //---------------------------------
 
-//TODO
+//TODO 乘法除法实现
 
 //------------------------------------------
 //Pipeline design
@@ -132,14 +130,47 @@ assign IF_inst_in=inst_sram_rdata;
 //IF_ID data
 reg [31:0] IF_ID_inst_reg;
 reg [31:0] IF_ID_PC_reg;
+reg [31:0] IF_ID_PC4_reg;
 
-//d flipflop of IF_PC
+//Jump control
+wire jump_short;
+wire jump_long;
+wire jump_alu;
+wire jump_nop;
+
+wire [31:0]PC_jump_short;
+wire [31:0]PC_jump_long;
+wire [31:0]PC_jump_alu;
+
+assign jump_nop=~(jump_short|jump_long|jump_alu);
+
+assign IF_PC_in=
+    {32{jump_short}&PC_jump_short}|
+    {32{jump_long}&PC_jump_long}|
+    {32{jump_alu}&PC_jump_alu}|
+    {32{jump_short}&PC_4};
+
+//TODO : 整理代码
+
+//d flipflop of IF_PC_reg
 always@(posedge clk)begin
-    if(!reset)
+    if(!reset)begin
+        IF_PC_reg<=32'hbfc00000;
+    end
+    else begin
+        IF_PC_reg<=(IF_ID_allowout?IF_PC_in:IF_PC_reg);
+    end
+end
+
+//d flipflop of IF_ID_PC_reg
+always@(posedge clk)begin
+    if(!reset)begin
         IF_ID_PC_reg<=0;
+        IF_ID_PC4_reg<=0;
     end
     else begin
         IF_ID_PC_reg<=(IF_ID_allowout?IF_PC_reg:IF_ID_PC_reg);
+        IF_ID_PC4_reg<=(IF_ID_allowout?PC_4:IF_ID_PC4_reg);
     end
 end
 
@@ -161,7 +192,7 @@ always@(posedge clk)begin
     else if(IF_ID_allowin)begin
         IF_ID_valid<=IF_ID_valid_in;
     end
-    else if(IF_ID_valid_in&&IF_ID_allowin)begin
+    if(IF_ID_valid_in&&IF_ID_allowin)begin
         IF_ID_data<=IF_ID_datain;
     end
 end
@@ -241,7 +272,7 @@ assign ID_inst_in=IF_ID_inst_reg;
 wire [31:0]Offset00Ext={ID_inst_in[15]?14'b11_1111_1111_1111:14'b0,ID_inst_in[15:0],2'b00};
 wire [31:0]ImmUnsignedExt={16'b0,ID_inst_in[15:0]};
 wire [31:0]ImmSignedExt={ID_inst_in[15]?16'hffff:16'b0,ID_inst_in[15:0]};
-wire [31:0]LongJmp={PCReg[31:28],ID_inst_in[25:0],2'b00};
+wire [31:0]LongJmp={IF_PC_reg[31:28],ID_inst_in[25:0],2'b00};
 
 //Additional Data Reg in ID/EX
 
@@ -249,7 +280,6 @@ reg [31:0]Offset00Ext_reg;
 reg [31:0]ImmUnsignedExt_reg;
 reg [31:0]ImmSignedExt_reg;
 reg [31:0]LongJmp_reg;
-reg [31:0]LastPC_4;
 
 //d-ff with resetn
 always@(posedge clk)begin
@@ -267,15 +297,6 @@ always@(posedge clk)begin
     end
 end
 
-always@(posedge clk)begin
-    if(!resetn)begin
-        LastPC_4<=32'b0;
-    end
-    else if(PC_write)
-        LastPC_4<=PC_4;
-    end
-end
-
 
 //Jump address calc in ID
 wire [31:0]jaddr_c;
@@ -284,27 +305,166 @@ wire jump_short;
 wire jump_long;
 wire jump_ac;
 
+assign PC_jump_short=IF_PC_reg+Offset00Ext;
+assign PC_jump_long=LongJmp;
+assign PC_jump_alu=A_data;
+
+//Link reg read logic here
+
+wire ID_rs=IF_ID_inst_reg[25:21];
+wire ID_rt=IF_ID_inst_reg[20:16];
+wire ID_rd=IF_ID_inst_reg[15:11];
+
+regfile_raddr1=ID_rs;
+regfile_raddr2=ID_rt;
+
+wire [31:0]A_data=regfile_rdata1;
+wire [31:0]B_data=regfile_rdata2;
+
+//ID Decode Logic
+//Control and ALUcontrol
+
+wire ID_control_jump_short;//1
+wire ID_control_jump_long;//1
+wire ID_control_alu_b_src;//4
+wire ID_control_aluop;//16
+wire ID_control_mem_wen_pick;//5
+wire ID_control_reg_a_valid;//1
+wire ID_control_reg_b_valid;//1
+wire ID_control_mem_read;//1
+wire ID_control_reg_write;//1
+wire ID_control_reg_write_src;//16
+wire ID_control_reg_write_tgt;//6
+wire ID_control_r_type;/1
+wire ID_alucontrol_aluop;//16
+wire ID_alucontrol_mul_control;//4
+wire ID_alucontrol_reg_write;//5
+wire ID_alucontrol_reg_write_src;//5
+wire ID_alucontrol_reg_write_tgt;//4
+wire ID_alucontrol_jmp;//1
+wire ID_alucontrol_alu_a_src;//1
+wire ID_alucontrol_reg_a_valid;
+wire ID_alucontrol_reg_b_valid;
+
+control control(
+    IF_ID_inst_reg,
+    A_data,
+    B_data,
+    ID_control_jump_short,//1
+    ID_control_jump_long,//1
+    ID_control_alu_b_src,//4
+    ID_control_aluop,//16
+    ID_control_mem_wen_pick,//5
+    ID_control_reg_a_valid,//1
+    ID_control_reg_b_valid,//1
+    ID_control_mem_read,//1
+    ID_control_reg_write,//1
+    ID_control_reg_write_src,//16
+    ID_control_reg_write_tgt,//6
+    ID_control_r_type//1
+    //54 bit in total
+);
+
+alucontrol alucontrol(
+    IF_ID_inst_reg,
+    ID_alucontrol_aluop,//16
+    ID_alucontrol_mul_control,//4
+    ID_alucontrol_reg_write,//5
+    ID_alucontrol_reg_write_src,//5
+    ID_alucontrol_reg_write_tgt,//4
+    ID_alucontrol_jmp,//1
+    ID_alucontrol_alu_a_src,//1
+    ID_alucontrol_reg_a_valid,
+    ID_alucontrol_reg_b_valid
+    //38 bit in total
+);
+
+
+//Generate data to be saved
+
+wire [53:0]control_data=
+    {
+        ID_control_jump_short,
+        ID_control_jump_long,
+        ID_control_alu_b_src,
+        ID_control_aluop,
+        ID_control_mem_wen_pick,
+        ID_control_reg_a_valid,
+        ID_control_reg_b_valid,
+        ID_control_mem_read,
+        ID_control_reg_write,
+        ID_control_reg_write_src,
+        ID_control_reg_write_tgt,
+        ID_control_r_type
+    };
+
+wire [37:0]alucontrol_data=
+    {
+        ID_alucontrol_aluop,
+        ID_alucontrol_mul_control,
+        ID_alucontrol_reg_write,
+        ID_alucontrol_reg_write_src,
+        ID_alucontrol_reg_write_tgt,
+        ID_alucontrol_jmp,
+        ID_alucontrol_alu_a_src,
+        ID_alucontrol_reg_a_valid,
+        ID_alucontrol_reg_b_valid
+    };
+
+//Need to save:
+//inst 32
+//a,b 64
+//control logic 54+38
+
+wire [217:0]ID_data_gen=
+    {
+        IF_ID_inst_reg,
+        A_data,
+        B_data,
+        control_data,
+        alucontrol_data,
+        IF_ID_PC_reg
+    };
+
+
+pipe_reg_interpreter ID_control_signal(ID_data_gen);
+
+assign jump_short=ID_control_signal.jump_short;
+assign jump_long=ID_control_signal.jump_long;
+assign jump_alu=ID_control_signal.jump_alu;
+
+assign ID_EX_datain=ID_data_gen;
+
+//MEM addr calc
+
+wire [31:0]ID_MEM_addr;
+assign ID_MEM_addr=A_data+ImmSignedExt;
 
 //ID_EX data
-pipe_reg ID_EX_reg();
+reg [217:0] ID_EX_data;
+reg [31:0] ID_EX_MEM_addr_reg;
+pipe_reg_interpreter ID_EX_reg(ID_EX_data);
 
 //ID data flow
 always@(posedge clk)begin
     if(!resetn)begin
         ID_EX_valid<=1'b0;
+        ID_MEM_addr_reg<=32'b0;
     end
     else if(ID_EX_allowin)begin
         ID_EX_valid<=ID_EX_valid_in;
     end
-    else if(ID_EX_valid_in&&ID_EX_allowin)begin
+    if(ID_EX_valid_in&&ID_EX_allowin)begin
         ID_EX_data<=ID_EX_datain;
+        ID_EX_MEM_addr_reg<=ID_MEM_addr;
     end
 end
 
 //stage EX--------------------------------------
 //EX control
 reg EX_MEM_valid;//data in this stage is valid
-reg EX_MEM_data;//TODO
+reg [217:0]EX_MEM_data;
+wire [217:0]EX_MEM_data_in=ID_EX_data;
 wire EX_MEM_valid_in;//input wire: data from last stage is valid
 wire EX_MEM_allowin;//data can get in this stage
 wire EX_MEM_readygo;//data can get out of this stage
@@ -316,28 +476,45 @@ assign EX_MEM_allowin=EX_MEM_readygo&&EX_MEM_allowin||!EX_MEM_valid;
 assign EX_MEM_valid_out=EX_MEM_valid&&EX_MEM_readygo;
 assign EX_MEM_allowout=EX_MEM_readygo&&EX_MEM_allowin;
 
+//ALU
+    assign A=ID_EX_reg.A_data;
+    assign B=ID_EX_reg.B_data;
+    assign ALUop=ID_EX_reg.aluop;
+    // Overflow,
+    // CarryOut,
+    // Zero,
+
 //EX data
+reg [31:0] EX_result;
 
 //EX_MEM data
-pipe_reg EX_MEM_reg();
+reg [217:0] EX_MEM_data;
+reg [31:0] EX_MEM_MEM_addr_reg;
+
+pipe_reg_interpreter EX_MEM_reg(EX_MEM_data);
 
 //EX data flow
 always@(posedge clk)begin
     if(!resetn)begin
         EX_MEM_valid<=1'b0;
+        EX_result<=32'b0;
+        EX_MEM_MEM_addr_reg<=32'b0;
     end
     else if(EX_MEM_allowin)begin
         EX_MEM_valid<=EX_MEM_valid_in;
     end
-    else if(EX_MEM_valid_in&&EX_MEM_allowin)begin
+    if(EX_MEM_valid_in&&EX_MEM_allowin)begin
         EX_MEM_data<=EX_MEM_datain;
+        EX_result<=Result;
+        EX_MEM_MEM_addr_reg<=ID_EX_MEM_addr_reg;
     end
 end
 
 //stage MEM----------------------------------------
 //MEM control
 reg MEM_WB_valid;//data in this stage is valid
-reg MEM_WB_data;//TODO
+reg [217:0]MEM_WB_data;
+wire [217:0]MEM_WB_datain;
 wire MEM_WB_valid_in;//input wire: data from last stage is valid
 wire MEM_WB_allowin;//data can get in this stage
 wire MEM_WB_readygo;//data can get out of this stage
@@ -348,11 +525,21 @@ assign MEM_WB_readygo=TODO;//data can flow out of this stage
 assign MEM_WB_allowin=MEM_WB_readygo&&MEM_WB_allowin||!MEM_WB_valid;
 assign MEM_WB_valid_out=MEM_WB_valid&&MEM_WB_readygo;
 assign MEM_WB_allowout=MEM_WB_readygo&&MEM_WB_allowin;
+assign MEM_WB_datain=EX_MEM_data;
 
 //MEM data
+//MEM sockets:
+    wire [31:0]MEM_addr;
+    assign data_sram_addr=EX_MEM_MEM_addr_reg;//TODO
+    // data_sram_wen controlled by fsm
+    //EX_MEM_reg.B_data
+    SMUX(EX_MEM_reg.B_data);//TODO
+    LMUX(data_sram_rdata);//TODO
+    assign data_sram_wdata=SMUX_result;//TODO
 
 //MEM_WB data
-pipe_reg MEM_WB_reg();
+pipe_reg_interpreter MEM_WB_reg(MEM_WB_data);
+reg [31:0]MEM_result;
 
 //MEM data flow
 always@(posedge clk)begin
@@ -362,12 +549,19 @@ always@(posedge clk)begin
     else if(MEM_WB_allowin)begin
         MEM_WB_valid<=MEM_WB_valid_in;
     end
-    else if(MEM_WB_valid_in&&MEM_WB_allowin)begin
+    if(MEM_WB_valid_in&&MEM_WB_allowin)begin
         MEM_WB_data<=MEM_WB_datain;
     end
 end
 
 //stage WB-----------------------------------
+
+//TODO: Link debug wires
+//debug interface
+    output  [31:0]   debug_wb_pc,
+    output  [3 :0]   debug_wb_rf_wen,
+    output  [4 :0]   debug_wb_rf_wnum,
+    output  [31:0]   debug_wb_rf_wdata
 
 //Reserved
 //---------------------------------
