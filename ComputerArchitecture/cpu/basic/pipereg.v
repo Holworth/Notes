@@ -1,3 +1,8 @@
+//pipereg.v
+//pipe_reg_interpreter
+//Huaqiang Wang (c) 2018
+`include "define.v"
+
 module pipe_reg_interpreter(
     input [217:0] datain
 );
@@ -22,21 +27,21 @@ assign
 
 wire control_jump_short;//1
 wire control_jump_long;//1
-wire control_alu_b_src;//4
-wire control_aluop;//16
-wire control_mem_wen_pick;//5
+wire [3:0]control_alu_b_src;//4
+wire [15:0]control_aluop;//16
+wire [4:0]control_mem_wen_pick;//5
 wire control_reg_a_valid;//1
 wire control_reg_b_valid;//1
 wire control_mem_read;//1
 wire control_reg_write;//1
-wire control_reg_write_src;//16
-wire control_reg_write_tgt;//6
+wire [15:0]control_reg_write_src;//16
+wire [5:0]control_reg_write_tgt;//6
 wire control_r_type;/1
-wire alucontrol_aluop;//16
-wire alucontrol_mul_control;//4
-wire alucontrol_reg_write;//5
-wire alucontrol_reg_write_src;//5
-wire alucontrol_reg_write_tgt;//4
+wire [16:0]alucontrol_aluop;//16
+wire [3:0]alucontrol_mul_control;//4
+wire [4:0]alucontrol_reg_write;//5
+wire [5:0]alucontrol_reg_write_src;//5
+wire [4:0]alucontrol_reg_write_tgt;//4
 wire alucontrol_jmp;//1
 wire alucontrol_alu_a_src;//1
 wire alucontrol_reg_a_valid;
@@ -76,7 +81,7 @@ assign
     =alucontrol_data;
 
 //Generate real control logic
-wire [4:0]reg_write;
+wire reg_write;
 wire [3:0]mul_control;
 wire alu_a_src;
 wire [3:0]alu_b_src;
@@ -87,12 +92,18 @@ wire jump_short;
 wire jump_long;
 wire jump_alu;
 wire [15:0]aluop;
-wire [4:0]mem_wen_pick;
 wire reg_a_valid;
 wire reg_b_valid;
 wire mem_read;
-wire reg_write;
 wire r_type;
+wire [4:0]rs;
+wire [4:0]rt;
+wire [4:0]rd;
+
+assign rs=inst[25:21];
+assign rt=inst[20:16];
+assign rd=inst[15:11];
+
 
 assign reg_write=(r_type?alucontrol_reg_write:control_reg_write);
 assign mul_control=(r_type?alucontrol_mul_control:4'b0);
@@ -105,12 +116,22 @@ assign jump_short=control_jump_short;
 assign jump_long=control_jump_long;
 assign jump_alu=jump_alu;
 assign aluop=(r_type?alucontrol_aluop:control_aluop);
-assign mem_wen_pick=control_mem_wen_pick;
 assign reg_a_valid=(r_type?alucontrol_reg_a_valid:control_reg_a_valid);
 assign reg_b_valid=(r_type?alucontrol_reg_b_valid:control_reg_b_valid);
 assign mem_read=control_mem_read;
 assign reg_write=(r_type?alucontrol_reg_write:control_reg_write);
 assign r_type=control_r_type;
 
+wire [4:0]regfile_waddr;
 
-endmodule;
+assign regfile_waddr=
+    {5{reg_write_tgt[0]}}&rd|
+    {5{reg_write_tgt[4]}}&rt|
+    {5{reg_write_tgt[5]}}&5'b31;
+
+wire mem_write=
+    control_mem_wen_pick!=0;
+
+//TODO: move all these logic into decode part
+
+endmodule

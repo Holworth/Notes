@@ -1,3 +1,6 @@
+//alucontrol.v
+//Huaqiang Wang (c) 2018
+
 `include "define.v"
 
 module alucontrol(
@@ -209,7 +212,7 @@ assign regw_src_pc=jalr_sop;
 
 assign regw_src_rs=
     movn_sop|
-    movz_sop;
+    movz_sop;//not implemented
 
 assign regw_src_hi=mfhi_sop;
 assign regw_src_lo=mflo_sop;

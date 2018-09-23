@@ -104,7 +104,7 @@
 //ie: reg_write_fsrc[4:0]
 `define regw_src_alu 5'b00001 
 `define regw_src_pc 5'b00010 
-`define regw_src_rs 5'b00100 
+`define regw_src_rs 5'b00100 //not implemented
 `define regw_src_hi 5'b01000 
 `define regw_src_lo 5'b10000 
 
@@ -122,8 +122,8 @@
 `define divu_mc 4'1000
 
 //alu_a_src--------------------------
-`define alu_a_src_a 0;
-`define alu_a_src_sa 1;
+`define alu_a_src_a 1'b0;
+`define alu_a_src_sa 1'b1;
 
 //alu_b_src--------------------------
 `define alu_b_src_immsigned 4'b0001;
@@ -133,11 +133,11 @@
 //reserved
 
 //mem_wen_pick-----------------------
-`define sw 5'b00001
-`define sh 5'b00010
-`define sb 5'b00100
-`define swl 5'b01000
-`define swr 5'b10000
+`define mem_wen_pick_sw 5'b00001
+`define mem_wen_pick_sh 5'b00010
+`define mem_wen_pick_sb 5'b00100
+`define mem_wen_pick_swl 5'b01000
+`define mem_wen_pick_swr 5'b10000
 
 //reg_write_src------------------------
 `define regw_fsrc_alu    16'b0000_0000_0000_0001 
@@ -153,6 +153,8 @@
 `define regw_fsrc_memhu  16'b0000_0100_0000_0000 
 `define regw_fsrc_meml   16'b0000_1000_0000_0000 
 `define regw_fsrc_memr   16'b0001_0000_0000_0000 
+`define regw_fsrc_mem    16'b0010_0000_0000_0000 
+`define regw_fsrc_lui    16'b0100_0000_0000_0000 
 
 //reg_write_ftgt-------------------
 `define regw_ftgt_rd     6'b000001 
@@ -161,3 +163,28 @@
 `define regw_ftgt_nop    6'b001000 
 `define regw_ftgt_rt     6'b010000 
 `define regw_ftgt_31     6'b100000 
+
+// {reg_write_src,mem_wen_pick}-------------
+`define lw {`regw_fsrc_mem,5'b0}
+`define lb {`regw_fsrc_memb,5'b0}
+`define lh {`regw_fsrc_memh,5'b0}
+`define lbu {`regw_fsrc_membu,5'b0}
+`define lhu {`regw_fsrc_memhu,5'b0}
+`define lwl {`regw_fsrc_meml,5'b0}
+`define lwr {`regw_fsrc_memr,5'b0}
+`define swl {16'b0,`mem_wen_pick_swl}
+`define swr {16'b0,`mem_wen_pick_swr}
+`define sb {16'b0,`mem_wen_pick_sb}
+`define sh {16'b0,`mem_wen_pick_sh}
+`define sw {16'b0,`mem_wen_pick_sw}
+`define lui {`regw_fsrc_lui,5'b0}
+
+`define alu {`regw_fsrc_alu,5'b0}
+`define pc {`regw_fsrc_pc,5'b0}
+`define hi {`regw_fsrc_hi,5'b0}
+`define lo {`regw_fsrc_lo,5'b0}
+`define imm16 {`regw_fsrc_imm16,5'b0}
+`define pc8 {`regw_fsrc_pc8,5'b0}
+
+//bubble-----------------
+`define bubble 217'b0

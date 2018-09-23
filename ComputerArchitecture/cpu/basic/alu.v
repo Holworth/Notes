@@ -36,7 +36,7 @@ module alu(
     output Overflow,
     output CarryOut,
     output Zero,
-    output reg [`DATA_WIDTH - 1:0] Result
+    output [`DATA_WIDTH - 1:0] Result
 );
 
     // reg [`DATA_WIDTH - 1:0] Result;
@@ -61,22 +61,25 @@ module alu(
     assign Zero=({Result}==0);
 
     assign Overflow=
-        ((ALUop==`ADD)?
+        ((ALUop==`ALUOP_AND)?
         (A[`DATA_WIDTH - 1]==B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]):
         (A[`DATA_WIDTH - 1]!=B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]));
     
     //移位器逻辑
 
-    wire [63:0]shift_left_64;
     wire [63:0]shift_right_64;
+    wire [63:0]shift_aright_64;
 
-    assign shift_left_64={B,32'b0};
-    assign shift_right_64={32'b0,B};
-    assign shift_aright_64={32{B[31]},B};
+    wire [31:0]result_sll;
+    wire [31:0]result_sr;
     
-    assign result_sll=(shift_left_64<<A[4:0])[63:32];
-    assign result_srl=(shift_right_64>>A[4:0])[31:0];
-    assign result_sra=(shift_aright_64>>A[4:0])[31:0];
+    wire op_sra;
+    assign op_sra=ALUop[10];
+
+    assign shift_right_64={{32{op_sra&B[31]}},B}>>A[4:0];
+    
+    assign result_sll=B<<A[4:0];
+    assign result_sr=shift_right_64[31:0];
 
     //LUI逻辑
 
@@ -86,20 +89,20 @@ module alu(
     //选择器逻辑
 
     assign Result=
-        (32{ALUop==`ALUOP_AND}&(A&B))|
-        (32{ALUop==`ALUOP_OR }&(A|B))|
-        (32{ALUop==`ALUOP_ADD}&adder)|
-        (32{ALUop==`ALUOP_SUB}&adder)|
-        (32{ALUop==`ALUOP_XOR}&(A^B))|
-        (32{ALUop==`ALUOP_NOR}&(~(A|B)))|
-        (32{ALUop==`ALUOP_SLTU}&{31'b0,CarryOut})|
-        (32{ALUop==`ALUOP_SLT}&{31'b0,adder[`DATA_WIDTH-1]^Overflow})|
-        (32{ALUop==`ALUOP_SLL}&result_sll)|
-        (32{ALUop==`ALUOP_SRL}&result_srl)|
-        (32{ALUop==`ALUOP_SRA}&result_sra)|
-        (32{ALUop==`ALUOP_LUI}&result_lui)|
-        (32{ALUop==`ALUOP_A}&A)|
-        (32{ALUop==`ALUOP_B}&B)
+        ({32{ALUop==`ALUOP_AND}}&(A&B))|
+        ({32{ALUop==`ALUOP_OR} }&(A|B))|
+        ({32{ALUop==`ALUOP_ADD}}&adder)|
+        ({32{ALUop==`ALUOP_SUB}}&adder)|
+        ({32{ALUop==`ALUOP_XOR}}&(A^B))|
+        ({32{ALUop==`ALUOP_NOR}}&(~(A|B)))|
+        ({32{ALUop==`ALUOP_SLTU}}&{31'b0,CarryOut})|
+        ({32{ALUop==`ALUOP_SLT}}&{31'b0,adder[`DATA_WIDTH-1]^Overflow})|
+        ({32{ALUop==`ALUOP_SLL}}&result_sll)|
+        ({32{ALUop==`ALUOP_SRL}}&result_sr)|
+        ({32{ALUop==`ALUOP_SRA}}&result_sr)|
+        ({32{ALUop==`ALUOP_LUI}}&result_lui)|
+        ({32{ALUop==`ALUOP_A}}&A)|
+        ({32{ALUop==`ALUOP_B}}&B)
         ;
 
 endmodule

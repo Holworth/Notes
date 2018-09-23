@@ -226,6 +226,7 @@ wire regw_fsrc_memh;
 wire regw_fsrc_memhu;
 wire regw_fsrc_meml;
 wire regw_fsrc_memr;
+wire regw_fsrc_mem;
 
 assign reg_write_src[0]= regw_fsrc_alu;
 assign reg_write_src[1]= regw_fsrc_pc;
@@ -240,7 +241,9 @@ assign reg_write_src[9]= regw_fsrc_memh;
 assign reg_write_src[10]= regw_fsrc_memhu;
 assign reg_write_src[11]= regw_fsrc_meml;
 assign reg_write_src[12]= regw_fsrc_memr;
-assign reg_write_src[15:13]=3'b0;
+assign reg_write_src[13]= regw_fsrc_mem;
+assign reg_write_src[14]= regw_fsrc_lui;
+assign reg_write_src[15]=1'b0;
 
 assign regw_fsrc_alu=
     lui_op|
@@ -255,17 +258,20 @@ assign regw_fsrc_pc=0;
 assign regw_fsrc_rs=0;
 assign regw_fsrc_hi=0;
 assign regw_fsrc_lo=0;
-assign regw_fsrc_imm16=lui;
+// assign regw_fsrc_imm16=lui;
+assign regw_fsrc_imm16=0;//changed into lui
 assign regw_fsrc_pc8=
-    jal|
-    bgezal|
-    bltzal;
+    jal_op|
+    bgezal_op|
+    bltzal_op;
 assign regw_fsrc_memb=lb_op;
 assign regw_fsrc_membu=lbu_op;
 assign regw_fsrc_memh=lh_op;
 assign regw_fsrc_memhu=lhu_op;
 assign regw_fsrc_meml=lwl_op;
 assign regw_fsrc_memr=lwr_op;
+assign regw_fsrc_mem=lw_op;
+assign regw_fsrc_lui=lui_op;
 
 // output [3:0]reg_write_tgt
 wire regw_ftgt_rd;
