@@ -60,37 +60,37 @@
 `define subop_mtlo	6'b010011
 
 //control
-`define beq	6'b000100
-`define bgez	6'b000001
-`define blez	6'b000110
-`define bltz	6'b000001
-`define bne	6'b000101
-`define addiu	6'b001001
-`define andi	6'b001100
-`define lb	6'b100000
-`define lbu	6'b100100
-`define lh	6'b100001
-`define lhu	6'b100101
-`define lui	6'b001111
-`define lw	6'b100011
-`define lwl	6'b100010
-`define lwr	6'b100110
-`define ori	6'b001101
-`define sb	6'b101000
-`define sh	6'b101001
-`define sw	6'b101011
-`define swl	6'b101011
-`define swr	6'b101110
-`define xori	6'b001110
-`define j	6'b000010
-`define jal	6'b000011
-`define slti	6'b001010
-`define sltiu	6'b001011
-`define addi	6'b001000
-`define bgtz	6'b000111
-`define bgezal	6'b000001
-`define bltzal	6'b000001
-`define r	6'b000000
+`define beq_ins	6'b000100
+`define bgez_ins	6'b000001
+`define blez_ins	6'b000110
+`define bltz_ins	6'b000001
+`define bne_ins	6'b000101
+`define addiu_ins	6'b001001
+`define andi_ins	6'b001100
+`define lb_ins	6'b100000
+`define lbu_ins	6'b100100
+`define lh_ins	6'b100001
+`define lhu_ins	6'b100101
+`define lui_ins	6'b001111
+`define lw_ins	6'b100011
+`define lwl_ins	6'b100010
+`define lwr_ins	6'b100110
+`define ori_ins	6'b001101
+`define sb_ins	6'b101000
+`define sh_ins	6'b101001
+`define sw_ins	6'b101011
+`define swl_ins	6'b101011
+`define swr_ins	6'b101110
+`define xori_ins	6'b001110
+`define j_ins	6'b000010
+`define jal_ins	6'b000011
+`define slti_ins	6'b001010
+`define sltiu_ins	6'b001011
+`define addi_ins	6'b001000
+`define bgtz_ins	6'b000111
+`define bgezal_ins	6'b000001
+`define bltzal_ins	6'b000001
+`define r_ins	6'b000000
 
 //reg_write------------------
 `define regw_rd 5'b00001
@@ -116,10 +116,10 @@
 `define regw_tgt_nop 4'b1000 
  
 //mul_control----------------------
-`define mult_mc 4'0001
-`define multu_mc 4'0010
-`define div_mc 4'0100
-`define divu_mc 4'1000
+`define mult_mc 4'b0001
+`define multu_mc 4'b0010
+`define div_mc 4'b0100
+`define divu_mc 4'b1000
 
 //alu_a_src--------------------------
 `define alu_a_src_a 1'b0;
@@ -187,4 +187,4 @@
 `define pc8 {`regw_fsrc_pc8,5'b0}
 
 //bubble-----------------
-`define bubble 217'b0
+`define bubble 219'b0

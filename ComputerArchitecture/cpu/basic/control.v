@@ -22,16 +22,49 @@ module control(
     //54 bit in total
 );
 
+wire [4:0]inst2016;
+wire [5:0]opcode;
+
 assign inst2016=inst[20:16];
 assign opcode=inst[31:26];
-assign r_type=r_op;
 
 //decoder
 //----------------------------------
+wire beq_op;
+wire bgez_op;
+wire blez_op;
+wire bltz_op;
+wire bne_op;
+wire addiu_op;
+wire andi_op;
+wire lb_op;
+wire lbu_op;
+wire lh_op;
+wire lhu_op;
+wire lui_op;
+wire lw_op;
+wire lwl_op;
+wire lwr_op;
+wire ori_op;
+wire sb_op;
+wire sh_op;
+wire sw_op;
+wire swl_op;
+wire swr_op;
+wire xori_op;
+wire j_op;
+wire jal_op;
+wire slti_op;
+wire sltiu_op;
+wire addi_op;
+wire bgtz_op;
+wire bgezal_op;
+wire bltzal_op;
+wire r_op;
 
 assign beq_op= opcode==6'b000100;
-assign bgez_op= (opcode==6'b000001)&(inst2016==00001);
-assign blez_op= (opcode==6'b000110)&(inst2016==00000);
+assign bgez_op= (opcode==6'b000001)&(inst2016==5'b00001);
+assign blez_op= (opcode==6'b000110)&(inst2016==5'b00000);
 assign bltz_op= opcode==6'b000001;
 assign bne_op= opcode==6'b000101;
 assign addiu_op= opcode==6'b001001;
@@ -56,10 +89,12 @@ assign jal_op= opcode==6'b000011;
 assign slti_op= opcode==6'b001010;
 assign sltiu_op= opcode==6'b001011;
 assign addi_op= opcode==6'b001000;
-assign bgtz_op= (opcode==6'b000111)&(inst2016==00000);
-assign bgezal_op= (opcode==6'b000001)&(inst2016==10001);
-assign bltzal_op= (opcode==6'b000001)&(inst2016==10000);
+assign bgtz_op= (opcode==6'b000111)&(inst2016==5'b00000);
+assign bgezal_op= (opcode==6'b000001)&(inst2016==5'b10001);
+assign bltzal_op= (opcode==6'b000001)&(inst2016==5'b10000);
 assign r_op= opcode==6'b000000;
+
+assign r_type=r_op;
 
 assign jump_short=
 beq_op&(A==B)|
@@ -102,9 +137,10 @@ assign alu_b_src_immsigned=
     addi_op;
 
 assign alu_b_src_a_immunsigned=
-    andi|
-    ori|
-    xori;
+    andi_op|
+    ori_op|
+    xori_op|
+    lui_op;
 
 assign alu_b_src_PC_8=jal_op;
 assign alu_b_src_reg=r_op;
@@ -227,6 +263,7 @@ wire regw_fsrc_memhu;
 wire regw_fsrc_meml;
 wire regw_fsrc_memr;
 wire regw_fsrc_mem;
+wire regw_fsrc_lui;
 
 assign reg_write_src[0]= regw_fsrc_alu;
 assign reg_write_src[1]= regw_fsrc_pc;
@@ -271,7 +308,7 @@ assign regw_fsrc_memhu=lhu_op;
 assign regw_fsrc_meml=lwl_op;
 assign regw_fsrc_memr=lwr_op;
 assign regw_fsrc_mem=lw_op;
-assign regw_fsrc_lui=lui_op;
+assign regw_fsrc_lui=0;//use alu instead. so we can do bypass on lui
 
 // output [3:0]reg_write_tgt
 wire regw_ftgt_rd;

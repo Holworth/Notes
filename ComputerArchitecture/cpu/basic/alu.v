@@ -83,7 +83,7 @@ module alu(
 
     //LUI逻辑
 
-    wire result_lui;
+    wire [31:0]result_lui;
     assign result_lui={B[15:0],16'b0};//TODO
 
     //选择器逻辑

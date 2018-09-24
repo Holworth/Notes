@@ -17,6 +17,7 @@ module alucontrol(
     //38 bit in total
 );
 
+wire [5:0]function_op;
 assign function_op=inst[5:0];
 
 //reg_write has special control! it may depends on rread2, so data correlation may happen on it!
@@ -51,34 +52,34 @@ wire mflo_sop;
 wire mthi_sop;
 wire mtlo_sop;
 
-assign addu_sop=function_op==100001;
-assign and_sop=function_op==100100;
-assign jalr_sop=function_op==001001;
-assign jr_sop=function_op==001000;
-assign movn_sop=function_op==001011;//not implemented
-assign movz_sop=function_op==001010;//not implemented
-assign nor_sop=function_op==100111;
-assign or_sop=function_op==100101;
-assign sll_sop=function_op==000000;
-assign sllv_sop=function_op==000100;
-assign slt_sop=function_op==101010;
-assign sltu_sop=function_op==101011;
-assign sra_sop=function_op==000011;
-assign srav_sop=function_op==000111;
-assign srl_sop=function_op==000010;
-assign srlv_sop=function_op==000110;
-assign subu_sop=function_op==100011;
-assign xor_sop=function_op==100110;
-assign add_sop=function_op==100000;
-assign sub_sop=function_op==100010;
-assign div_sop=function_op==011010;
-assign divu_sop=function_op==011011;
-assign mult_sop=function_op==011000;
-assign multu_sop=function_op==011001;
-assign mfhi_sop=function_op==010000;
-assign mflo_sop=function_op==010010;
-assign mthi_sop=function_op==010001;
-assign mtlo_sop=function_op==010011;
+assign addu_sop=function_op==6'b100001;
+assign and_sop=function_op==6'b100100;
+assign jalr_sop=function_op==6'b001001;
+assign jr_sop=function_op==6'b001000;
+assign movn_sop=function_op==6'b001011;//not implemented
+assign movz_sop=function_op==6'b001010;//not implemented
+assign nor_sop=function_op==6'b100111;
+assign or_sop=function_op==6'b100101;
+assign sll_sop=function_op==6'b000000;
+assign sllv_sop=function_op==6'b000100;
+assign slt_sop=function_op==6'b101010;
+assign sltu_sop=function_op==6'b101011;
+assign sra_sop=function_op==6'b000011;
+assign srav_sop=function_op==6'b000111;
+assign srl_sop=function_op==6'b000010;
+assign srlv_sop=function_op==6'b000110;
+assign subu_sop=function_op==6'b100011;
+assign xor_sop=function_op==6'b100110;
+assign add_sop=function_op==6'b100000;
+assign sub_sop=function_op==6'b100010;
+assign div_sop=function_op==6'b011010;
+assign divu_sop=function_op==6'b011011;
+assign mult_sop=function_op==6'b011000;
+assign multu_sop=function_op==6'b011001;
+assign mfhi_sop=function_op==6'b010000;
+assign mflo_sop=function_op==6'b010010;
+assign mthi_sop=function_op==6'b010001;
+assign mtlo_sop=function_op==6'b010011;
 
 //gen output
 // assign aluop=
@@ -129,16 +130,18 @@ assign sra_alu=sra_sop|srav_sop;
 assign lui_alu=0;
 assign a_alu=mthi_sop|mtlo_sop;
 assign b_alu=0;
-
-assign mul_control= {4{mult_sop}}&`mult_mc|
-                    {4{multu_sop}}&`multu_mc|
-                    {4{div_sop}}&`div_mc|
-                    {4{divu_sop}}&`divu_mc;
+ 
+assign mul_control= ({4{mult_sop}}&`mult_mc)|
+                    ({4{multu_sop}}&`multu_mc)|
+                    ({4{div_sop}}&`div_mc)|
+                    ({4{divu_sop}}&`divu_mc);
 
 wire reg_write_rd;
 wire reg_write_r2;
 wire reg_write_hi;
 wire reg_write_lo;
+wire reg_write_r20;
+wire reg_write_r21;
 
 assign reg_write[0]=reg_write_rd;
 assign reg_write[1]=reg_write_r20;
@@ -169,6 +172,7 @@ assign reg_write_rd=
     mfhi_sop|
     mflo_sop;
 
+//Not implemented:
 assign reg_write_r20=movn_sop;
 assign reg_write_r21=movz_sop;
 assign reg_write_hi=mfhi_sop;
