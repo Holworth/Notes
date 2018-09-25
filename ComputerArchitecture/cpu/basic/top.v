@@ -194,11 +194,11 @@ end
 //d flipflop of IF_ID_PC_reg
 always@(posedge clk)begin
     if(!resetn)begin
-        IF_ID_PC_reg<=0;
+//        IF_ID_PC_reg<=0;
         IF_ID_PC4_reg<=0;
     end
     else begin
-        IF_ID_PC_reg<=(IF_ID_allowout?IF_PC_reg:IF_ID_PC_reg);
+//        IF_ID_PC_reg<=(IF_ID_allowout?IF_PC_reg:IF_ID_PC_reg);
         IF_ID_PC4_reg<=(IF_ID_allowout?PC_4:IF_ID_PC4_reg);
     end
 end
@@ -659,12 +659,12 @@ wire corelation_B1;
 wire corelation_B2;
 wire corelation_B3;
 
-assign corelation_A1=(ID_rs!=0)&(ID_rs==ID_EX_reg.regfile_waddr)&ID_EX_reg.reg_write;
-assign corelation_A2=(ID_rs!=0)&(ID_rs==EX_MEM_reg.regfile_waddr)&EX_MEM_reg.reg_write;
-assign corelation_A3=(ID_rs!=0)&(ID_rs==MEM_WB_reg.regfile_waddr)&MEM_WB_reg.reg_write;
-assign corelation_B1=(ID_rt!=0)&(ID_rt==ID_EX_reg.regfile_waddr)&ID_EX_reg.reg_write;
-assign corelation_B2=(ID_rt!=0)&(ID_rt==EX_MEM_reg.regfile_waddr)&EX_MEM_reg.reg_write;
-assign corelation_B3=(ID_rt!=0)&(ID_rt==MEM_WB_reg.regfile_waddr)&MEM_WB_reg.reg_write;
+assign corelation_A1=ID_control_signal.reg_a_valid&(ID_rs!=0)&(ID_rs==ID_EX_reg.regfile_waddr)&ID_EX_reg.reg_write;
+assign corelation_A2=ID_control_signal.reg_a_valid&(ID_rs!=0)&(ID_rs==EX_MEM_reg.regfile_waddr)&EX_MEM_reg.reg_write;
+assign corelation_A3=ID_control_signal.reg_a_valid&(ID_rs!=0)&(ID_rs==MEM_WB_reg.regfile_waddr)&MEM_WB_reg.reg_write;
+assign corelation_B1=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==ID_EX_reg.regfile_waddr)&ID_EX_reg.reg_write;
+assign corelation_B2=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==EX_MEM_reg.regfile_waddr)&EX_MEM_reg.reg_write;
+assign corelation_B3=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==MEM_WB_reg.regfile_waddr)&MEM_WB_reg.reg_write;
 
 wire bypass_A2;
 wire bypass_A3;
