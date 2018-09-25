@@ -37,11 +37,11 @@ wire control_reg_write;//1
 wire [15:0]control_reg_write_src;//16
 wire [5:0]control_reg_write_tgt;//6
 wire control_r_type;//1
-wire [16:0]alucontrol_aluop;//16
+wire [15:0]alucontrol_aluop;//16
 wire [3:0]alucontrol_mul_control;//4
 wire [4:0]alucontrol_reg_write;//5
-wire [5:0]alucontrol_reg_write_src;//5
-wire [4:0]alucontrol_reg_write_tgt;//4
+wire [4:0]alucontrol_reg_write_src;//5
+wire [3:0]alucontrol_reg_write_tgt;//4
 wire alucontrol_jmp;//1
 wire alucontrol_alu_a_src;//1
 wire alucontrol_reg_a_valid;
@@ -118,7 +118,7 @@ assign reg_write_src=(r_type?{11'b0,alucontrol_reg_write_src}:control_reg_write_
 assign reg_write_tgt=(r_type?{2'b0,alucontrol_reg_write_tgt}:control_reg_write_tgt);
 assign jump_short=control_jump_short;
 assign jump_long=control_jump_long;
-assign jump_alu=alucontrol_jmp;
+assign jump_alu=alucontrol_jmp&r_type;
 assign aluop=(r_type?alucontrol_aluop:control_aluop);
 assign reg_a_valid=(r_type?alucontrol_reg_a_valid:control_reg_a_valid);
 assign reg_b_valid=(r_type?alucontrol_reg_b_valid:control_reg_b_valid);

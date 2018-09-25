@@ -260,7 +260,7 @@ assign regw_tgt_nop=jr_sop;
 
 assign jmp=jalr_sop|jr_sop;
 
-assign alu_a_src = sll_sop|sra_sop;
+assign alu_a_src = sll_sop|sra_sop|srl_sop;
 
 assign reg_a_valid=
     addu_sop|

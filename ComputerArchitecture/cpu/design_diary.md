@@ -312,10 +312,36 @@ TODO:
 
 ## CPU框架完成 9.22
 
-TODO: LUI指令需要重新设计
+DONE: LUI指令需要重新设计 9.23
 
 ***
 
 ## CPU设计完成 9.23
 
 暂未完成的部分: 乘法和除法的具体实现, 中断机制, 更高效的前递算法
+
+***
+
+## CPU debug 9.24
+
+### BUG1
+
+将
+`assign regfile_wen=WB_reg_control;`
+
+修改为
+`assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};`
+
+### BUG2
+
+    output  [3 :0]   debug_wb_rf_wen,
+
+CPU与debug框架配合不够紧密.
+
+### BUG3
+
+MEM control logic
+
+***
+
+## 实验报告书写 9.25

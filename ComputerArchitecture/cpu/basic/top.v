@@ -263,11 +263,14 @@ wire ID_EX_valid_out;//output wire: data from this stage is valid
 wire ID_EX_allowout;//data is getting out of this stage
 
 assign ID_EX_valid_in=IF_ID_valid_out;
-assign ID_EX_readygo=1;//data can flow out of this stage
-//Always send bubble or inst
+assign ID_EX_readygo=inst_sent;//data can flow out of this stage
 //decode need only 1 clock cycle, yet 
 assign ID_EX_allowin=ID_EX_readygo&&EX_MEM_allowin||!ID_EX_valid;
-assign ID_EX_valid_out=ID_EX_valid&&ID_EX_readygo;
+
+//Always send bubble or inst
+assign ID_EX_valid_out=1;
+
+//ID_EX_valid&&ID_EX_readygo;
 assign ID_EX_allowout=ID_EX_readygo&&ID_EX_allowin;
 
 wire inst_sent;
@@ -458,7 +461,7 @@ always@(posedge clk)begin
     if(!resetn)begin
         ID_EX_valid<=1'b0;
         ID_EX_MEM_addr_reg<=32'b0;
-        ID_EX_data<=218'b0;
+        ID_EX_data<=219'b0;
     end
     else if(ID_EX_allowin)begin
         ID_EX_valid<=ID_EX_valid_in;
@@ -466,6 +469,11 @@ always@(posedge clk)begin
     if(ID_EX_valid_in&&ID_EX_allowin)begin
         ID_EX_data<=(bubble?`bubble:ID_EX_datain);
         ID_EX_MEM_addr_reg<=ID_MEM_addr;
+    end
+    else 
+    begin
+        ID_EX_data<=`bubble;
+        ID_EX_MEM_addr_reg<=32'b0;
     end
 end
 
@@ -583,6 +591,7 @@ wbmux wbmux(
 );
 
 assign data_sram_wdata=mux_output;//TODO
+assign data_sram_wen=strb&{4{EX_MEM_reg.mem_wen_pick!=0}};
 assign MEM_result_in=mux_output;//TODO
 
 //MEM_WB data
@@ -596,6 +605,7 @@ always@(posedge clk)begin
         MEM_WB_valid<=1'b0;
         WB_reg_control<=4'b0;
         MEM_result<=31'b0;
+        MEM_WB_data<=220'b0;
     end
     else if(MEM_WB_allowin)begin
         MEM_WB_valid<=MEM_WB_valid_in;
@@ -603,7 +613,14 @@ always@(posedge clk)begin
     if(MEM_WB_valid_in&&MEM_WB_allowin)begin
         MEM_WB_data<=MEM_WB_datain;
         MEM_result<=MEM_result_in;
-        WB_reg_control<=strb&{4{EX_MEM_reg.reg_write}};
+        WB_reg_control<={4{EX_MEM_reg.reg_write}};
+    end 
+    //WB need only 1 clk cycle, insert a bubble if the next ins does not come.
+    else
+    begin
+        MEM_WB_data<=220'b0;
+        MEM_result<=32'b0;
+        WB_reg_control<=4'b0;
     end
 end
 
@@ -615,14 +632,15 @@ assign regfile_waddr=MEM_WB_reg.regfile_waddr;
 // MEM_WB_reg.reg_write_tgt[1] --> write hi TODO
 // MEM_WB_reg.reg_write_tgt[2] --> write lo TODO
 
-assign regfile_wen=WB_reg_control;
+//TODO: regfile_wen now is only 1 bit!!! 
+assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};
 assign regfile_wdata=MEM_result;
 
 //TODO: Link debug wires
 //debug interface
 
 assign debug_wb_pc=MEM_WB_reg.PC;
-assign debug_wb_rf_wen=regfile_wen;
+assign debug_wb_rf_wen={4{regfile_wen}};
 assign debug_wb_rf_wnum=regfile_waddr;
 assign debug_wb_rf_wdata=regfile_wdata;
 
@@ -653,34 +671,54 @@ wire bypass_A3;
 wire bypass_B2;
 wire bypass_B3;
 
-assign bypass_A2=corelation_A2&EX_MEM_reg.reg_write;
-assign bypass_A3=corelation_A2&EX_MEM_reg.mem_read;
-assign bypass_B2=corelation_B2&EX_MEM_reg.reg_write;
-assign bypass_B3=corelation_B2&EX_MEM_reg.mem_read;
+assign bypass_A2=corelation_A2&(!EX_MEM_reg.mem_read);
+assign bypass_A3=corelation_A3;
+assign bypass_B2=corelation_B2&(!EX_MEM_reg.mem_read);
+assign bypass_B3=corelation_B3;
 
 //TODO
 
-// assign A_data=
-//     (bypass_A2?EX_result:
-//     (bypass_A3?MEM_result:regfile_rdata1
-//     ));
-// assign B_data=
-//     (bypass_B2?EX_result:
-//     (bypass_B3?MEM_result:regfile_rdata2
-//     ));
+wire [31:0]bypassed_regfile_rdata1;
+wire [31:0]bypassed_regfile_rdata2;
 
-assign A_data=regfile_rdata1;
-assign B_data=regfile_rdata2;
+assign bypassed_regfile_rdata1=
+    (bypass_A2?EX_result:
+    (bypass_A3?MEM_result:regfile_rdata1
+    ));
+assign bypassed_regfile_rdata2=
+    (bypass_B2?EX_result:
+    (bypass_B3?MEM_result:regfile_rdata2
+    ));
 
-assign bubble = 0;
+//TODO : add bypass
 
-// assign bubble=
-//     corelation_A1|
-//     corelation_A2&(~bypass_A2)|
-//     corelation_A3&(~bypass_A3)|
-//     corelation_B1|
-//     corelation_B2&(~bypass_B2)|
-//     corelation_B3&(~bypass_B3);
+//alu_a_src--------------------------
+// `define alu_a_src_a 1'b0;
+// `define alu_a_src_sa 1'b1;
+assign A_data=ID_control_signal.alu_a_src?
+    {26'b0,IF_ID_inst_reg[10:6]}:
+    bypassed_regfile_rdata1;
+
+//alu_b_src--------------------------
+// `define alu_b_src_immsigned 4'b0001;
+// `define alu_b_src_a_immunsigned 4'b0010;
+// `define alu_b_src_PC_8 4'b0100;
+// `define alu_b_src_reg 4'b1000;
+assign B_data=
+{32{ID_control_signal.alu_b_src[0]}}&ImmSignedExt|
+{32{ID_control_signal.alu_b_src[1]}}&ImmUnsignedExt|
+{32{ID_control_signal.alu_b_src[2]}}&(IF_ID_PC_reg+8)|//TODO: maybe it will be a problem
+{32{ID_control_signal.alu_b_src[3]}}&bypassed_regfile_rdata2;
+
+// assign bubble = 0;
+
+assign bubble=
+    corelation_A1|
+    corelation_A2&(~bypass_A2)|
+    corelation_A3&(~bypass_A3)|
+    corelation_B1|
+    corelation_B2&(~bypass_B2)|
+    corelation_B3&(~bypass_B3);
 
 
     

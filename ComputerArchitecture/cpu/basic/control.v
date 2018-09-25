@@ -81,7 +81,7 @@ assign ori_op= opcode==6'b001101;
 assign sb_op= opcode==6'b101000;
 assign sh_op= opcode==6'b101001;
 assign sw_op= opcode==6'b101011;
-assign swl_op= opcode==6'b101011;
+assign swl_op= opcode==6'b101010;
 assign swr_op= opcode==6'b101110;
 assign xori_op= opcode==6'b001110;
 assign j_op= opcode==6'b000010;
@@ -127,11 +127,6 @@ assign alu_b_src_immsigned=
     lw_op|
     lwl_op|
     lwr_op|
-    sb_op|
-    sh_op|
-    sw_op|
-    swl_op|
-    swr_op|
     slti_op|
     sltiu_op|
     addi_op;
@@ -143,7 +138,22 @@ assign alu_b_src_a_immunsigned=
     lui_op;
 
 assign alu_b_src_PC_8=jal_op;
-assign alu_b_src_reg=r_op;
+assign alu_b_src_reg=
+    r_op|
+    beq_op|
+    bgez_op|
+    blez_op|
+    bltz_op|
+    bne_op|
+    bgtz_op|
+    bgezal_op|
+    bltzal_op|
+    sb_op|
+    sh_op|
+    sw_op|
+    swl_op|
+    swr_op
+;//TODO : not tested yet
 
 // assign aluop=
 
@@ -191,7 +201,14 @@ assign srl_alu=0;
 assign sra_alu=0;
 assign lui_alu=lui_op;
 assign a_alu=0;
-assign b_alu=jal_op;
+assign b_alu=
+    jal_op|
+    sb_op|
+    sh_op|
+    sw_op|
+    swl_op|
+    swr_op
+;
 assign add_alu=
     addiu_op|
     lb_op|
