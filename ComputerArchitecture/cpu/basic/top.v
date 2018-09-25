@@ -709,7 +709,7 @@ assign B_data=
 {32{ID_control_signal.alu_b_src[1]}}&ImmUnsignedExt|
 {32{ID_control_signal.alu_b_src[2]}}&(IF_ID_PC_reg+8)|//TODO: maybe it will be a problem
 {32{ID_control_signal.alu_b_src[3]}}&bypassed_regfile_rdata2;
-
+  
 // assign bubble = 0;
 
 assign bubble=

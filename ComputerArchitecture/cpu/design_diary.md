@@ -345,3 +345,33 @@ MEM control logic
 ***
 
 ## 实验报告书写 9.25
+
+## 下一周的实验日程设计
+
+```
+修改SW指令 计算来自EX级 SW来源在pipereg中
+运行测试
+删除状态机IF, 关键修改如下:
+    valid=1
+    inst=instram_result
+    ID_EX_inst_reg<=instram_result
+    或者
+    添加PRE-IF级(选取)
+删除状态机MEM, 关键修改如下:
+    移动mux到WB
+    在MEM创建ALU_reg
+    或者
+    EX-MEM(在EX访存, 在MEM级写回)(选取)
+在lab2-1检查
+在lab1检查(检查分支预测是否正常)
+阅读乘除指令
+乘法除法实现
+乘法除法引入
+在lab2-2检查
+在lab2-3检查
+实验报告
+```
+
+本周由于有操作系统汇报, 预计会在周六之后开始实验.
+
+***
