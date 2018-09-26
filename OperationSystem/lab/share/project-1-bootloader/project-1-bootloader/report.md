@@ -164,6 +164,15 @@ Idea2 实现起来比较复杂, 提交时采用第一种写法.
 	j   0x8007b1cc
 ```
 
+--
+
+Makefile文件改动:
+
+```
+kernel: kernel.c
+	${CC} -G 0 -O2  -fno-pic -mno-abicalls -fno-builtin -nostdinc -mips3 -Ttext=0xffffffffa0800000 -N -o kernel kernel.c -nostdlib -Wl,-m -Wl,elf32ltsmip -T ld.script		
+```
+
 ****
 
 #### 总结: Bootblock被载入内存后的执行流程
@@ -226,9 +235,13 @@ return;
 	jal printstr
 ```
 
+--
+
 ### 一个实际操作问题
 
 前几次操作中不知道需要在开发板重启之后重新插拔SD卡. 这引发了很多不必要的问题.
+
+--
 
 ### 思考题解答
 
@@ -249,3 +262,7 @@ return;
 研究思路: 加连接器脚本/不加连接器脚本编译, 之后比较objdump结果.
 
 2018.9.25更新: 在P1反馈汇总中已经详细解释了连接器脚本的作用, 因此不再展开.
+
+---
+
+Huaqiang Wang (c) 2018

@@ -19,8 +19,10 @@ main:
 	li  $a0, 0xa0800200
 #	li  $a0, 0xa0800000
 	li  $a1, 0x00000200
-	li  $a2, 0x00000200
+	li  $a2, 0x00000400
 
+	#lb	$a2,  0xa08001ff
+	#sll	$a2, 9
 #normal way
 
 	jal 0x8007b1cc

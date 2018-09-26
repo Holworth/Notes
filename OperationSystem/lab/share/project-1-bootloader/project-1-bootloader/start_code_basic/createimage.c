@@ -37,7 +37,7 @@ Elf32_Phdr *read_exec_file(FILE *opfile)
 
 uint8_t count_kernel_sectors(Elf32_Phdr *Phdr)
 {
-    return (uint8_t)((Phdr->p_filesz + SECTOR_SIZE - 1) / SECTOR_SIZE);
+    return (uint8_t)((Phdr->p_memsz + SECTOR_SIZE - 1) / SECTOR_SIZE);
 }
 
 void write_bootblock(FILE *image, FILE *file, Elf32_Phdr *phdr)

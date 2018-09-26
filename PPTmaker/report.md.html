@@ -1,0 +1,347 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>reveal.js</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+
+                <section id="themes">
+                    <h2>Settings</h2>
+                    <h6>Original code from reveal.js</h6>
+                    <h6>Converter by AW</h6>
+                    <h6>ESC to show general view.</h6>
+                    <h6>S to use speecher's mode.</h6>
+                    <p>
+                        You can select from different transitions, like: <br>
+                        <a href="?transition=none#/transitions">None</a> -
+                        <a href="?transition=fade#/transitions">Fade</a> -
+                        <a href="?transition=slide#/transitions">Slide</a> -
+                        <a href="?transition=convex#/transitions">Convex</a> -
+                        <a href="?transition=concave#/transitions">Concave</a> -
+                        <a href="?transition=zoom#/transitions">Zoom</a>
+                    </p>
+                </section>
+                <section>
+                <section data-markdown>
+                    <textarea data-template>
+﻿#### Operation System Instance Analyze Report
+# 第三部分
+
+王华强 张丽玮 刘蕴哲
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+```
+exec/usys.S
+sys_exec/sysfiles.c->argstr, fetchstr, argint, fetchint/syscall.c
+ ->exec/exec.c
+```
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 背景介绍
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 代码分析
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 问题解答
+
+### 用户态的 exec 是在哪里定义的？和一般的函数定义有什么区别。
+
+A：在exec.c中定义的。区别？
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 第一次进行 exec 系统调用的位置在哪里？加载的程序是哪个？参数是什么？
+A：在initcode.s中。加载的程序是int T_SYSCALL，参数是$argv，$init，$0
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### sys_exec 是如何获取到从用户态传递过来的参数的？
+
+A：在 initcode.S 中调用了一个系统调用。这个进程将 exec 所需的参数压栈，然后把系统调用号存在 %eax 中。这个系统调用号和 syscalls 数组中的条目匹配，因此通过syscalls的系统调用函数来获得相应的参数。
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### argint 的功能是什么？它在调用 fetchint时第一个参数是什么含义？其中proc->tf->esp指向的栈是用户栈还是内核栈？proc->tf->esp+4+4*n中为什么要加 4？
+
+A：argint 利用用户空间的 %esp 寄存器定位第 n 个参数。
+第一个参数是process的进程结构体。
+指向的是用户态。
+
+因为%esp 指向系统调用结束后的返回地址。参数地址就恰好在 %esp 之上（%esp+4），因此要+4.
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### exec/exec.c 加载用户程序用到的 struct elfhdr 数据结构，其中 magic,phnum,phoff 等字段的作用是什么？以及 struct proghd 的数据结构，其中 vaddr, memsz, filesz等字段的作用是什么？
+
+
+* magic
+* phnum-	number of program headers,程序头表中的项数。
+* phoff-start of program headers，程序头表的文件偏移（以字节为单位）。如果文件没有程序头表，则此成员值为零。
+* vader-该字段指明该段中内容的起始位置在进程地址空间中的虚拟地址;
+* memsz-该字段指明该段中内容在内存镜像中的大小,也可以是0;单位是字节;
+* filesz-该字段指明该段中内容在文件中的大小,也可以是0;单位是字节;
+
+> Magic： 7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 7f
+> 、45、4c、46分别对应ascii码的Del(删除)、字母E、字母L、字母F。这四个字节被称为ELF文件的魔数，操作系统在加载可执行文件时会确认魔数是否正确，如果不正确则拒绝加载。 第五个字节标识ELF文件是32位（01）还是64位（02）的。 第六个字节标识该ELF文件字节序是小端（01）还是大端（02）的。 第七个字节指示ELF文件的版本号，一般是01。 后九个字节ELF标准未做定义。一般为00.
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+###· exec/exec/c 执行完以后，返回的地址是什么？为什么？
+
+TODO
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### 进阶题
+
+> 请结合代码详细分析 Linux 中 elf 文件格式(利用 readelf 命令)，以及链接和加载的机制。
+
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+
+##参考资料——xv6中文手册
+
+> #### 第一个系统调用：exec
+> 
+> `initcode.S` 干的第一件事是触发 `exec` 系统调用。就像我们在第0章看到的一样，`exec`
+> 用一个新的程序来代替当前进程的内存和寄存器，但是其文件描述符、进程 id 和父进程都是不变的。
+> 
+> `initcode.S`（7708）刚开始会将 `$argv，$init，$0` 三个值推入栈中，接下来把 `%eax` 设置为
+> `SYS_exec` 然后执行 `int T_SYSCALL`：这样做是告诉内核运行 `exec`
+> 这个系统调用。如果运行正常的话，`exec` 不会返回：它会运行名为 `$init` 的程序，`$init` 是一个以空字符结尾的字符串，即
+> `/init`（7721-7723）。如果 `exec` 失败并且返回了，`initcode` 会循环调用一个不会返回的系统调用
+> `exit` 。
+> 
+> 系统调用 `exec` 的参数是
+> `$init、$argv`。最后的`0`让这个手动构建的系统调用看起来就像普通的系统调用一样，我们会在第3章详细讨论这个问题。和之前的代码一样，xv6
+> 努力避免为第一个进程的运行单独写一段代码，而是尽量使用通用于普通操作的代码。
+> 
+> 第2章讲了 `exec` 的具体实现，概括地讲，它会从文件中获取的 `/init` 的二进制代码代替 `initcode` 的代码。现在
+> `initcode` 已经执行完了，进程将要运行 `/init`。
+> `init`（7810）会在需要的情况下创建一个新的控制台设备文件，然后把它作为描述符0，1，2打开。接下来它将不断循环，开启控制台
+> shell，处理没有父进程的僵尸进程，直到 shell 退出，然后再反复。系统就这样运行起来了。
+> 
+> #### 现实情况
+> 
+> 大多操作系统都采用了进程这个概念，而大多的进程都和 xv6 的进程类似。但是真正的操作系统会利用一个显式的链表在常数时间内找到空闲的
+> `proc`，而不像 `allocproc` 中那样花费线性时间；xv6 使用的是朴素的线性搜索（找第一个空闲的 `proc`）。
+> 
+> xv6 的地址空间结构有一个缺点，即无法使用超过 2GB 的物理 RAM。当然我们可以解决这个问题，不过最好的解决方法还是使用64位的机器。
+> 
+
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+> #### 代码：`exec`
+> 
+> `exec` 是创建地址空间中用户部分的系统调用。它根据文件系统中保存的某个文件来初始化用户部分。`exec`（5910）通过
+> `namei`（5920）打开二进制文件，这一点将在第 6 章进行解释。然后，它读取 ELF 头。xv6 应用程序以通行的 ELF
+> 格式来描述，该格式在 `elf.h` 中定义。一个 ELF 二进制文件包括了一个 ELF 头，即结构体 `struct
+> elfhdr`（0955），然后是连续几个程序段的头，即结构体 `struct proghdr`（0974）。每个 `proghdr`
+> 都描述了需要载入到内存中的程序段。xv6 中的程序只有一个程序段的头，但其他操作系统中可能有多个。
+> 
+> `exec` 第一步是检查文件是否包含 ELF 二进制代码。一个 ELF 二进制文件是以4个“魔法数字”开头的，即
+> 0x7F，“E”，“L”，“F”，或者写为宏 `ELF_MAGIC`（0952）。如果 ELF 头中包含正确的魔法数字，`exec`
+> 就会认为该二进制文件的结构是正确的。
+> 
+> `exec` 通过 `setupkvm`（5931）分配了一个没有用户部分映射的页表，再通过 `allocuvm`（5943）为每个 ELF
+> 段分配内存，然后通过 `loaduvm`（5945）把段的内容载入内存中。`allocuvm` 会检查请求分配的虚拟地址是否是在
+> `KERNBASE` 之下。 `loaduvm`（1818） 通过 `walkpgdir` 来找到写入 ELF 段的内存的物理地址；通过
+> `readi` 来将段的内容从文件中读出。
+> 
+> `exec` 创建的第一个用户程序 `/init` 程序段的头是这样的：
+> 
+> ~~~
+> #objdump -p _init
+> 
+> _init:    file format elf32-i386
+> 
+> Program Header:
+>     LOAD off    0x00000054 vaddr 0x00000000 paddr 0x00000000 align 2**2
+>          filesz 0x000008c0 memsz 0x000008cc flags ~~~
+> 
+> 程序段头中的 `filesz` 可能比 `memsz` 小，这表示中间相差的地方应该用 0 填充（对于 C
+> 的全局变量）而不是继续从文件中读数据。对于 `/init`，`filesz` 是 2240 字节而 `memsz` 是 2252 字节。所以
+> `allocuvm` 会分配足够的内存来装 2252 字节的内容，但只从文件 `/init` 中读取 2240 字节的内容。
+> 
+> 现在 `exec` 要分配以及初始化用户栈了。它只为栈分配一页内存。`exec` 一次性把参数字符串拷贝到栈顶，然后把指向它们的指针保存在
+> `ustack` 中。它还会在 `main` 参数列表 `argv` 的最后放一个空指针。这样，`ustack` 中的前三项就是伪造的返回
+> PC，`argc` 和 `argv` 指针了。
+> 
+> `exec` 会在栈的页下方放一个无法访问的页，这样当程序尝试使用超过一个页的栈时就会出错。另外，这个无法访问的页也让 `exec`
+> 能够处理那些过于庞大的参数；当参数过于庞大时，`exec` 用于将参数拷贝到栈上的函数 `copyout` 会发现目标页无法访问，并且返回
+> -1。
+> 
+> 在创建新的内存映像时，如果 `exec` 发现了错误，比如一个无效的程序段，它就会跳转到标记 `bad` 处，释放这段内存映像，然后返回
+> -1。`exec` 必须在确认该调用可以成功后才能释放原来的内存映像，否则，若原来的内存映像被释放，`exec` 甚至都无法向它返回 -1 了。`exec` 中的错误只可能发生在新建内存映像时。一旦新的内存映像建立完成，`exec`
+> 就能装载新映像（5989）而把旧映像释放（5990）。最后，`exec` 成功地返回 0。
+
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+
+> ### 代码：第一个系统调用
+> 
+> 第一章的最后在 `initcode.S` 中调用了一个系统调用。让我们再看一遍（7713）。这个进程将 `exec`
+> 所需的参数压栈，然后把系统调用号存在 %eax 中。这个系统调用号和 syscalls 数组中的条目匹配，（syscall
+> 是一个函数指针的数组）（3350）。我们需要设法使得 int 指令将处理器的状态从用户模式切换到内核模式，调用适当的内核函数（例如在这里是
+> `sys_exec`），并且使内核可以取出 `sys_exec` 的参数。接下来的几个小节将描述 xv6
+> 是如何做到这一点的，你会发现我们可以用同样的代码来实现中断和异常。
+
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+> ### 代码：系统调用
+> 
+> 对于系统调用，`trap` 调用 `syscall`（3375）。`syscall` 从中断帧中读出系统调用号，中断帧也包括被保存的
+> %eax，以及到系统调用函数表的索引。对第一个系统调用而言，%eax 保存的是 SYS_exec（3207），并且 `syscall`
+> 会调用第 `SYS_exec` 个系统调用函数表的表项，相应地也就调用了 `sys_exec`。
+> 
+> `syscall` 在 %eax 保存系统调用函数的返回值。当 `trap` 返回用户空间时，它会从 `cp->tf`
+> 中加载其值到寄存器中。因此，当 `exec`
+> 返回时，它会返回系统调用处理函数返回的返回值（3381）。系统调用按照惯例会在发生错误的时候返回一个小于 0
+> 的数，成功执行时返回正数。如果系统调用号是非法的，syscall 会打印错误并且返回 -1。
+> 
+> 之后的章节会讲解系统调用的实现。这一章关心的是系统调用的机制。还有一点点的机制没有说到：如何获得系统调用的参数。工具函数
+> `argint`、`argptr` 和 `argstr` 获得第 n
+> 个系统调用参数，他们分别用于获取整数，指针和字符串起始地址。argint 利用用户空间的 %esp 寄存器定位第 n 个参数：%esp
+> 指向系统调用结束后的返回地址。参数就恰好在 %esp 之上（%esp+4）。因此第 n 个参数就在 %esp+4+4*n。
+> 
+> `argint` 调用 `fetchint` 从用户内存地址读取值到 `*ip`。`fetchint`
+> 可以简单地将这个地址直接转换成一个指针，因为用户和内核共享同一个页表，但是内核必须检验这个指针的确指向的是用户内存空间的一部分。内核已经设置好了页表来保证本进程无法访问它的私有地址以外的内存：如果一个用户尝试读或者写高于（包含）p->sz的地址，处理器会产生一个段中断，这个中断会杀死此进程，正如我们之前所见。但是现在，我们在内核态中执行，用户提供的任何地址都是有权访问的，因此必须要检查这个地址是在
+> p->sz 之下的。
+> 
+> `argptr` 和 `argint` 的目标是相似的：它解析第 n 个系统调用参数。`argptr` 调用 `argint` 来把第 n
+> 个参数当做是整数来获取，然后把这个整数看做指针，检查它的确指向的是用户地址空间。注意 `argptr`
+> 的源码中有两次检查。首先，用户的栈指针在获取参数的时候被检查。然后这个获取到得参数作为用户指针又经过了一次检查。
+> 
+> `argstr` 是最后一个用于获取系统调用参数的函数。它将第 n 个系统调用参数解析为指针。它确保这个指针是一个 NUL
+> 结尾的字符串并且整个完整的字符串都在用户地址空间中。
+> 
+> 系统调用的实现（例如，sysproc.c 和 sysfile.c）仅仅是封装而已：他们用 `argint`，`argptr` 和
+> `argstr` 来解析参数，然后调用真正的实现。在第一章，`sys_exec` 利用这些函数来获取参数。                        
+                    </textarea>
+                </section>
+                </section>
+                
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
+</html>

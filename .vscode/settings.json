@@ -61,7 +61,18 @@
         "xlocmon": "c",
         "xmemory0": "cpp",
         "random": "cpp",
-        "stdc++.h": "c"
+        "stdc++.h": "c",
+        "bitset": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "xhash": "cpp",
+        "unordered_map": "c",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "future": "cpp",
+        "memory": "cpp",
+        "ratio": "cpp",
+        "xcomplex": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

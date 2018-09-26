@@ -37,7 +37,7 @@ Elf32_Phdr *read_exec_file(FILE *opfile)
 
 uint8_t count_kernel_sectors(Elf32_Phdr *Phdr)
 {
-    return (uint8_t)((Phdr->p_filesz + SECTOR_SIZE - 1) / SECTOR_SIZE);
+    return (uint8_t)((Phdr->p_memsz + SECTOR_SIZE - 1) / SECTOR_SIZE);
 }
 
 void write_bootblock(FILE *image, FILE *file, Elf32_Phdr *phdr)
@@ -73,6 +73,7 @@ void record_kernel_sectors(FILE *image, uint8_t kernelsz)
 void extent_opt(Elf32_Phdr *Phdr_bb, Elf32_Phdr *Phdr_k, int kernelsz)
 {
     puts("----------------------------------");
+    
     puts("--------KERNEL--------");
     printf("number of kernel sectors: 0x%x(%d)\n", kernelsz, (int)kernelsz);
     printf("kernel size: %d\n", Phdr_k->p_filesz);
@@ -84,9 +85,9 @@ void extent_opt(Elf32_Phdr *Phdr_bb, Elf32_Phdr *Phdr_k, int kernelsz)
     printf("bootblock image memory offset: 0x%x\n", Phdr_bb->p_offset);
 }
 
-int main()
+int main(int argc, char* argv[], char* env[])
 {
-    printf("Createimage by aw.\nCompiled in %s, %s.\nFilename:%s\n", __DATE__, __TIME__, __FILE__);
+    printf("\n\nCreateimage by aw.\nCompiled in %s, %s.\nFilename:%s\n", __DATE__, __TIME__, __FILE__);
     FILE *bootblock_file = fopen("./bootblock", "rb"); //binary read;
     FILE *kernel_file = fopen("./kernel", "rb");       //binary read;
     FILE *image_file = fopen("./image", "wb");         //bin write;

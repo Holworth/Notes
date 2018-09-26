@@ -1,3 +1,9 @@
 [submodule "RefBooks"]
 	path = RefBooks
 	url = git@github.com:AugustusWillisWang/RefBooks.git
+[submodule "OperationSystem/xv6-public"]
+	path = OperationSystem/xv6-public
+	url = git://github.com/mit-pdos/xv6-public.git
+[submodule "OperationSystem/xv6-book"]
+	path = OperationSystem/xv6-book
+	url = git://github.com/mit-pdos/xv6-book.git
