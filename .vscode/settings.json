@@ -72,7 +72,13 @@
         "future": "cpp",
         "memory": "cpp",
         "ratio": "cpp",
-        "xcomplex": "cpp"
+        "xcomplex": "cpp",
+        "forward_list": "c",
+        "fstream": "c",
+        "mutex": "c",
+        "sstream": "c",
+        "thread": "c",
+        "unordered_set": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

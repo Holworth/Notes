@@ -322,6 +322,10 @@ SELECT column_name(s) FROM table2;
 
 > UNION 结果集中的列名总是等于 UNION 中第一个 SELECT 语句中的列名。
 
+### INTERSECT
+
+### EXCEPT
+
 ## 笛卡尔积
 
 ```sql
@@ -368,6 +372,102 @@ select * from a
 except
 select * from b
 ```
+
+
+## 求统计信息
+
+```
+select AVG(GPA) ... 
+select MAX(GPA) ... 
+select MIN(GPA) ... 
+select COUNT(GPA) ... 
+select SUM(GPA) ... 
+select SUM(distinct GPA) ... 
+```
+
+## GROUP BY
+
+```sql
+select major, count(*) as number
+from Student
+where age>20
+group by major
+having grade>80
+order by number asc;
+```
+
+distinct可以看作是group by的一个特例. 组名只保留一个.
+
+`having`:在group by的基础上进行选择.
+
+`order by`:排序
+
+## 嵌套的select语句
+
+关键字: in, exists, any
+
+```sql
+select major, count(*) as number
+from Student
+where stid in (
+    select .....
+)
+```
+
+```sql
+select major, count(*) as number
+from Student
+where exists (
+    select .....
+)
+```
+
+```sql
+select name
+from Student S
+where score > any (
+    select score
+    from Student S2
+    where S2.name like '%Tom%'
+);
+```
+
+```sql
+select name
+from Student S
+where score > all (
+    select score
+    from Student S2
+    where S2.name like '%Tom%'
+);
+```
+
+性能较差, 尽量避免
+
+## 完整性约束(TODO)
+
+### 主键 primary key()
+
+### foreign key() references()
+
+### CHECK()对单个表定义
+
+只对insert和update敏感.
+
+### ASSERTION()
+
+对任何修改都敏感.
+
+警告: 代价非常大!
+
+## 触发器
+
+TODO
+
+```
+Constraint cname xxxxx
+```
+可以命名约束.
 
 ***
 

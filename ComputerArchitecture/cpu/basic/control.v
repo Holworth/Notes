@@ -400,6 +400,8 @@ assign reg_a_valid=
 assign reg_b_valid=
     beq_op|
     bne_op|
+    lwl_op|//newly added
+    lwr_op|//newly added
     r_op;
 
 

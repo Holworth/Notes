@@ -320,7 +320,7 @@ module wbmux(
         `pc:
         begin
             strb=4'b0000;
-            mux_output={pc+8};
+            mux_output={pc+32'd8};
         end
 
         `hi:
@@ -338,7 +338,7 @@ module wbmux(
         `pc8:
         begin
             strb=4'b0000;
-            mux_output={pc+8};
+            mux_output={pc+32'd8};
         end
 
 

@@ -41,21 +41,21 @@ module alu(
 
     // reg [`DATA_WIDTH - 1:0] Result;
 
-    //å…¬ç”¨åŠ æ³•å™¨é€»è¾‘
+    //¹«ÓÃ¼Ó·¨Æ÷Âß¼­
     wire [`DATA_WIDTH+1:0]adder_with_cin;
     wire [`DATA_WIDTH:0]adder;
     wire [`DATA_WIDTH:0]addee;
 
-    //åŠ æ³•å™¨ä½¿ç”¨çš„cin
+    //¼Ó·¨Æ÷Ê¹ÓÃµÄcin
     wire neg1;
     assign neg1=((ALUop==`ALUOP_ADD)?0:1);
 
-    //å¸¦cinçš„å…±ç”¨åŠ æ³•å™¨
+    //´øcinµÄ¹²ÓÃ¼Ó·¨Æ÷
     assign addee=((ALUop==`ALUOP_ADD)?B:~B);
     assign adder=adder_with_cin[`DATA_WIDTH+1:1];
     assign adder_with_cin={1'b0,A,neg1}+{addee,neg1}; 
 
-    //æ ‡å¿—ä½(flag)è¾“å‡ºé€»è¾‘
+    //±êÖ¾Î»(flag)Êä³öÂß¼­
     assign CarryOut=adder[32];
 
     assign Zero=({Result}==0);
@@ -65,7 +65,7 @@ module alu(
         (A[`DATA_WIDTH - 1]==B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]):
         (A[`DATA_WIDTH - 1]!=B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]));
     
-    //ç§»ä½å™¨é€»è¾‘
+    //ÒÆÎ»Æ÷Âß¼­
 
     wire [63:0]shift_right_64;
     wire [63:0]shift_aright_64;
@@ -81,12 +81,12 @@ module alu(
     assign result_sll=B<<A[4:0];
     assign result_sr=shift_right_64[31:0];
 
-    //LUIé€»è¾‘
+    //LUIÂß¼­
 
     wire [31:0]result_lui;
     assign result_lui={B[15:0],16'b0};//TODO
 
-    //é€‰æ‹©å™¨é€»è¾‘
+    //Ñ¡ÔñÆ÷Âß¼­
 
     assign Result=
         ({32{ALUop==`ALUOP_AND}}&(A&B))|
