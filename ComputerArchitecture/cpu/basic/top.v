@@ -72,6 +72,8 @@ reg_file regfile(
 
 reg [31:0]HI;
 reg [31:0]LO;
+reg [63:0]mul_result;
+reg [63:0]div_result;
 
 //ALU
 //---------------------------------
@@ -507,6 +509,37 @@ always@(posedge clk)begin
     end
 end
 
+//EX: mul and div
+//MUL
+wire [63:0]mulout;
+multipler multipler
+(
+    clk, // 乘法器模块时钟信号
+    resetn, // 复位信号，低电平有效
+    ID_EX_data.mul_control[0], // 控制有符号乘法和无符号乘法
+    ID_EX_data.A_data, // 被乘数
+    ID_EX_data.B_data, // 乘数
+    mulout   //乘法结果，高 32 写入 HI，低 32 位写入LO
+);
+
+//DIV
+wire [63:0]divout;
+wire div_complete;
+divider divider
+(
+    clk, //除法器模块时钟信号
+    resetn, //复位信号，低电平有效
+    ID_EX_data.mul_control[2]|ID_EX_data.mul_control[3], //除法运算命令，在除法完成后，如果外界没有新的除法进入，必须将该信号置为 0
+    ID_EX_data.mul_control[2], //控制有符号除法和无符号除法的信号
+    ID_EX_data.A_data, //被除数
+    ID_EX_data.B_data, //除数
+    divout[31:0], //除法结果，商
+    divout[63:32], //除法结果，余数
+    div_complete //除法完成信号，除法内部 count 计算达到33
+);
+
+
+
 //stage MEM----------------------------------------
 
 //MEM control
@@ -521,7 +554,7 @@ wire MEM_WB_valid_out;//output wire: data from this stage is valid
 wire MEM_WB_allowout;//data is getting out of this stage
 
 assign MEM_WB_valid_in=EX_MEM_valid_out;
-assign MEM_WB_readygo=1;//data can flow out of this stage
+assign MEM_WB_readygo=!div_stall;//data can flow out of this stage
 assign MEM_WB_allowin=MEM_WB_readygo&&WB_allowin||!MEM_WB_valid;
 assign MEM_WB_valid_out=MEM_WB_valid&&MEM_WB_readygo;
 assign MEM_WB_allowout=MEM_WB_readygo&&MEM_WB_allowin;
@@ -581,19 +614,73 @@ always@(posedge clk)begin
     end
 end
 
+//MEM: mul and div
+//MUL and DIV will return their result here.
+//If they DIV need to stall pipeline, it will stall pipeline here.
+//Thus there will not be DIV, MUL structure corelation.
+
+always@(posedge clk)begin
+    mul_result<=mulout;
+end
+
+always@(posedge clk)begin
+    if(!resetn)begin
+        div_result<=64'b0;
+    end
+    else begin
+        if(div_complete)
+            div_result<=divout;
+    end
+end
+
+wire div_stall=(EX_MEM_reg.mul_control[2]|EX_MEM_reg.mul_control[3])&(!div_complete);
+
 //stage WB-----------------------------------
 assign WB_allowin=1;
 assign regfile_waddr=MEM_WB_reg.regfile_waddr;
 
+// All operations about hi/lo gathered here, so that corelation can be avoided;
+wire mthi_w=MEM_WB_reg.reg_write_tgt[1]; //--> write hi TODO
+wire mtlo_w=MEM_WB_reg.reg_write_tgt[2]; //--> write lo TODO
+wire mfhi_w=MEM_WB_reg.reg_write_src[3];
+wire mflo_w=MEM_WB_reg.reg_write_src[4];
 
-// MEM_WB_reg.reg_write_tgt[1] --> write hi TODO
-// MEM_WB_reg.reg_write_tgt[2] --> write lo TODO
+// mul_control shows if mul/div happened
+wire mul_w = MEM_WB_reg.mul_control[0]|MEM_WB_reg.mul_control[1];
+wire div_w = MEM_WB_reg.mul_control[2]|MEM_WB_reg.mul_control[3];
+
+// HI/LO control
+always@(posedge clk)begin
+    if(!resetn)begin
+        HI<=32'b0;
+    end
+    else begin
+        HI<=
+            {32{mthi_w}}&MEM_WB_reg.A_data|
+            {32{mul_w}}&mul_result[63:32]|
+            {32{div_w}}&div_result[63:32]|
+            {32{!(div_w&mul_w&mthi_w)}}&HI;
+    end
+end
+
+always@(posedge clk)begin
+    if(!resetn)begin
+        LO<=32'b0;
+    end
+    else begin
+        LO<=
+            {32{mtlo_w}}&MEM_WB_reg.A_data|
+            {32{mul_w}}&mul_result[31:0]|
+            {32{div_w}}&div_result[31:0]|
+            {32{!(div_w&mul_w&mtlo_w)}}&LO;
+    end
+end
+
 
 //TODO: regfile_wen now is only 1 bit!!! 
 assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};
 assign regfile_wdata=MEM_result;
 
-//TODO: Link debug wires
 //debug interface
 
 assign debug_wb_pc=MEM_WB_reg.PC;

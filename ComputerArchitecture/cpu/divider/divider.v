@@ -23,13 +23,13 @@ wire [32:0]y_abs=y[32]?(~y+1):y;
 wire sign=x[31]^y[31];
 reg result_sign;
 reg dividend_sign;
-reg [63:0]result_reg;
+reg [64:0]result_reg;
 reg [31:0] x_abs_reg;
 reg [31:0] y_abs_reg;
-wire [31:0]dividend=result_reg[63:32];
-wire [31:0]quotient=result_reg[31:0];
+wire [31:0]dividend=result_reg[64:33];
+wire [31:0]quotient=result_reg[32:1];
 
-wire [32:0]abssub=result_reg[63:31]-{1'b0,y_abs_reg[31:0]};
+wire [32:0]abssub=result_reg[64:32]-{1'b0,y_abs_reg[31:0]};
 
 always@(posedge div_clk)begin
     if(!resetn)begin
@@ -59,16 +59,24 @@ always@(posedge div_clk)begin
     end
 
     if(in_div)begin
-        if(counter==32)begin
+        if(counter==33)begin
             in_div<=0;
         end
         else begin
-
+            if(abssub[32])begin
+                //quotient<-0
+                result_reg<={result_reg[64:1],1'b0}<<1;
+            end
+            else
+            begin
+                //quotient<-1
+                result_reg<={abssub,result_reg[31:1],1'b1}<<1;
+            end
         end 
     end
 end
 
-assign complete=counter==32;
+assign complete=counter==33;
 assign s=quotient;
 assign r=dividend;
 
