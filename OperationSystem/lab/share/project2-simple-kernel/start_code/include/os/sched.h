@@ -33,6 +33,7 @@
 #include "queue.h"
 
 #define NUM_MAX_TASK 16
+#define ASM_USER 156
 
 /* used to save register infomation */
 typedef struct regs_context
@@ -80,6 +81,7 @@ typedef struct pcb
     /* previous, next pointer */
     void *prev;
     void *next;
+    //used in algo queue
 
     /* process id */
     pid_t pid;
@@ -101,6 +103,12 @@ typedef struct pcb
 
     /* process lock conut */
     int lock_cnt;
+
+    /* entry position */
+    uint32_t entry;
+
+    /* PCB valid */
+    int valid;
 
     //进程锁设计说明
     //进程唤醒按照不同的优先级进行, 同时进程锁在被触发之后, 对应不同的锁建立不同锁的等待队列. 如果锁解除时当前进程的剩余锁数为0, 则会将其设法加入运行队列中.
@@ -135,5 +143,15 @@ void do_sleep(uint32_t);
 void do_block(queue_t *);
 void do_unblock_one(queue_t *);
 void do_unblock_all(queue_t *);
+
+// Newly introduced:
+
+// void copy_pcb(pcb_t* tgt, pcb_t* src);
+pid_t new_pid();
+
+extern pid_t last_used_process_id;
+extern queue_t process_queue;
+extern queue_t block_queue;
+
 
 #endif

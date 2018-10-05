@@ -24,6 +24,7 @@ END(asm_start)
 
 .macro SAVE_CONTEXT offset
     // TODO save context
+    mov 
 .endm
 
 .macro RESTORE_CONTEXT offset

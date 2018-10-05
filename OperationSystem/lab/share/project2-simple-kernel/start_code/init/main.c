@@ -37,9 +37,33 @@
 #define bios_printstr 0x8007b980
 
 
-
 static void init_pcb()
 {
+    // For now, the func init_pcb will load the pcb list in test.c into pcb table;
+    // Or you can say, what init_pcb is doing now is to use the pcb list in test.c as pcb table;
+    // Firstly, it will init pcb as null, then load task list. Finally use pcb table to start up process queue.
+
+    // Init pcb as null.
+
+    // PCB is global var, so:
+    // for(int i=0;i<NUM_MAX_TASK;i++)
+    // {
+    //     pcb[i].valid=0;
+    // }
+
+    // Load task list.
+    queue_init(&process_queue);
+    int task_num=num_sched1_tasks;
+    struct task_info **tasks_used =sched1_tasks;
+    for(int i=0;i<task_num;i++)
+    {
+        pcb[i].valid=1;
+        pcb[i].pid=new_pid();
+        pcb[i].type=tasks_used[i]->type;
+        pcb[i].status=TASK_READY;
+        pcb[i].entry=tasks_used[i]->entry_point;
+        queue_push(&process_queue,(void*)&(pcb[i]));
+    }
 
 }
 
@@ -65,7 +89,7 @@ static void init_syscall(void)
 void __attribute__((section(".entry_function"))) _start(void)
 {
 	// Call PMON BIOS printstr to print message "Kernel: main.c called."
-	char hello_os[]="Kernel: main.c called.\n";
+	char hello_os[]="---------------------------\nOS Kernel by AW\n> [INIT] main.c called.\n";
 	void (*call_printstr)(char* ) = bios_printstr;
 	call_printstr(hello_os);
 
@@ -95,7 +119,7 @@ void __attribute__((section(".entry_function"))) _start(void)
 	{
 		// (QAQQQQQQQQQQQ)
 		// If you do non-preemptive scheduling, you need to use it to surrender control
-		// do_scheduler();
+		do_scheduler();
 	};
 	return;
 }

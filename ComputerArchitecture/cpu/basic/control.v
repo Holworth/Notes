@@ -342,9 +342,8 @@ assign reg_write_tgt[3]= regw_ftgt_nop;
 assign reg_write_tgt[4]= regw_ftgt_rt;
 assign reg_write_tgt[5]= regw_ftgt_31;
 
-assign regw_ftgt_rd=
-    andi_op|
-    addi_op;
+assign regw_ftgt_rd=0;
+
 assign regw_ftgt_hi=0;
 assign regw_ftgt_lo=0;
 assign regw_ftgt_nop=0;
@@ -361,6 +360,8 @@ assign regw_ftgt_rt=
     sltiu_op|
     slti_op|
     ori_op|
+    addi_op|
+    andi_op|
     addiu_op;
 
 assign regw_ftgt_31=
@@ -402,6 +403,11 @@ assign reg_b_valid=
     bne_op|
     lwl_op|//newly added
     lwr_op|//newly added
+    sw_op|
+    swl_op|
+    swr_op|
+    sb_op|
+    sh_op|
     r_op;
 
 
