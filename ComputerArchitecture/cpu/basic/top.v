@@ -166,7 +166,7 @@ wire [31:0]PC_jump_alu;
 assign jump_nop=~(jump_short|jump_long|jump_alu);
 
 assign IF_PC_in=(resetn)?
-    bubble?IF_delayslot:
+    (bubble|div_stall)?IF_delayslot:
     (
     ({32{jump_short}}&PC_jump_short)|
     ({32{jump_long}}&PC_jump_long)|
@@ -417,7 +417,7 @@ always@(posedge clk)begin
     if(!resetn)begin
         ID_EX_valid<=1'b0;
         ID_EX_MEM_addr_reg<=32'b0;
-        ID_EX_data<=219'b0;
+        ID_EX_data<=220'b0;
     end
     else if(ID_EX_allowin)begin
         ID_EX_valid<=ID_EX_valid_in;
@@ -428,8 +428,10 @@ always@(posedge clk)begin
     end
     else 
     begin
-        ID_EX_data<=`bubble;
-        ID_EX_MEM_addr_reg<=32'b0;
+        if(!div_stall)begin
+            ID_EX_data<=`bubble;
+            ID_EX_MEM_addr_reg<=32'b0;
+        end
     end
 end
 
@@ -437,7 +439,7 @@ end
 //EX control
 reg EX_MEM_valid;//data in this stage is valid
 reg [219:0]EX_MEM_data;
-wire [219:0]EX_MEM_datain=ID_EX_data;
+wire [219:0]EX_MEM_datain=ID_EX_data;   
 wire EX_MEM_valid_in;//input wire: data from last stage is valid
 wire EX_MEM_allowin;//data can get in this stage
 wire EX_MEM_readygo;//data can get out of this stage
@@ -447,7 +449,8 @@ wire EX_MEM_allowout;//data is getting out of this stage
 assign EX_MEM_valid_in=ID_EX_valid_out;
 assign EX_MEM_readygo=1;//data can flow out of this stage
 //TODO: mul and div
-assign EX_MEM_allowin=EX_MEM_readygo&&MEM_WB_allowin||!EX_MEM_valid;
+assign EX_MEM_allowin=(EX_MEM_readygo&&MEM_WB_allowin||!EX_MEM_valid)&(!div_stall);//Added control logic in 10.7
+// assign EX_MEM_allowin=(EX_MEM_readygo&&MEM_WB_allowin||!EX_MEM_valid);
 assign EX_MEM_valid_out=EX_MEM_valid&&EX_MEM_readygo;
 assign EX_MEM_allowout=EX_MEM_readygo&&EX_MEM_allowin;
 
@@ -498,6 +501,7 @@ always@(posedge clk)begin
         EX_MEM_valid<=1'b0;
         EX_result<=32'b0;
         EX_MEM_MEM_addr_reg<=32'b0;
+        EX_MEM_data<=220'b0;
     end
     else if(EX_MEM_allowin)begin
         EX_MEM_valid<=EX_MEM_valid_in;
@@ -516,9 +520,9 @@ multipler multipler
 (
     clk, // 乘法器模块时钟信号
     resetn, // 复位信号，低电平有效
-    ID_EX_data.mul_control[0], // 控制有符号乘法和无符号乘法
-    ID_EX_data.A_data, // 被乘数
-    ID_EX_data.B_data, // 乘数
+    ID_EX_reg.mul_control[0], // 控制有符号乘法和无符号乘法
+    ID_EX_reg.A_data, // 被乘数
+    ID_EX_reg.B_data, // 乘数
     mulout   //乘法结果，高 32 写入 HI，低 32 位写入LO
 );
 
@@ -529,10 +533,10 @@ divider divider
 (
     clk, //除法器模块时钟信号
     resetn, //复位信号，低电平有效
-    ID_EX_data.mul_control[2]|ID_EX_data.mul_control[3], //除法运算命令，在除法完成后，如果外界没有新的除法进入，必须将该信号置为 0
-    ID_EX_data.mul_control[2], //控制有符号除法和无符号除法的信号
-    ID_EX_data.A_data, //被除数
-    ID_EX_data.B_data, //除数
+    ID_EX_reg.mul_control[2]|ID_EX_reg.mul_control[3], //除法运算命令，在除法完成后，如果外界没有新的除法进入，必须将该信号置为 0
+    ID_EX_reg.mul_control[2], //控制有符号除法和无符号除法的信号
+    ID_EX_reg.A_data, //被除数
+    ID_EX_reg.B_data, //除数
     divout[31:0], //除法结果，商
     divout[63:32], //除法结果，余数
     div_complete //除法完成信号，除法内部 count 计算达到33
@@ -554,7 +558,7 @@ wire MEM_WB_valid_out;//output wire: data from this stage is valid
 wire MEM_WB_allowout;//data is getting out of this stage
 
 assign MEM_WB_valid_in=EX_MEM_valid_out;
-assign MEM_WB_readygo=!div_stall;//data can flow out of this stage
+assign MEM_WB_readygo=1;//data can flow out of this stage
 assign MEM_WB_allowin=MEM_WB_readygo&&WB_allowin||!MEM_WB_valid;
 assign MEM_WB_valid_out=MEM_WB_valid&&MEM_WB_readygo;
 assign MEM_WB_allowout=MEM_WB_readygo&&MEM_WB_allowin;
@@ -601,9 +605,16 @@ always@(posedge clk)begin
         MEM_WB_valid<=MEM_WB_valid_in;
     end
     if(MEM_WB_valid_in&&MEM_WB_allowin)begin
-        MEM_WB_data<=MEM_WB_datain;
-        MEM_result<=MEM_result_in;
-        WB_reg_control<={4{EX_MEM_reg.reg_write}};
+        if(!div_stall)begin
+            MEM_WB_data<=MEM_WB_datain;
+            MEM_result<=MEM_result_in;
+            WB_reg_control<={4{EX_MEM_reg.reg_write}};
+        end
+        else begin
+            MEM_WB_data<=220'b0;
+            MEM_result<=32'b0;
+            WB_reg_control<=4'b0;
+        end
     end 
     //WB need only 1 clk cycle, insert a bubble if the next ins does not come.
     else
@@ -659,7 +670,7 @@ always@(posedge clk)begin
             {32{mthi_w}}&MEM_WB_reg.A_data|
             {32{mul_w}}&mul_result[63:32]|
             {32{div_w}}&div_result[63:32]|
-            {32{!(div_w&mul_w&mthi_w)}}&HI;
+            {32{!(div_w|mul_w|mthi_w)}}&HI;
     end
 end
 
@@ -672,14 +683,17 @@ always@(posedge clk)begin
             {32{mtlo_w}}&MEM_WB_reg.A_data|
             {32{mul_w}}&mul_result[31:0]|
             {32{div_w}}&div_result[31:0]|
-            {32{!(div_w&mul_w&mtlo_w)}}&LO;
+            {32{!(div_w|mul_w|mtlo_w)}}&LO;
     end
 end
 
 
 //TODO: regfile_wen now is only 1 bit!!! 
 assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};
-assign regfile_wdata=MEM_result;
+assign regfile_wdata=
+    {32{mfhi_w}}&HI|
+    {32{mflo_w}}&LO|
+    {32{!(mfhi_w|mflo_w)}}&MEM_result;
 
 //debug interface
 
@@ -727,11 +741,21 @@ wire [31:0]bypassed_regfile_rdata2;
 
 assign bypassed_regfile_rdata1=
     (bypass_A2?EX_result:
-    (bypass_A3?MEM_result:regfile_rdata1
+    (bypass_A3?
+        (
+        {32{mflo_w}}&LO| 
+        {32{mfhi_w}}&HI| 
+        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+    regfile_rdata1
     ));
 assign bypassed_regfile_rdata2=
     (bypass_B2?EX_result:
-    (bypass_B3?MEM_result:regfile_rdata2
+    (bypass_B3?
+    (
+        {32{mflo_w}}&LO| 
+        {32{mfhi_w}}&HI| 
+        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+    regfile_rdata2
     ));
 
 //TODO : add bypass

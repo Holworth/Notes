@@ -1,7 +1,7 @@
 //divider.v
 //Huaqiang Wang (c) 2018
 
-module div
+module divider
 (
 input div_clk, //除法器模块时钟信号
 input resetn, //复位信号，低电平有效

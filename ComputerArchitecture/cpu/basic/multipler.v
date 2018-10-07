@@ -1,4 +1,4 @@
-module mul(
+module multipler(
 input mul_clk, // 乘法器模块时钟信号
 input resetn, // 复位信号，低电平有效
 input mul_signed, // 控制有符号乘法和无符号乘法

@@ -1,10 +1,10 @@
 module mul(
-input mul_clk, // ³Ë·¨Æ÷Ä£¿éÊ±ÖÓĞÅºÅ
-input resetn, // ¸´Î»ĞÅºÅ£¬µÍµçÆ½ÓĞĞ§
-input mul_signed, // ¿ØÖÆÓĞ·ûºÅ³Ë·¨ºÍÎŞ·ûºÅ³Ë·¨
-input [31:0] x, // ±»³ËÊı
-input [31:0] y, // ³ËÊı
-output [63:0] result   //³Ë·¨½á¹û£¬¸ß 32 Ğ´Èë HI£¬µÍ 32 Î»Ğ´ÈëLO
+input mul_clk, // ä¹˜æ³•å™¨æ¨¡å—æ—¶é’Ÿä¿¡å·
+input resetn, // å¤ä½ä¿¡å·ï¼Œä½ç”µå¹³æœ‰æ•ˆ
+input mul_signed, // æ§åˆ¶æœ‰ç¬¦å·ä¹˜æ³•å’Œæ— ç¬¦å·ä¹˜æ³•
+input [31:0] x, // è¢«ä¹˜æ•°
+input [31:0] y, // ä¹˜æ•°
+output [63:0] result   //ä¹˜æ³•ç»“æœï¼Œé«˜ 32 å†™å…¥ HIï¼Œä½ 32 ä½å†™å…¥LO
 );
 
 wire signed [63:0] result_ref;
