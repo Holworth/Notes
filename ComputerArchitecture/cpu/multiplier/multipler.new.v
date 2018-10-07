@@ -65,15 +65,13 @@ wire need_sl=
 
 // wire [2*WIDTH-1:0]result_68={{WIDTH{result_34[31]}},result_34,{POSITION{1'b0}}};
 
-wire [2*WIDTH-1:0]after_position={{WIDTH{y[WIDTH-1]}},y,{POSITION{1'b0}}};//place data into right position`
+wire [2*WIDTH-1:0]after_position={{WIDTH{y[WIDTH-1]}},y}<<(POSITION+need_sl);//place data into right position`
 wire [2*WIDTH-1:0]after_reverse=
     {(2*WIDTH){need_reverse}}&(~after_position)|
     {(2*WIDTH){need_y}}&(after_position)|
     {(2*WIDTH){need_0}}&(0);
 
-assign result=need_sl?
-    {after_reverse,1'b0}://<<1
-    after_reverse;
+assign result=after_reverse;
 
 assign result_plus1=
     (x==3'b100)|
@@ -100,7 +98,7 @@ generate
     begin
         // full_bit_adder
         assign Cout[i]=~Ain[i]&~Bin[i]&Cin[i]|~Ain[i]&Bin[i]&~Cin[i]|Ain[i]&~Bin[i]&~Cin[i]|Ain[i]&Bin[i]&Cin[i];
-        assign Sout[i]=Ain[i]&Bin[i]|Ain[i]&Bin[i]|Bin[i]&Cin[i];
+        assign Sout[i]=Ain[i]&Bin[i]|Ain[i]&Cin[i]|Bin[i]&Cin[i];
     end
 endgenerate
 
@@ -197,12 +195,31 @@ output [63:0] result   //乘法结果，高 32 写入 HI，低 32 位写入LO
 
 wire [33:0]x_34=mul_signed?{{2{x[31]}},x}:{2'b0,x};
 wire [33:0]y_34=mul_signed?{{2{y[31]}},y}:{2'b0,y};
-wire [34:0]y_34_ext={x_34,1'b0};
+wire [34:0]y_34_ext={y_34,1'b0};
 
 // wire [67:0]x_68={{34{x_34[33]}},x_34};
 
 wire [67:0]booth_result [16:0];
 wire [16:0]add1;
+
+// wire [63:0]booth_ref_result=
+//     booth_result [0]+add1[0]+
+//     booth_result [1]+add1[1]+
+//     booth_result [2]+add1[2]+
+//     booth_result [3]+add1[3]+
+//     booth_result [4]+add1[4]+
+//     booth_result [5]+add1[5]+
+//     booth_result [6]+add1[6]+
+//     booth_result [7]+add1[7]+
+//     booth_result [8]+add1[8]+
+//     booth_result [9]+add1[9]+
+//     booth_result [10]+add1[10]+
+//     booth_result [11]+add1[11]+
+//     booth_result [12]+add1[12]+
+//     booth_result [13]+add1[13]+
+//     booth_result [14]+add1[14]+
+//     booth_result [15]+add1[15]+
+//     booth_result [16]+add1[16];
 
 genvar booth_cnt;
 generate
@@ -234,6 +251,8 @@ wire [67:0]C;
 
 reg [67:0]S_reg;
 reg [67:0]C_reg;
+reg add1_14;
+reg add1_15;
 
 wire [13:0]wt_C[68:0];
 //FIXIT
@@ -256,12 +275,19 @@ endgenerate
 always@(posedge mul_clk)begin
     S_reg<=S;
     C_reg<=C;
+    add1_14<=add1[14];
+    add1_15<=add1[15];
 end
 
-wire [64:0] res_1={S_reg,add1[14]};
-wire [64:0] res_2={C_reg,add1[15],add1[14]};
+wire [64:0] res_1={S_reg,add1_14};
+wire [64:0] res_2={C_reg,add1_15,add1_14};
 wire [64:0] res_3=res_1+res_2;
 
-assign result=res_3[64:1];
+reg resetn_reg;
+always@(posedge mul_clk)begin
+    resetn_reg<=resetn;
+end
+
+assign result=resetn_reg?res_3[64:1]:64'b0;
 
 endmodule
