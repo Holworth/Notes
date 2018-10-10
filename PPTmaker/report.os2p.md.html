@@ -1,0 +1,501 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>reveal.js</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+
+                <section id="themes">
+                    <h2>Settings</h2>
+                    <h6>Original code from reveal.js</h6>
+                    <h6>Converter by AW</h6>
+                    <h6>ESC to show general view.</h6>
+                    <h6>S to use speecher's mode.</h6>
+                    <p>
+                        You can select from different transitions, like: <br>
+                        <a href="?transition=none#/transitions">None</a> -
+                        <a href="?transition=fade#/transitions">Fade</a> -
+                        <a href="?transition=slide#/transitions">Slide</a> -
+                        <a href="?transition=convex#/transitions">Convex</a> -
+                        <a href="?transition=concave#/transitions">Concave</a> -
+                        <a href="?transition=zoom#/transitions">Zoom</a>
+                    </p>
+                </section>
+                <section>
+                <section data-markdown>
+                    <textarea data-template>
+#### 操作系统研讨课实验报告
+
+# Project2-A Simple Kernel
+
+* 王华强
+* 2016K8009929035
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 实验简述
+
+实验要求: 
+
+关键前提:
+
+> Allocate per-task state statically in main.c
+
+> Use faked SYSCALL to call kernel functions
+
+> But, in this project compiled with the kernel and share the same address with the kernel
+
+> Decide your own STACK_MIN and STACK_MAX
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 实验具体细节
+
+### 系统整体设计
+
+```mermaid
+graph LR;
+系统启动-->初始化例外处理
+初始化例外处理-->初始化PCB表
+初始化PCB表-->调度器
+调度器-->启动第一个进程
+启动第一个进程-->调度器
+调度器-->进程
+```
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+进程运行状态转移图如下:
+
+```mermaid
+graph TD;
+
+进程启动状态-->进程等待队列
+进程等待队列--需要运行下一个进程-->进程运行状态
+进程运行状态--非抢占式调度触发-->进程等待队列
+进程运行状态-->进程退出
+进程运行状态-->进程获取Mutex_lock
+进程运行状态-->进程获取Spin_lock
+进程获取Spin_lock-->进程运行状态
+进程获取Mutex_lock--直接成功-->进程运行状态
+进程获取Mutex_lock--锁不可用-->进程阻塞队列
+进程运行状态--时间片用尽-->进程等待队列
+进程阻塞队列--Mutex_lock允许进程运行,进程所有锁都满足要求-->进程等待队列
+进程睡眠队列--时间中断时等待时间已到-->进程等待队列
+进程运行状态--sleep函数-->进程睡眠队列
+```
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### PCB设计与初始化
+
+关键问题解答:
+
+> Initialize PCB
+> • Which registers should be set?
+> • Where is the task located?
+> • How to setup stack? Stack size?
+> • Where is the PCB located?
+
+> Pay attention to the initialization of the register in YOUR PCB (For special regs)
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### 栈空间分配
+
+> 问题: 空间分配的大小, 用户栈和内核栈的区分, 是否需要释放不适用的栈空间
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### 调度器逻辑
+
+使用先进先出队列(暂时)
+
+3种优先级处理方式:
+
+1. FIFO+不同长度的时间片
+1. 按照优先级排布的多个FIFO
+1. 优先队列
+
+彩票算法之类的不在考虑范围内.
+
+> 问题: 优先级和等待时长的优先度
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+#### 调度器实现上下文切换
+
+保存现场时使用$k0,$k1辅助.
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### Mutex Lock 实现
+
+为每个 Mutex Lock 分配一个单独的阻塞队列.
+
+为每个进程设置一个当前等待解锁的锁的数目的计数器, 保存在PCB中. 每当这个进程进入一个锁的等待队列, 这个值加1. 每当进程进入一个锁的可用状态时, 这个计数器减1. 
+
+当这个计数器为0时, 这个进程进入等待队列(Ready_queue).
+
+* 获取锁时的动作
+* 释放锁时的动作
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### 中断处理
+
+调整寄存器开关中断(mfco, mtco)
+
+处理中断的流程如下:
+
+```
+（1）接收中断信号
+（2）关闭中断响应
+（3）保护现场（save context）
+（4）确定中断原因
+（5）跳转到对应中断处理入口地址
+（6）处理中断
+（7）打开中断响应
+（8）restore context
+（9）继续执行原进程
+```
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+#### 中断处理的实现
+
+TODO: 例外入口函数拷贝
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### sleep()及时钟中断
+
+#### 时钟中断触发时的工作
+
+对于全局计时器变量: 计时器+=1
+
+对于正在运行的进程: 比较PCB中的信息与计时器, 判断其时间片是否已经用尽, 是否需要进入等待队列.
+
+对于睡眠状态中的进程: 比较PCB中的信息与计时器, 判断是否需要唤醒, 如果唤醒则进入等待队列.
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+#### sleep()实现
+
+维护可遍历的`sleeping_queue`队列.
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+### SYSCALL实现
+
+```
+写CP0
+SYSCALL
+```
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## Design Review
+
+### 1. What is PCB? What are included in PCB?
+
+为了描述和控制进程的运行，操作系统需要为每个进程定义一个数据结构去描述一个进程，这是我们所说的进 程控制块（ProcessControlBlock），简称 PCB。它是进程重要的组成部分，它记录了操作系统用于描述进程的当前状态 和控制进程的全部信息，比如：进程号、进程状态、发生任务切换时保存的现场（通用寄存器的值）、栈地址空间、优先级等 信息。
+操作系统就是根据进程的 PCB 来感知进程的存在，并依此对进程进行管理和控制，PCB 是进程存在的唯一标识。 
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+sched.h中PCB的数据类型包括用户态/核心态上下文、用户态/核心态栈顶指针、进程号、进程类型、进程状态等
+
+task_info包含了入口地址指针、作业类型
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+xv6PCB结构体参考:
+```c
+struct proc {
+uint sz;                     // Size of process memory (bytes) 小
+pde_t* pgdir;                // Page table 页表
+char *kstack;                // Bottom of kernel stack for process 进程在核心的栈底地址，简称内核栈//need
+enum procstate state;        // Process state 进程状态//need
+int pid;                     // Process ID       系统分配的编号，当进程进入ZOMBIE状态后返回系统分配的编号。//need
+struct proc *parent;         // Parent process 父进程
+struct trapframe *tf;        // Trap frame for current syscall 系统调用进入中断
+struct context *context;     // swtch() here to run process   //need
+void *chan;                  // If non-zero, sleeping on chan 
+int killed;                  // If non-zero, have been killed 杀死进程
+struct file *ofile[NOFILE];  // Open files    文件指针
+struct inode *cwd;           // Current directory 文件的索引节点
+char name[16];               // Process name (debugging) 进程名//need
+};（xv6）
+```
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 2. What need to be done for initializing tasks?
+
+1. 接受锁
+1. 向PCB中分配该进程对应的进程号、进程的栈地址、进程状态、创建该进程上下文信息对的context数据结构、进程优先级、进程类型、进程的入口地址。
+1. 控制调度器地址跳转到该作业的入口地址
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 3. When is context switching in this project?
+
+非抢占式：do_scheduler()函数执行在旧进程结束的时候，或者第一个进程开始之前。
+
+抢占式： 有高优先级的进程抢占式执行时do_schedule()函数也会执行，并且切换上下文
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 4. What need to be done for context switching?
+
+(见讲义)
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 5. How do you manage blocked tasks?
+
+对应不同锁, 使用不同的block_queue.
+
+互斥锁要求当前只有一个进程或者线程占用该锁，其余要占用该锁的进程或线程需要进入一个阻塞栈？队列？保持阻塞态，当该锁被释放时，被阻塞的进程或线程就会返回到就绪队列根据do_schedule执行。
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 6. What is the workflow for handling interrupt (for both clock interrupt and syscalls)?
+
+```
+接收中断信号
+关闭中断响应
+保护现场（save context）
+确定中断原因
+跳转到对应中断处理入口地址
+处理中断
+打开中断响应
+restore context
+继续执行原进程
+```
+
+具体到代码实现: (参见代码)
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 7. How do you implement the priority based scheduler?
+
+(见上文)
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+### 8. When do you wake up the sleeping task?
+
+(见上文)
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 思考题解答
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 附加题实现详述
+
+带优先级的do_scheduler: 3种实现方法
+
+* Support one thread to acquire multiple locks (at least two)
+* Support more than two threads to acquire a single lock
+* Design your own test cases and show the results 
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+## 问题
+
+汇编语言描述符
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+Huaqiang Wang (c) 2018                        
+                    </textarea>
+                </section>
+                </section>
+                
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
+</html>

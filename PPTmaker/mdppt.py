@@ -45,7 +45,7 @@ def convertline(line):
 
     #在此处添加针对语法的特殊处理
     #对于单行语法    
-    if "---" in line:
+    if ("---" in line) and (len(line)<=4):
         add(r'''
         </textarea>
         </section>
@@ -56,7 +56,7 @@ def convertline(line):
         ''')
         return 0
     else: 
-        if "--" in line:
+        if ("--" in line)and(len(line)<=3):
             add(r'''
                 </textarea>
                 </section>

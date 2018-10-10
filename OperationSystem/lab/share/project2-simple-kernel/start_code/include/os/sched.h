@@ -98,13 +98,19 @@ typedef struct pcb
 
     // newly added struct contents are as following:
 
+    /* parent process id */
+    pid_t parent_pid;
+
     /* process priority level */
     int priority_level;
+
+    /* next time to stop */
+    uint32_t time_to_stop;
 
     /* process lock conut */
     int lock_cnt;
 
-    /* entry position */
+    /* entry position (for debug) */
     uint32_t entry;
 
     /* PCB valid */

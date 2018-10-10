@@ -221,6 +221,6 @@ For (a), assume that the system is multiprogrammed, and that each job gets its f
 
 4. A real-time system needs to handle two voice calls that each run every 5 msec and consume 1 msec of CPU time per burst, plus one video at 24 frames/sec, with each frame requiring 20 msec of CPU time. Is this system schedulable?
 
-1/5+20/(1000/24)=0.68
+2/5+20/(1000/24)=0.88
 
 是可调度的.

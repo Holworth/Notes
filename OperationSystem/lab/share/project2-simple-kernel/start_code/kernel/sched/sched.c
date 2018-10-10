@@ -39,11 +39,6 @@ void scheduler(void)
     // SAVE_CONTEXT(ASM_USER);
     new_proc->status=TASK_RUNNING;
 
-    // Jump to task entry
-    void (*task)();
-    task=new_proc->entry;
-    task();
-    
     // RESTORE_CONTEXT(ASM_USER);
     return;
     // After return, do_scheduler will:

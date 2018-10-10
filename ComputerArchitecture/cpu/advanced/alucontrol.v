@@ -208,7 +208,9 @@ assign regw_src_alu=
     sra_sop|
     srav_sop|
     srl_sop|
-    srlv_sop;
+    srlv_sop|
+    mthi_sop|//TODO
+    mtlo_sop;//TODO
 
 assign regw_src_pc=jalr_sop;
 

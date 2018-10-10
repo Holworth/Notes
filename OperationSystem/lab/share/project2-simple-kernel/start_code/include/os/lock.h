@@ -42,6 +42,9 @@ typedef struct spin_lock
 
 typedef struct mutex_lock
 {
+    queue_t lock_queue;
+    pcb_t* lock_current;
+    lock_status_t status;
 } mutex_lock_t;
 
 /* init lock */

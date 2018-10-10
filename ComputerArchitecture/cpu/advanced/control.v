@@ -120,13 +120,6 @@ assign alu_b_src[3]=alu_b_src_reg;
 
 assign alu_b_src_immsigned=
     addiu_op|
-    lb_op|
-    lbu_op|
-    lh_op|
-    lhu_op|
-    lw_op|
-    lwl_op|
-    lwr_op|
     slti_op|
     sltiu_op|
     addi_op;
@@ -148,6 +141,13 @@ assign alu_b_src_reg=
     bgtz_op|
     bgezal_op|
     bltzal_op|
+    lb_op|
+    lbu_op|
+    lh_op|
+    lhu_op|
+    lw_op|
+    lwl_op|
+    lwr_op|
     sb_op|
     sh_op|
     sw_op|
