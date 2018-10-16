@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>9.12</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="人工智能基础作业-9.12">人工智能基础作业 9.12</h1>
+<ul>
+<li>王华强</li>
+<li>2016K8009929035</li>
+</ul>
+<hr />
+<h2 id="最佳的k划分best-k-division">最佳的k划分(Best K-division)</h2>
+<p>设计算法找到使得回归树的greedy function最佳的k划分(k是任意正整数). 要求先形式化这一问题, 再给出解决算法.</p>
+<p>提示: 动态规划.</p>
+<h2 id="question">Question</h2>
+<p>Let N be a node of a regression tree, design a greedy algorithm to find the best division of the data set, which ensures the greatest target function loss.</p>
+<p>The target function is defined as:</p>
+<p><br /><span class="math display">$$\sum_{j=1}^{T}(\frac{-2B_j^2}{2A_j+\lambda})+\gamma T+Const$$</span><br /></p>
+<p>Where <span class="math inline"><em>I</em><sub><em>i</em></sub></span> represents a node, <span class="math inline"><em>y</em><sub><em>i</em></sub></span> is the real value of a record, T is the number of leaf nodes generated, <span class="math inline"><em>A</em><sub><em>j</em></sub> = |<em>I</em><sub><em>j</em></sub>|</span>, <span class="math inline"><em>B</em><sub><em>j</em></sub> = ∑<sub><em>j</em></sub><em>y</em><sub><em>j</em></sub></span>.</p>
+<p>We assume that the number of elements of the node is <code>Node_Size</code>.</p>
+<h2 id="algorithm">Algorithm</h2>
+<p>Firstly we fix the sequence of all the elements.</p>
+<p>A basic idea is to enumerate all posible ways of division. By dynamic programming, we can lower the cost.</p>
+<p>We use 2-d array <code>Result</code> to record intermediate results. <code>Result[j][i]</code> means the lowest target function value from <code>division(i,j)</code>, which means the last division happend before the gap between element <code>i</code> and <code>i+1</code> with j divisions in total.</p>
+<p>Thus we can get the algorithm represented by pseudocode.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co">//Prepare Data</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">Let Result[&lt;<span class="dv">0</span>][]=INF;</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">Let Result[][&lt;<span class="dv">0</span>]=INF;</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">Let Result[&gt;=Node_Size][]=INF;</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">Let Result[][&gt;=Node_Size]=INF;</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">//Dynamic Programming</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="cf">for</span>(j=<span class="dv">0</span>;j&lt;Node_Size;j++)</a>
+<a class="sourceLine" id="cb1-9" data-line-number="9">    <span class="cf">for</span>(i=<span class="dv">0</span>;i&lt;Node_Size;i++)</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">    {</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">        Result[j][i]=</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">            min{Result[j][i<span class="dv">-1</span>],(Result[j<span class="dv">-1</span>][i]+Loss(j,i))};</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">        Update record_of_divisions[j][i];<span class="co">//record the position of divisions.</span></a>
+<a class="sourceLine" id="cb1-14" data-line-number="14">    };</a>
+<a class="sourceLine" id="cb1-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb1-16" data-line-number="16"><span class="co">//Pick Result</span></a>
+<a class="sourceLine" id="cb1-17" data-line-number="17">Return min(Result), as well as the way of division;</a></code></pre></div>
+<p>Loss(j,i) is the loss gain from adding a division at the ith gap.</p>
+</body>
+</html>

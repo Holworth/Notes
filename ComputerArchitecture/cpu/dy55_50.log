@@ -1,0 +1,152 @@
+==============================================================
+Test begin!
+dhrystone test begin.
+
+
+Dhrystone Benchmark, Version 2.1 (Language: C)
+
+
+
+Dhrystone Benchmark, Version 2.1 (Language: C)
+
+
+Program compiled without 'register' attribute
+
+
+Execution starts, 10 runs through Dhrystone
+
+Execution ends
+
+
+Final values of the variables used in the benchmark:
+
+
+Int_Glob:            5
+
+        should be:   5
+
+Bool_Glob:           1
+
+        should be:   1
+
+Ch_1_Glob:           A
+
+        should be:   A
+
+Ch_2_Glob:           B
+
+        should be:   B
+
+Arr_1_Glob[8]:       7
+
+        should be:   7
+
+Arr_2_Glob[8][7]:    20
+
+        should be:   20
+
+Ptr_Glob->
+
+  Ptr_Comp:          -2147471664
+
+        should be:   (implementation-dependent)
+
+  Discr:             0
+
+        should be:   0
+
+  Enum_Comp:         2
+
+        should be:   2
+
+  Int_Comp:          17
+
+        should be:   17
+
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+
+Next_Ptr_Glob->
+
+  Ptr_Comp:          -2147471664
+
+        should be:   (implementation-dependent), same as above
+
+  Discr:             0
+
+        should be:   0
+
+  Enum_Comp:         1
+
+        should be:   1
+
+  Int_Comp:          18
+
+        should be:   18
+
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+
+Int_1_Loc:           5
+
+        should be:   5
+
+Int_2_Loc:           13
+
+        should be:   13
+
+Int_3_Loc:           7
+
+        should be:   7
+
+Enum_Loc:            1
+
+        should be:   1
+
+Str_1_Loc:           DHRYSTONE PROGRAM, 1'ST STRING
+
+        should be:   DHRYSTONE PROGRAM, 1'ST STRING
+
+Str_2_Loc:           DHRYSTONE PROGRAM, 2'ND STRING
+
+        should be:   DHRYSTONE PROGRAM, 2'ND STRING
+
+
+Begin ns: 91910
+
+End ns: 187490
+
+Total ns: 95580
+
+Dhrystones per Second:                      105263 
+
+
+The CPU Freq you set is 50MHz
+
+So DMIPS/MHZ : 1198/1000
+
+dhrystone PASS!
+
+==============================================================
+Test end!
+----PASS!!!
+$finish called at time : 1076376810 ps : File "C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/testbench/mycpu_tb.v" Line 261
+run: Time (s): cpu = 00:03:17 ; elapsed = 00:02:40 . Memory (MB): peak = 3257.883 ; gain = 25.648
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {50.000} CONFIG.MMCM_DIVCLK_DIVIDE {1} CONFIG.MMCM_CLKFBOUT_MULT_F {9} CONFIG.MMCM_CLKOUT0_DIVIDE_F {18} CONFIG.MMCM_CLKOUT1_DIVIDE {9} CONFIG.CLKOUT1_JITTER {159.475} CONFIG.CLKOUT1_PHASE_ERROR {105.461} CONFIG.CLKOUT2_JITTER {137.681} CONFIG.CLKOUT2_PHASE_ERROR {105.461}] [get_ips clk_pll]
+generate_target all [get_files  C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/rtl/xilinx_ip/clk_pll/clk_pll.xci]
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'clk_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'clk_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'clk_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'clk_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'clk_pll'...
+export_ip_user_files -of_objects [get_files C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/rtl/xilinx_ip/clk_pll/clk_pll.xci] -no_script -sync -force -quiet
+reset_run clk_pll_synth_1
+WARNING: [Vivado 12-1017] Problems encountered:
+1. Failed to delete one or more files in run directory C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.runs/clk_pll_synth_1
+
+launch_runs -jobs 8 clk_pll_synth_1
+[Sun Oct 14 18:28:05 2018] Launched clk_pll_synth_1...
+Run output will be captured here: C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.runs/clk_pll_synth_1/runme.log
+export_simulation -of_objects [get_files C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/rtl/xilinx_ip/clk_pll/clk_pll.xci] -directory C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.ip_user_files/sim_scripts -ip_user_files_dir C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.ip_user_files -ipstatic_source_dir C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.ip_user_files/ipstatic -lib_map_path [list {modelsim=C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.cache/compile_simlib/modelsim} {questa=C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.cache/compile_simlib/questa} {riviera=C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.cache/compile_simlib/riviera} {activehdl=C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/run_vivado/mycpu_prj1/mycpu_prj1.cache/compile_simlib/activehdl}] -force -quiet

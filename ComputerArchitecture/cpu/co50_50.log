@@ -1,0 +1,64 @@
+run all
+==============================================================
+Test begin!
+coremark test begin.
+
+arg : 0, 0, 102, 1, 7, 1, 2000 
+
+test start
+
+computation done 
+
+2K performance run parameters for coremark.
+
+CoreMark Size    : 666
+
+Total ns : 8476100
+
+Iterations/1000Sec : 117980
+
+The CPU Freq you set is 50MHz
+
+So COREMARK/MHZ : 2359/1000
+
+COREMARK/MHZ = (1000000.0/CPU_COUNT_PER_US)*NSEC_PER_USEC*results[0].iterations/total_ns
+
+It equals to 1000MHz/CPU_Freq(MHz) * 1000*1000*iteration/total_ns
+
+It also equals to (Iterations/1000Sec)/CPU_Freq(MHz)/1000
+
+In this run, iterate=1, total_ns=8476100
+
+
+
+Total ticks      : 0
+
+Iterations       : 1
+
+Compiler version : GCC4.3.0
+
+Compiler flags   :  -O3 -mno-abicalls -funroll-all-loops -falign-jumps=16 -falign-functions=16 -fgcse-sm -fgcse-las -finline-functions -finline-limit=1000 -msoft-float -EL -march=mips1 -mips1
+
+Memory location  : Please put data memory location here
+
+			(e.g. code in flash, data on heap etc)
+
+seedcrc          : 0xe9f5
+
+[0]crclist       : 0xe714
+
+[0]crcmatrix     : 0x1fd7
+
+[0]crcstate      : 0x8e3a
+
+[0]crcfinal      : 0xe714
+
+Correct operation validated. See readme.txt for run and reporting rules.
+
+coremark PASS!
+
+==============================================================
+Test end!
+----PASS!!!
+$finish called at time : 9451575 ns : File "C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/testbench/mycpu_tb.v" Line 261
+run: Time (s): cpu = 00:16:58 ; elapsed = 00:15:45 . Memory (MB): peak = 1561.020 ; gain = 166.043

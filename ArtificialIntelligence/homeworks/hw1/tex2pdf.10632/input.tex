@@ -1,0 +1,178 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\date{}
+
+\begin{document}
+
+\hypertarget{ux4ebaux5de5ux667aux80fdux57faux7840ux4f5cux4e1a-9.12}{%
+\section{人工智能基础作业
+9.12}\label{ux4ebaux5de5ux667aux80fdux57faux7840ux4f5cux4e1a-9.12}}
+
+\begin{itemize}
+\tightlist
+\item
+  王华强
+\item
+  2016K8009929035
+\end{itemize}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\hypertarget{ux6700ux4f73ux7684kux5212ux5206best-k-division}{%
+\subsection{最佳的k划分(Best
+K-division)}\label{ux6700ux4f73ux7684kux5212ux5206best-k-division}}
+
+设计算法找到使得回归树的greedy function最佳的k划分(k是任意正整数).
+要求先形式化这一问题, 再给出解决算法.
+
+提示: 动态规划.
+
+\hypertarget{question}{%
+\subsection{Question}\label{question}}
+
+Let N be a node of a regression tree, design a greedy algorithm to find
+the best division of the data set, which ensures the greatest target
+function loss.
+
+The target function is defined as:
+
+\[\sum_{j=1}^{T}(\frac{-2B_j^2}{2A_j+\lambda})+\gamma T+Const\]
+
+Where \(I_i\) represents a node, \(y_i\) is the real value of a record,
+T is the number of leaf nodes generated, \(A_j=|I_j|\),
+\(B_j=\sum_{j}y_j\).
+
+We assume that the number of elements of the node is
+\texttt{Node\_Size}.
+
+\hypertarget{algorithm}{%
+\subsection{Algorithm}\label{algorithm}}
+
+Firstly we fix the sequence of all the elements.
+
+A basic idea is to enumerate all posible ways of division. By dynamic
+programming, we can lower the cost.
+
+We use 2-d array \texttt{Result} to record intermediate results.
+\texttt{Result{[}j{]}{[}i{]}} means the lowest target function value
+from \texttt{division(i,j)}, which means the last division happend
+before the gap between element \texttt{i} and \texttt{i+1} with j
+divisions in total.
+
+Thus we can get the algorithm represented by pseudocode.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{//Prepare Data}
+\NormalTok{Let Result[<}\DecValTok{0}\NormalTok{][]=INF;}
+\NormalTok{Let Result[][<}\DecValTok{0}\NormalTok{]=INF;}
+\NormalTok{Let Result[>=Node_Size][]=INF;}
+\NormalTok{Let Result[][>=Node_Size]=INF;}
+
+\CommentTok{//Dynamic Programming}
+\ControlFlowTok{for}\NormalTok{(j=}\DecValTok{0}\NormalTok{;j<Node_Size;j++)}
+    \ControlFlowTok{for}\NormalTok{(i=}\DecValTok{0}\NormalTok{;i<Node_Size;i++)}
+\NormalTok{    \{}
+\NormalTok{        Result[j][i]=}
+\NormalTok{            min\{Result[j][i}\DecValTok{-1}\NormalTok{],(Result[j}\DecValTok{-1}\NormalTok{][i]+Loss(j,i))\};}
+\NormalTok{        Update record_of_divisions[j][i];}\CommentTok{//record the position of divisions.}
+\NormalTok{    \};}
+
+\CommentTok{//Pick Result}
+\NormalTok{Return min(Result), as well as the way of division;}
+\end{Highlighting}
+\end{Shaded}
+
+Loss(j,i) is the loss gain from adding a division at the ith gap.
+
+\end{document}

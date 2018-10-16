@@ -1,0 +1,15 @@
+        [3212000 ns] Test is running, debug_wb_pc = 0xbfc1bfd0
+----[3220935 ns] Number 8'd66 Functional Test Point PASS!!!
+        [3222000 ns] Test is running, debug_wb_pc = 0xbfc813b4
+        [3232000 ns] Test is running, debug_wb_pc = 0xbfc81b6c
+        [3242000 ns] Test is running, debug_wb_pc = 0xbfc8230c
+----[3250635 ns] Number 8'd67 Functional Test Point PASS!!!
+        [3252000 ns] Test is running, debug_wb_pc = 0xbfc29518
+        [3262000 ns] Test is running, debug_wb_pc = 0xbfc29c78
+        [3272000 ns] Test is running, debug_wb_pc = 0xbfc2a410
+----[3279495 ns] Number 8'd68 Functional Test Point PASS!!!
+==============================================================
+Test end!
+----PASS!!!
+$finish called at time : 3280215 ns : File "C:/Users/autum/Desktop/ucas_CDE2_3/mycpu_verify/testbench/mycpu_tb.v" Line 261
+run: Time (s): cpu = 00:07:56 ; elapsed = 00:07:17 . Memory (MB): peak = 1469.195 ; gain = 143.422
