@@ -727,19 +727,19 @@ wire corelation_B2=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==EX_MEM_reg.r
 wire corelation_B3=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==MEM_WB_reg.regfile_waddr)&MEM_WB_reg.reg_write;
 
 
-wire bypass_A1=corelation_A1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0])&(!jump_with_reg);
-wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
+wire bypass_A1=corelation_A1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
+wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4]);
 wire bypass_A3=corelation_A3;
-wire bypass_B1=corelation_B1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0])&(!jump_with_reg);
-wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
+wire bypass_B1=corelation_B1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
+wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4]);
 wire bypass_B3=corelation_B3;
 
-wire bypass_A1=corelation_A1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0])&(!jump_with_reg);
-wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
-wire bypass_A3=corelation_A3;
-wire bypass_B1=corelation_B1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0])&(!jump_with_reg);
-wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
-wire bypass_B3=corelation_B3;
+wire bypass_A1_inst=corelation_A1&1'b0;
+wire bypass_A2_inst=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
+wire bypass_A3_inst=corelation_A3;
+wire bypass_B1_inst=corelation_B1&1'b0;
+wire bypass_B2_inst=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(jump_with_reg&EX_MEM_reg.mem_read));
+wire bypass_B3_inst=corelation_B3;
 
 wire [31:0] bypassed_regfile_rdata1=(bypass_A1?Result:
     (bypass_A2?(EX_MEM_reg.mem_read?MEM_result_in:EX_result):
@@ -751,6 +751,25 @@ wire [31:0] bypassed_regfile_rdata1=(bypass_A1?Result:
     regfile_rdata1
     )));
 wire [31:0] bypassed_regfile_rdata2=(bypass_B1?Result:
+    (bypass_B2?(EX_MEM_reg.mem_read?MEM_result_in:EX_result):
+    (bypass_B3?
+    (
+        {32{mflo_w}}&LO| 
+        {32{mfhi_w}}&HI| 
+        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+    regfile_rdata2
+    )));
+
+wire [31:0] bypassed_regfile_rdata1_inst=(bypass_A1?Result:
+    (bypass_A2?(EX_MEM_reg.mem_read?MEM_result_in:EX_result):
+    (bypass_A3?
+        (
+        {32{mflo_w}}&LO| 
+        {32{mfhi_w}}&HI| 
+        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+    regfile_rdata1
+    )));
+wire [31:0] bypassed_regfile_rdata2_inst=(bypass_B1?Result:
     (bypass_B2?(EX_MEM_reg.mem_read?MEM_result_in:EX_result):
     (bypass_B3?
     (
