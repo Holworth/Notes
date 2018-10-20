@@ -8,12 +8,11 @@ static char plane1[] = {"    ___         _  "};
 static char plane2[] = {"| __\\_\\______/_| "};
 static char plane3[] = {"<[___\\_\\_______| "};
 static char plane4[] = {"|  o'o             "};
-int markx;
+
 void printk_task1(void)
 {
     int i;
     int print_location = 1;
-    int markx=1;
     for (i = 0;; i++)
     {
         vt100_move_cursor(1, print_location);

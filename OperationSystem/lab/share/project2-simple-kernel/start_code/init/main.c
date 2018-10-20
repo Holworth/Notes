@@ -62,11 +62,14 @@ static void init_pcb()
     // Load task list.
     queue_init(&ready_queue);
 	last_used_process_id=0;
-    int task_num=num_sched1_tasks;
-    struct task_info **tasks_used =sched1_tasks;
+    int task_num=num_lock_tasks;
+    struct task_info **tasks_used =lock_tasks;
+    // int task_num=num_sched1_tasks;
+    // struct task_info **tasks_used =sched1_tasks;
 	int i;
     for(i=0;i<task_num;i++)
     {
+		printk("\n");
         pcb[i].valid=1;
         pcb[i].pid=new_pid();
         pcb[i].type=tasks_used[i]->type;
@@ -83,11 +86,10 @@ static void init_pcb()
 		check(pcb[i].entry);
     }
 	current_running=&empty_pcb_for_init;
+	current_running->pid=0;
 	process_id=0;
 	current_running->status=TASK_EXITED;
 	printk("\n");
-	check(sched1_tasks[0]->entry_point);
-	check(tasks_used[0]->entry_point);
 }
 
 static void init_exception_handler()
@@ -148,21 +150,21 @@ void __attribute__((section(".entry_function"))) _start(void)
 	char critical_point[]="> [TEST] critical_point.\n";
 	void (*call_printstr)(char* ) = bios_printstr;
 	call_printstr(hello_os);
+	breakpoint=1;
 
 	// Close the cache, no longer refresh the cache 
 	// when making the exception vector entry copy
 	asm_start();
 	// interrupt_disable();
 	printk("> [INIT] asm_start() succeeded.\n");
-	call_printstr(critical_point);
 	// printk("> [INIT] printk() working nornally.\n");
 
 	// init interrupt (^_^)
-	//init_exception();
+	init_exception();
 	printk("> [INIT] Interrupt processing initialization succeeded.\n");
 
 	// init system call table (0_0)
-	//init_syscall();
+	init_syscall();
 	printk("> [INIT] System call initialized successfully.\n");
 
 	// init Process Control Block (-_-!)
@@ -170,8 +172,12 @@ void __attribute__((section(".entry_function"))) _start(void)
 	printk("> [INIT] PCB initialization succeeded.\n");
 
 	// init screen (QAQ)
-	init_screen();
-	printk("> [INIT] SCREEN initialization succeeded.\n");
+	#ifdef DEBUG
+		printk("> [INIT] init_screen() closed for debugging.\n");
+	#else
+		init_screen();
+		printk("> [INIT] SCREEN initialization succeeded.\n");
+	#endif
 
 	// TODO Enable interrupt
 	
@@ -179,7 +185,8 @@ void __attribute__((section(".entry_function"))) _start(void)
 	{
 		// (QAQQQQQQQQQQQ)
 		// If you do non-preemptive scheduling, you need to use it to surrender control
-		printk("> [INIT] in while() loop.\n");
+		// printk("> [INIT] in while() loop.\n");
+		// while(breakpoint);
 		do_scheduler();
 	};
 	return;

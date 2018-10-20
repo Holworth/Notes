@@ -115,6 +115,11 @@ void scheduler(void)
         current_running->kernel_context.regs[31]=current_running->entry;
         //sp
         current_running->kernel_context.regs[29]=current_running->kernel_stack_top;
+        //cp0
+        current_running->kernel_context.cp0_status=0x30400004;
+        current_running->kernel_context.cp0_cause=0x0;
+        current_running->priority_level=0x0;//TODO
+        current_running->block_time=time_elapsed;
     }
     new_proc->status=TASK_RUNNING;
     check( current_running->kernel_context.regs[31]);

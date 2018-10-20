@@ -16,6 +16,7 @@ mutex_lock_t mutex_lock;
 
 void lock_task1(void)
 {
+
         int print_location = 1;
         while (1)
         {

@@ -44,8 +44,8 @@ uint8_t count_kernel_sectors(Elf32_Phdr *Phdr)
 void write_bootblock(FILE *image, FILE *file, Elf32_Phdr *phdr)
 {
     fseek(file, phdr->p_offset, SEEK_SET); //从头开始搜索到程序段的位置
-    fread(buffer, 1, phdr->p_filesz, file);
-    fwrite(buffer, 1, phdr->p_filesz, image);
+    fread(buffer, 1, phdr->p_memsz, file);
+    fwrite(buffer, 1, phdr->p_memsz, image);
     puts("Bootblock write finished.");
 }
 
@@ -54,13 +54,22 @@ void write_kernel(FILE *image, FILE *knfile, Elf32_Phdr *Phdr, int kernelsz)
     fseek(knfile, Phdr->p_offset, SEEK_SET); //从头开始搜索到程序段的位置
     fseek(image, SECTOR_SIZE, SEEK_SET);
     //按kernelsz进行写入操作
-    while (kernelsz-- > 0)
+    uint32_t kernel_filesz=Phdr->p_filesz;
+    uint32_t kernel_memsz=Phdr->p_memsz;
+    uint32_t kernel_0sz=kernel_memsz-kernel_filesz;
+    while (kernel_filesz-- > 0)
     {
-        fread(buffer, 1, SECTOR_SIZE, knfile);
-        fwrite(buffer, 1, SECTOR_SIZE, image);
+        fread(buffer, 1, 1, knfile);
+        fwrite(buffer, 1, 1, image);
         // fseek(knfile, SECTOR_SIZE, SEEK_CUR);
         // fseek(image, SECTOR_SIZE, SEEK_CUR);
     }
+    buffer[0]=0;
+    while (kernel_0sz-- > 0)
+    {
+        fwrite(buffer, 1, 1, image);
+    }
+
     puts("Kernel write finished.");
 }
 
