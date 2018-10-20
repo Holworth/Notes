@@ -49,24 +49,24 @@ void *queue_remove(queue_t *queue, void *item);
 
 // typedef pcb_t item_t;
 
-typedef struct list
-{
-    int head;
-    int tail;
-    int empty;
-    pcb_t *[NUM_MAX_TASK]list_array;
-} list_t;
+// typedef struct list
+// {
+//     int head;
+//     int tail;
+//     int empty;
+//     pcb_t *list_array[NUM_MAX_TASK];
+// } list_t;
 
 
-void list_init(list_t *list);
+// void list_init(list_t *list);
 
-int list_is_empty(list_t *list);
+// int list_is_empty(list_t *list);
 
-void list_push(list_t *list, void *item);
+// void list_push(list_t *list, void *item);
 
-void *list_pop(list_t *list);
+// void *list_pop(list_t *list);
 
-/* remove this item and return next item */
-void *list_remove(list_t *queue, void *item);
+// /* remove this item and return next item */
+// void *list_remove(list_t *queue, void *item);
 
 #endif

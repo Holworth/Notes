@@ -220,6 +220,7 @@ int printk(const char *fmt, ...)
 
 int printf(const char *fmt, ...)
 {
+	//TODO FIXIT
 	int ret;
 	va_list va;
 	char buff[256];

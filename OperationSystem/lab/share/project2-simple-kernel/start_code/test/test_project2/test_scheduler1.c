@@ -8,17 +8,18 @@ static char plane1[] = {"    ___         _  "};
 static char plane2[] = {"| __\\_\\______/_| "};
 static char plane3[] = {"<[___\\_\\_______| "};
 static char plane4[] = {"|  o'o             "};
-
+int markx;
 void printk_task1(void)
 {
     int i;
     int print_location = 1;
-
+    int markx=1;
     for (i = 0;; i++)
     {
         vt100_move_cursor(1, print_location);
         printk("> [TASK] This task is to test scheduler. (%d)", i);
         do_scheduler();
+        // while(markx);
     }
 }
 
@@ -56,6 +57,7 @@ void drawing_task1(void)
             vt100_move_cursor(i, j + 3);
             printk("%s", plane4);
         }
+
         do_scheduler();
 
         vt100_move_cursor(1, j + 0);

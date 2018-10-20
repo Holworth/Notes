@@ -104,8 +104,11 @@ typedef struct pcb
     /* process priority level */
     int priority_level;
 
-    /* next time to stop */
-    uint32_t time_to_stop;
+    /* block time */
+    uint32_t block_time;
+
+    /* sleep time */
+    uint32_t sleep_time;
 
     /* process lock conut */
     int lock_cnt;
@@ -115,6 +118,9 @@ typedef struct pcb
 
     /* PCB valid */
     int valid;
+
+    /* Process first run */
+    int first_run;
 
     //进程锁设计说明
     //进程唤醒按照不同的优先级进行, 同时进程锁在被触发之后, 对应不同的锁建立不同锁的等待队列. 如果锁解除时当前进程的剩余锁数为0, 则会将其设法加入运行队列中.
@@ -136,11 +142,18 @@ extern queue_t ready_queue;
 /* block queue to wait */
 extern queue_t block_queue;
 
+/* sleep queue to sleep */
+extern queue_t sleep_queue;
+
 /* current running task PCB */
 extern pcb_t *current_running;
 extern pid_t process_id;
 
+/* last used process id */
+extern pid_t last_used_process_id;
+
 extern pcb_t pcb[NUM_MAX_TASK];
+extern pcb_t empty_pcb_for_init;
 extern uint32_t initial_cp0_status;
 
 void do_scheduler(void);
@@ -155,9 +168,9 @@ void do_unblock_all(queue_t *);
 // void copy_pcb(pcb_t* tgt, pcb_t* src);
 pid_t new_pid();
 
-extern pid_t last_used_process_id;
-extern queue_t process_queue;
-extern queue_t block_queue;
+// extern pid_t last_used_process_id;
+// extern queue_t ready_queue; //deled, use ready_queue instead
+// extern queue_t block_queue;
 
 
 #endif

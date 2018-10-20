@@ -10,32 +10,29 @@ main:
 
 	# 2) task2 call BIOS read kernel in SD card and jump to kernel start
 
-#	li  $a0, 0xa0800200
 #	target position
-	li  $a0, 0xa0800000
+	li  $a0, 0xa0800200
 #	data source
 	li  $a1, 0x00000200
 # 	data size
 #	calculate data size (byte)
 #	imagecrater saved kernel size in sector number here:
-#	li  $a0,  0x00000200
-	lb	$a2,  0xa08001ff
-	sll	$a2, 9
-# 	mult	$a3,$a0
-#    mflo    $a2
+#	lb	$a2,  0xa08001ff
+#	sll	$a2, 9
+
 #   or
 #   for small kernel:
-#	li  $a2, 0x00000200
+	li  $a2, 0x00008000
 
 #normal way
 
-#	jal 0x8007b1cc
-#	nop
-#	jal   0xa0800200
+	jal 0x8007b1cc
+	nop
+	jal   0xa0800200
 
 #bonus question:
-	li  $ra, 0xa0800000
-	j   0x8007b1cc
+#	li  $ra, 0xa0800000
+#	j   0x8007b1cc
 
 # while(1) --> stop here
 stop:
@@ -44,7 +41,7 @@ stop:
 
 .data
 
-msg: .ascii "It's a bootloader...\n"
+msg: .ascii "> [BOOT] Bootloader started.\n"
 
 # 1. PMON read SD card function address
 # read_sd_card();

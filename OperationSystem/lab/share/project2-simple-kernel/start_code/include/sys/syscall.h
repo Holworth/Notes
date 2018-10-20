@@ -36,6 +36,7 @@
 #define NUM_SYSCALLS 64
 
 /* define */
+// #define IGNORE 0
 #define SYSCALL_SLEEP 2
 
 #define SYSCALL_BLOCK 10
@@ -57,6 +58,7 @@ int (*syscall[NUM_SYSCALLS])();
 void system_call_helper(int, int, int, int);
 extern int invoke_syscall(int, int, int, int);
 
+void sys_nop();
 void sys_sleep(uint32_t);
 
 void sys_block(queue_t *);

@@ -32,10 +32,26 @@
 #include "common.h"
 #include "syscall.h"
 
-
 #define PORT 0xbfe48000
 #define bios_printstr 0x8007b980
+// current_running
+// ready_queue
+#define STACK_BASE 0xa0f00000
+#define STACK_SIZE 0x10000 
+// #define TASK_OFFSET 0x00000200
 
+// #define PRIORITY_SCH
+// TODO: time etc
+// TODO: syscall: handle_syscall, system_call_helper
+
+uint32_t stack_base_now = STACK_BASE;
+
+uint32_t alloc_stack()
+{
+    // uint32_t t=stack_base_now;
+    stack_base_now-=STACK_SIZE;
+    return stack_base_now;
+}
 
 static void init_pcb()
 {
@@ -43,28 +59,35 @@ static void init_pcb()
     // Or you can say, what init_pcb is doing now is to use the pcb list in test.c as pcb table;
     // Firstly, it will init pcb as null, then load task list. Finally use pcb table to start up process queue.
 
-    // Init pcb as null.
-
-    // PCB is global var, so:
-    // for(int i=0;i<NUM_MAX_TASK;i++)
-    // {
-    //     pcb[i].valid=0;
-    // }
-
     // Load task list.
-    queue_init(&process_queue);
+    queue_init(&ready_queue);
+	last_used_process_id=0;
     int task_num=num_sched1_tasks;
     struct task_info **tasks_used =sched1_tasks;
-    for(int i=0;i<task_num;i++)
+	int i;
+    for(i=0;i<task_num;i++)
     {
         pcb[i].valid=1;
         pcb[i].pid=new_pid();
         pcb[i].type=tasks_used[i]->type;
         pcb[i].status=TASK_READY;
         pcb[i].entry=tasks_used[i]->entry_point;
-        queue_push(&process_queue,(void*)&(pcb[i]));
+        pcb[i].first_run=1;
+        queue_push(&ready_queue,(void*)&(pcb[i]));
+		//alloc stack in scheduler if 1st run
+        // pcb[i].kernel_stack_top=alloc_stack();
+        // pcb[i].user_stack_top=alloc_stack();
+		check(i);
+		check(&pcb[i]);
+		check(pcb[i].pid);
+		check(pcb[i].entry);
     }
-
+	current_running=&empty_pcb_for_init;
+	process_id=0;
+	current_running->status=TASK_EXITED;
+	printk("\n");
+	check(sched1_tasks[0]->entry_point);
+	check(tasks_used[0]->entry_point);
 }
 
 static void init_exception_handler()
@@ -73,15 +96,45 @@ static void init_exception_handler()
 
 static void init_exception()
 {
+	//ref: P57
+	//http://course.ucas.ac.cn/access/content/group/149542/%E4%BD%9C%E4%B8%9A%E8%B5%84%E6%96%99%E6%9B%B4%E6%96%B0/%E9%BE%99%E8%8A%AF2F%E5%A4%84%E7%90%86%E5%99%A8%E6%89%8B%E5%86%8C_v0.1.pdf
+
 	// 1. Get CP0_STATUS
+	uint32_t cp0_get=get_CP0_STATUS();
 	// 2. Disable all interrupt
+	interrupt_disable();
+	// asm("mfc0    a0, CP0_STATUS\n"\
+    // 	"ori     a0, 0x1\n"\
+    // 	"mtc0    a0, CP0_STATUS\n"\
+    // 	"nop\n");
 	// 3. Copy the level 2 exception handling code to 0x80000180
+	memcpy(0x80000180,exception_handler_entry,(exception_handler_end-exception_handler_begin));
 	// 4. reset CP0_COMPARE & CP0_COUNT register
+	reset_count_compare();//TODO
+	// 将例外处理代码拷贝到例外处理入口、 初始化例外向量表，初始化 CP0_STATUS、CP0_COUNT、CP0_COMPARE 等异常处理相关寄存
+	// interrupt_enable();
+	//TODO ???
 }
 
 static void init_syscall(void)
 {
 	// init system call table.
+
+	syscall[SYSCALL_SLEEP]=&do_sleep;
+	syscall[SYSCALL_BLOCK]=&do_block;
+	syscall[SYSCALL_UNBLOCK_ONE]=&do_unblock_one;
+	syscall[SYSCALL_UNBLOCK_ALL]=&do_unblock_all;
+
+	// FIXIT:
+	syscall[SYSCALL_WRITE]=&screen_write;
+	// syscall[SYSCALL_READ]=&sys_read;???
+	syscall[SYSCALL_CURSOR]=&screen_move_cursor;
+	syscall[SYSCALL_REFLUSH]=&screen_reflush;
+	syscall[SYSCALL_MUTEX_LOCK_INIT]=&do_mutex_lock_init;
+	syscall[SYSCALL_MUTEX_LOCK_ACQUIRE]=&do_mutex_lock_acquire;
+	syscall[SYSCALL_MUTEX_LOCK_RELEASE]=&do_mutex_lock_release;
+
+	return;
 }
 
 // jump from bootloader.
@@ -89,20 +142,27 @@ static void init_syscall(void)
 void __attribute__((section(".entry_function"))) _start(void)
 {
 	// Call PMON BIOS printstr to print message "Kernel: main.c called."
-	char hello_os[]="---------------------------\nOS Kernel by AW\n> [INIT] main.c called.\n";
+	// char hello_os[]="---------------------------\nOS Kernel by AW\n> [INIT] main.c called.\n";
+	// asm("li $sp,0xa0f00000\n");
+	char hello_os[]="> [INIT] main.c called.\n";
+	char critical_point[]="> [TEST] critical_point.\n";
 	void (*call_printstr)(char* ) = bios_printstr;
 	call_printstr(hello_os);
 
 	// Close the cache, no longer refresh the cache 
 	// when making the exception vector entry copy
 	asm_start();
+	// interrupt_disable();
+	printk("> [INIT] asm_start() succeeded.\n");
+	call_printstr(critical_point);
+	// printk("> [INIT] printk() working nornally.\n");
 
 	// init interrupt (^_^)
-	init_exception();
+	//init_exception();
 	printk("> [INIT] Interrupt processing initialization succeeded.\n");
 
 	// init system call table (0_0)
-	init_syscall();
+	//init_syscall();
 	printk("> [INIT] System call initialized successfully.\n");
 
 	// init Process Control Block (-_-!)
@@ -119,6 +179,7 @@ void __attribute__((section(".entry_function"))) _start(void)
 	{
 		// (QAQQQQQQQQQQQ)
 		// If you do non-preemptive scheduling, you need to use it to surrender control
+		printk("> [INIT] in while() loop.\n");
 		do_scheduler();
 	};
 	return;

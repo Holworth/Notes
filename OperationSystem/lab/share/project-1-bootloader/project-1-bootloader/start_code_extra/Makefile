@@ -1,4 +1,4 @@
-CC = mipsel-linux-gcc
+CC = mipsel-linux-gcc -g
 
 all: image
 

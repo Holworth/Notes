@@ -37,6 +37,7 @@ Elf32_Phdr *read_exec_file(FILE *opfile)
 
 uint8_t count_kernel_sectors(Elf32_Phdr *Phdr)
 {
+    printf("count_kernel_sectors() get Phdr->p_memsz %d\nmake", Phdr->p_memsz);
     return (uint8_t)((Phdr->p_memsz + SECTOR_SIZE - 1) / SECTOR_SIZE);
 }
 
@@ -57,8 +58,8 @@ void write_kernel(FILE *image, FILE *knfile, Elf32_Phdr *Phdr, int kernelsz)
     {
         fread(buffer, 1, SECTOR_SIZE, knfile);
         fwrite(buffer, 1, SECTOR_SIZE, image);
-        fseek(knfile, SECTOR_SIZE, SEEK_CUR);
-        fseek(image, SECTOR_SIZE, SEEK_CUR);
+        // fseek(knfile, SECTOR_SIZE, SEEK_CUR);
+        // fseek(image, SECTOR_SIZE, SEEK_CUR);
     }
     puts("Kernel write finished.");
 }
@@ -76,11 +77,11 @@ void extent_opt(Elf32_Phdr *Phdr_bb, Elf32_Phdr *Phdr_k, int kernelsz)
     
     puts("--------KERNEL--------");
     printf("number of kernel sectors: 0x%x(%d)\n", kernelsz, (int)kernelsz);
-    printf("kernel size: %d\n", Phdr_k->p_filesz);
-    printf("kernel image memory size: 0x%x\n", Phdr_k->p_memsz);
+    printf("kernel image file size: 0x%x(%d)\n", Phdr_k->p_filesz,Phdr_k->p_filesz);
+    printf("kernel image memory size: 0x%x(%d)\n", Phdr_k->p_memsz,Phdr_k->p_memsz);
     printf("kernel image memory offset: 0x%x\n", Phdr_k->p_offset);
     puts("--------BOOTBLOCK--------");
-    printf("bootblock size: %d\n", Phdr_bb->p_filesz);
+    printf("bootblock image file size: 0x%x(%d)\n", Phdr_bb->p_filesz,Phdr_bb->p_filesz);
     printf("bootblock image memory size: 0x%x\n", Phdr_bb->p_memsz);
     printf("bootblock image memory offset: 0x%x\n", Phdr_bb->p_offset);
 }
@@ -89,7 +90,7 @@ int main(int argc, char* argv[], char* env[])
 {
     printf("\n\nCreateimage by aw.\nCompiled in %s, %s.\nFilename:%s\n", __DATE__, __TIME__, __FILE__);
     FILE *bootblock_file = fopen("./bootblock", "rb"); //binary read;
-    FILE *kernel_file = fopen("./kernel", "rb");       //binary read;
+    FILE *kernel_file = fopen("./main", "rb");       //binary read;
     FILE *image_file = fopen("./image", "wb");         //bin write;
 
     //找到程序头
