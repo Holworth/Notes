@@ -39,6 +39,13 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
     nop
 .endm
 
+.macro EPC_PLUS_4
+    mfc0    k0, CP0_EPC
+    addi    k0, 4
+    mtc0    k0, CP0_EPC
+    nop
+.endm
+
 .macro GET_STATUS
     mfc0    k0, CP0_STATUS
     nop
@@ -329,10 +336,17 @@ END(handle_int)
 NESTED(handle_syscall, 0, sp)
     // system call handler
     //TODO
+    #or a3, a2, a2
+    #or a2, a1, a1
+    #or a1, a0, a0
+    #or a1, v0, v0
     jal system_call_helper
     nop
     RESTORE_CONTEXT(KERNEL)#???
+    EPC_PLUS_4
     INTERRUPT_ENABLE
+    GET_STATUS
+    GET_EPC
     eret
 END(handle_syscall)
 

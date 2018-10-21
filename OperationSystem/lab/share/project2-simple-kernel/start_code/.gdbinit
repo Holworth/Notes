@@ -36,6 +36,7 @@ symbol-file main
 # 等待连接
 #b *0xa0800200
 # TODO: 在这里设置断点:
+b printf
 c
 
 # 附注

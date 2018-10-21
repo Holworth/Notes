@@ -162,6 +162,9 @@ void do_unblock_one(queue_t *queue)
     pcb_t* unblock_proc=queue->head;
     queue_dequeue(queue);
     unblock_proc->status=TASK_READY;
+    //Newly added in 2-4
+    unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
+    //----------------------------------
     queue_push(&ready_queue, unblock_proc);
     return;
 }
@@ -190,6 +193,9 @@ void do_unblock_high_priority(queue_t *queue)
     }
     max_priority_proc->status=TASK_READY;
     queue_remove(queue, max_priority_proc);
+    // Newly added in 2-4s
+    max_priority_proc->kernel_context.cp0_epc=max_priority_proc->kernel_context.regs[31];
+    //----------------------------------
     queue_push(&ready_queue, max_priority_proc);
     return;
 }
@@ -207,6 +213,9 @@ void do_unblock_all(queue_t *queue)
     {
         pcb_t* unblock_proc=queue->head;
         unblock_proc->status=TASK_READY;
+        // Newly added in 2-4s
+        unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
+        //----------------------------------
         queue_dequeue(queue);
         queue_push(&ready_queue, unblock_proc);
     }

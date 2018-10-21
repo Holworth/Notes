@@ -34,15 +34,12 @@
 
 #define PORT 0xbfe48000
 #define bios_printstr 0x8007b980
-// current_running
-// ready_queue
 #define STACK_BASE 0xa0f00000
 #define STACK_SIZE 0x10000 
-// #define TASK_OFFSET 0x00000200
+// current_running
+// ready_queue
 
 // #define PRIORITY_SCH
-// TODO: time etc
-// TODO: syscall: handle_syscall, system_call_helper
 
 uint32_t stack_base_now = STACK_BASE;
 
@@ -73,8 +70,16 @@ static void init_pcb()
     // struct task_info **tasks_used =lock_tasks;
 
 	//task3
-    int task_num=num_sched1_tasks;
-    struct task_info **tasks_used =sched1_tasks;
+    // int task_num=num_sched1_tasks;
+    // struct task_info **tasks_used =sched1_tasks;
+
+	//task4-1
+    int task_num=num_timer_tasks;
+    struct task_info **tasks_used =timer_tasks;
+
+	//task4-2
+    // int task_num=num_sched2_tasks;
+    // struct task_info **tasks_used =sched2_tasks;
 
 	int i;
     for(i=0;i<task_num;i++)

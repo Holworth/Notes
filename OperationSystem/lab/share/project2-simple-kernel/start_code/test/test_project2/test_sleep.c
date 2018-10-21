@@ -16,6 +16,7 @@ void sleep_task(void)
         for (i = 0; i < 20; i++)
         {
             sys_move_cursor(1, print_location);
+            printk("> [INFO] Syscall returned.\n");
             printf("> [TASK] This task is to test sleep(). (%d)\n", i);
         }
 
