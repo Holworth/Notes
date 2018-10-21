@@ -34,9 +34,11 @@ display /i $pc
 symbol-file main
 
 # 等待连接
-#b *0xa0800200
+b *0xa0800200
 # TODO: 在这里设置断点:
 b printf
+#b do_scheduler
+b fake_scene
 c
 
 # 附注

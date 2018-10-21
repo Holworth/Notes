@@ -22,6 +22,9 @@ queue_t ready_queue;
 queue_t block_queue;
 queue_t sleep_queue;
 
+/* addr for fake scene for the 1st proc*/
+uint32_t fake_scene_addr;
+
 static void check_sleeping()
 {
     if(queue_is_empty(&sleep_queue))
@@ -111,23 +114,32 @@ void scheduler(void)
         current_running->first_run=0;
         current_running->kernel_stack_top=alloc_stack();
         current_running->user_stack_top=alloc_stack();
-        current_running->kernel_context.pc=current_running->entry;
         current_running->priority_level=0x0;//TODO
         current_running->block_time=time_elapsed;
-        //ra
-        current_running->kernel_context.regs[31]=current_running->entry;
-        //sp
-        current_running->kernel_context.regs[29]=current_running->kernel_stack_top;
-        //cp0
+        //pc(useless)
+        // current_running->kernel_context.pc=current_running->entry;
         // current_running->kernel_context.cp0_status=0x30400004;//disable interrupt
-        current_running->kernel_context.cp0_status=0x10008001;//???
+        current_running->kernel_context.cp0_status=0x0;//close interrupt
         current_running->kernel_context.cp0_cause=0x0;
-        current_running->kernel_context.cp0_epc=current_running->entry;
+        current_running->user_context.cp0_status=0x0;
+
+        current_running->kernel_context.regs[31]=fake_scene_addr;
+        current_running->user_context.regs[31]=current_running->entry;
+        current_running->kernel_context.regs[29]=current_running->kernel_stack_top;
+        current_running->user_context.regs[29]=current_running->user_stack_top;
+        current_running->user_context.cp0_epc=current_running->entry;//set entry
+
+        //if kernel: disable interrupt
+        //if user:   enable interrupt
+        // current_running->user_context.cp0_status=(((current_running->type==USER_PROCESS)|(current_running->type==USER_THREAD))?
+            // 0x10008001:0x0);//set cp0_status
     }
     new_proc->status=TASK_RUNNING;
     check(current_running->kernel_context.regs[31]);
     check(current_running->kernel_context.regs[29]);
-    check(current_running->kernel_context.cp0_epc);
+    check(current_running->user_context.regs[31]);
+    check(current_running->user_context.regs[29]);
+    check(current_running->user_context.cp0_epc);
     return;
     // After return, do_scheduler will:
     // RESTORE_CONTEXT(KERNEL)

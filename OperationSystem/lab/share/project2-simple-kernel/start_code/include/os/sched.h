@@ -155,6 +155,7 @@ extern pid_t last_used_process_id;
 extern pcb_t pcb[NUM_MAX_TASK];
 extern pcb_t empty_pcb_for_init;
 extern uint32_t initial_cp0_status;
+extern uint32_t fake_scene_addr;
 
 void do_scheduler(void);
 void do_sleep(uint32_t);

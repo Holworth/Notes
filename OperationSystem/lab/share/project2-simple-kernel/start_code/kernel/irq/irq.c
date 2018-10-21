@@ -37,7 +37,7 @@ static void irq_timer()
         }
     }
 
-    scheduler();//FIXIT
+    do_scheduler();//FIXIT
     // set_CP0_COMPARE(TIMER_INTERVAL) in preemptive_scheduler();
     return;
 }

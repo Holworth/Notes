@@ -60,6 +60,7 @@ static void init_pcb()
     queue_init(&ready_queue);
 	last_used_process_id=0;
 	exception_handler_p=&exception_handler;
+	fake_scene_addr=set_fake_scene();
 
 	//task1
     // int task_num=num_sched1_tasks;
@@ -70,12 +71,12 @@ static void init_pcb()
     // struct task_info **tasks_used =lock_tasks;
 
 	//task3
-    // int task_num=num_sched1_tasks;
-    // struct task_info **tasks_used =sched1_tasks;
+    int task_num=num_sched1_tasks;
+    struct task_info **tasks_used =sched1_tasks;
 
 	//task4-1
-    int task_num=num_timer_tasks;
-    struct task_info **tasks_used =timer_tasks;
+    // int task_num=num_timer_tasks;
+    // struct task_info **tasks_used =timer_tasks;
 
 	//task4-2
     // int task_num=num_sched2_tasks;
@@ -216,7 +217,7 @@ void __attribute__((section(".entry_function"))) _start(void)
 		// (QAQQQQQQQQQQQ)
 		// If you do non-preemptive scheduling, you need to use it to surrender control
 		// printk("> [INIT] in while() loop.\n");
-		init_scheduler();
+		do_scheduler();
 		info("init_scheduler() called more than 1");
 		// do_scheduler();
 	};

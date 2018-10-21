@@ -51,6 +51,18 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
     nop
 .endm
 
+.macro RESET_CLOCK_INT
+    li      k1, 150000
+    mtc0    k1, CP0_COMPARE
+    mtc0    $0, CP0_COUNT
+.endm
+
+LEAF(reset_clock_int)
+    li      k1, 150000
+    mtc0    k1, CP0_COMPARE
+    mtc0    $0, CP0_COUNT
+END(reset_clock_int)
+
 LEAF(asm_cp)
 	la  k0, msg2
 	jal 0x8007b980
@@ -75,6 +87,12 @@ LEAF(get_CP0_STATUS)
     nop
     jr  ra
 END(get_CP0_STATUS)
+
+LEAF(set_fake_scene)
+    la  v0, fake_scene
+    nop
+    jr  ra
+END(set_fake_scene)
 
 LEAF(set_CP0_STATUS)
     mtc0    a0, CP0_STATUS
@@ -240,42 +258,31 @@ END(reset_count_compare)
     mtc0 k1, CP0_CAUSE
     nop
     
-    ############################
     mtc0 zero, CP0_STATUS
-    ############################
-
     lw k1, OFFSET_EPC(k0)
     mtc0 k1, CP0_EPC
     nop
-    
-    li      k1, 150000
-    mtc0    k1, CP0_COMPARE
-    mtc0    $0, CP0_COUNT
-    mtc0 k1, CP0_CAUSE
 
     lw k1, OFFSET_STATUS(k0)
     mtc0 k1, CP0_STATUS
     nop
-    #TODO: ???
-#    lw k1, OFFSET_PC(k0)
-#    jr k1
+
 .endm
 
-NESTED(init_scheduler, 0, ra)
-    INTERRUPT_DISABLE
-    SAVE_CONTEXT(KERNEL)
-    jal     scheduler
-    RESTORE_CONTEXT(KERNEL)
-    INTERRUPT_ENABLE
-    jr      ra
-END(init_scheduler)
+# NESTED(init_scheduler, 0, ra)
+#     INTERRUPT_DISABLE
+#     SAVE_CONTEXT(KERNEL)
+#     jal     scheduler
+#     RESTORE_CONTEXT(KERNEL)
+#     INTERRUPT_ENABLE
+#     jr      ra
+# END(init_scheduler)
 
 NESTED(do_scheduler, 0, ra)
-    INTERRUPT_DISABLE
+# Used in kernel mode
     SAVE_CONTEXT(KERNEL)
     jal     scheduler
     RESTORE_CONTEXT(KERNEL)
-    INTERRUPT_ENABLE
     jr      ra
 END(do_scheduler)
 
@@ -300,7 +307,7 @@ exception_handler_begin:
     // DONE close interrupt
     GET_EPC
     INTERRUPT_DISABLE
-    SAVE_CONTEXT(KERNEL)
+    SAVE_CONTEXT(USER)
     // jmp exception_handler[i] which decided by CP0_CAUSE //TODO FIXIT
     mfc0 k0, CP0_CAUSE
     andi k0, 0x0000007C
@@ -317,7 +324,6 @@ NESTED(handle_int, 0, sp)
     // interrupt handler
     // Leve3 exception Handler.
     //跳转到中断向量处理函数（interrupt_helper 方法）、恢复现场、开中断
-
     //准备参数(uint32_t status, uint32_t cause)
     mfc0 a0, CP0_STATUS
     mfc0 a1, CP0_CAUSE
@@ -325,13 +331,24 @@ NESTED(handle_int, 0, sp)
     jal interrupt_helper
     nop
     #RESTORE_CONTEXT(KERNEL)#??
-    RESTORE_CONTEXT(KERNEL)#???
+    RESTORE_CONTEXT(USER)#???
     GET_STATUS
     GET_EPC
+    RESET_CLOCK_INT
     INTERRUPT_ENABLE
     eret
     #jr  ra
 END(handle_int)
+
+NESTED(fake_scene, 0, sp)
+    RESTORE_CONTEXT(USER)#???
+    GET_STATUS
+    GET_EPC
+    RESET_CLOCK_INT
+    INTERRUPT_ENABLE
+    eret
+    #jr  ra
+END(fake_scene)
 
 NESTED(handle_syscall, 0, sp)
     // system call handler
@@ -342,17 +359,17 @@ NESTED(handle_syscall, 0, sp)
     #or a1, v0, v0
     jal system_call_helper
     nop
-    RESTORE_CONTEXT(KERNEL)#???
+    RESTORE_CONTEXT(USER)
     EPC_PLUS_4
-    INTERRUPT_ENABLE
     GET_STATUS
     GET_EPC
+    INTERRUPT_ENABLE
     eret
 END(handle_syscall)
 
 NESTED(handle_other, 0, sp)
     // other exception handler
-    RESTORE_CONTEXT(KERNEL)#???
+    RESTORE_CONTEXT(USER)#???
     GET_STATUS
     GET_EPC
     INTERRUPT_ENABLE
