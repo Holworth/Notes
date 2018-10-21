@@ -1,5 +1,7 @@
 #include "asm.h"
 
+msg2: .ascii "> [INFO] ASM critical point.\n"
+
 .equ    KERNEL, 0
 .equ    USER,   156
 
@@ -8,6 +10,45 @@
 
 .macro CLI
 .endm
+
+.macro MLOOP
+    mloop:
+    j  mloop
+.endm
+
+.macro INTERRUPT_ENABLE
+    #mfc0    k0, CP0_STATUS
+    li      k1, 0x10008001
+    #or      k0, k0, k1
+    mtc0    k1, CP0_STATUS
+    nop
+.endm
+
+.macro INTERRUPT_DISABLE
+    mfc0    k0, CP0_STATUS
+    #li      k1, 0xFFFF00FE
+    li      k1, 0xFFFFFFFE
+    and     k0, k1
+    mtc0    k0, CP0_STATUS
+    nop
+
+.endm
+
+.macro GET_EPC
+    mfc0    k0, CP0_EPC
+    nop
+.endm
+
+.macro GET_STATUS
+    mfc0    k0, CP0_STATUS
+    nop
+.endm
+
+LEAF(asm_cp)
+	la  k0, msg2
+	jal 0x8007b980
+	nop
+END(asm_cp)
 
 LEAF(asm_start)
     mtc0    zero, CP0_STATUS
@@ -28,61 +69,48 @@ LEAF(get_CP0_STATUS)
     jr  ra
 END(get_CP0_STATUS)
 
+LEAF(set_CP0_STATUS)
+    mtc0    a0, CP0_STATUS
+    jr  ra
+END(set_CP0_STATUS)
+
+LEAF(set_CP0_COMPARE)
+    mtc0    a0, CP0_COMPARE
+    jr  ra
+END(set_CP0_COMPARE)
+
+LEAF(set_CP0_COUNT)
+    mtc0    a0, CP0_COUNT
+    jr  ra
+END(set_CP0_COUNT)
+
 LEAF(interrupt_enable)
-#TODO: FIXIT
-    mfc0    k0, CP0_STATUS
-    ori     k0, 0x1
-    mtc0    k0, CP0_STATUS
+    INTERRUPT_ENABLE
     nop
     jr  ra
 END(interrupt_enable)
 
-LEAF(interrupt_disable)
+LEAF(interrupt_enable_init)
+#TODO: FIXIT
     mfc0    k0, CP0_STATUS
-    li      k1, 0xFFFFFFFE
-    and     k0, a1
+    ori     k0, 0x00008001
     mtc0    k0, CP0_STATUS
+    nop
+    jr  ra
+END(interrupt_enable_init)
+
+LEAF(interrupt_disable)
+    INTERRUPT_DISABLE
     nop
     jr  ra
 END(interrupt_disable)
 
-LEAF(interrupt_im_setas1)
-    mfc0    a0, CP0_STATUS
-    ori     a0, 0x0000FF00
-    mtc0    a0, CP0_STATUS
-    nop
-    jr  ra
-END(interrupt_im_setas1)
-
-.macro INTERRUPT_DISABLE
-    mfc0    a0, CP0_STATUS
-    ori     a0, 0x1
-    mtc0    a0, CP0_STATUS
-    nop
-.endm
-
-.macro INTERRUPT_ENABLE
-    mfc0    a0, CP0_STATUS
-    li      a1, 0xFFFFFFFE
-    and     a0, a1
-    mtc0    a0, CP0_STATUS
-    nop
-
-.endm
-
-.macro INTERRUPT_IM_SETAS1
-    mfc0    a0, CP0_STATUS
-    ori     a0, 0x0000FF00
-    mtc0    a0, CP0_STATUS
-    nop
-.endm
-
 # reset CP0_COMPARE & CP0_COUNT register
 LEAF(reset_count_compare)
-    li      k0, 0x100
+    li      k0, 0x10000
     li      k1, 0x0
     mtc0    k0, CP0_COMPARE
-    mtc0    k0, CP0_COUNT
+    mtc0    k1, CP0_COUNT
     nop
     jr  ra
 END(reset_count_compare)
@@ -190,9 +218,6 @@ END(reset_count_compare)
     lw $30, OFFSET_REG30(k0)
     lw $31, OFFSET_REG31(k0)
 
-    lw k1, OFFSET_STATUS(k0)
-    mtc0 k1, CP0_STATUS
-    nop
 
     lw k1, OFFSET_HI(k0)
     mthi k1
@@ -208,21 +233,55 @@ END(reset_count_compare)
     mtc0 k1, CP0_CAUSE
     nop
     
+    ############################
+    mtc0 zero, CP0_STATUS
+    ############################
+
     lw k1, OFFSET_EPC(k0)
     mtc0 k1, CP0_EPC
     nop
     
+    li      k1, 150000
+    mtc0    k1, CP0_COMPARE
+    mtc0    $0, CP0_COUNT
+    mtc0 k1, CP0_CAUSE
+
+    lw k1, OFFSET_STATUS(k0)
+    mtc0 k1, CP0_STATUS
+    nop
     #TODO: ???
 #    lw k1, OFFSET_PC(k0)
 #    jr k1
 .endm
 
-NESTED(do_scheduler, 0, ra)
+NESTED(init_scheduler, 0, ra)
+    INTERRUPT_DISABLE
     SAVE_CONTEXT(KERNEL)
     jal     scheduler
     RESTORE_CONTEXT(KERNEL)
+    INTERRUPT_ENABLE
+    jr      ra
+END(init_scheduler)
+
+NESTED(do_scheduler, 0, ra)
+    INTERRUPT_DISABLE
+    SAVE_CONTEXT(KERNEL)
+    jal     scheduler
+    RESTORE_CONTEXT(KERNEL)
+    INTERRUPT_ENABLE
     jr      ra
 END(do_scheduler)
+
+# NESTED(preemptive_scheduler, 0, ra)
+#     INTERRUPT_DISABLE
+#     jal     scheduler
+#     RESTORE_CONTEXT(KERNEL)
+#     INTERRUPT_ENABLE
+#     GET_STATUS
+#     #SET_EXL_0
+#     GET_EPC
+#     eret
+# END(preemptive_scheduler)
 
 .global exception_handler_begin
 .global exception_handler_end
@@ -232,29 +291,18 @@ exception_handler_begin:
     // Leve2 exception Handler.
     //主要完成例外处理入口相关内容：关中断、保存现场、根据 CP0_CAUSE 寄存器的例外触发状态跳转到中断处理函数（handle_int）
     // DONE close interrupt
-    SAVE_CONTEXT(KERNEL)
+    GET_EPC
     INTERRUPT_DISABLE
+    SAVE_CONTEXT(KERNEL)
     // jmp exception_handler[i] which decided by CP0_CAUSE //TODO FIXIT
     mfc0 k0, CP0_CAUSE
-    srl  k0,2
-    andi k0,0x0000001F
-    bne  k0,0,not_int
+    andi k0, 0x0000007C
+    la   k1, exception_handler
+    add  k0, k0, k1
+    lw   k1, (k0)
+    jalr  k1
     nop
-    jal  handle_int
-    nop
-    j    handler_end
-not_int:
-    bne  k0,8,not_sys
-    nop
-    jal  handle_syscall
-    nop
-    j    handler_end
-not_sys:
-    jal handle_other
-    nop
-handler_end:
-    #RESTORE_CONTEXT(KERNEL)
-    eret
+
 exception_handler_end:
 END(exception_handler_entry)
 
@@ -269,10 +317,13 @@ NESTED(handle_int, 0, sp)
     nop
     jal interrupt_helper
     nop
-    RESTORE_CONTEXT(KERNEL)
+    #RESTORE_CONTEXT(KERNEL)#??
+    RESTORE_CONTEXT(KERNEL)#???
+    GET_STATUS
+    GET_EPC
     INTERRUPT_ENABLE
-    nop
-    jr  ra
+    eret
+    #jr  ra
 END(handle_int)
 
 NESTED(handle_syscall, 0, sp)
@@ -280,12 +331,18 @@ NESTED(handle_syscall, 0, sp)
     //TODO
     jal system_call_helper
     nop
-    jr  ra
+    RESTORE_CONTEXT(KERNEL)#???
+    INTERRUPT_ENABLE
+    eret
 END(handle_syscall)
 
 NESTED(handle_other, 0, sp)
     // other exception handler
-    jr  ra
+    RESTORE_CONTEXT(KERNEL)#???
+    GET_STATUS
+    GET_EPC
+    INTERRUPT_ENABLE
+    eret
 END(handle_other)
 
 

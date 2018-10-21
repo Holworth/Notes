@@ -66,6 +66,9 @@ enum ExcCode
 
 void interrupt_helper(uint32_t, uint32_t);
 
+void (*exception_handler[32])();//TODO???
+void (*(*exception_handler_p)[32])();
+
 /* exception handler entery */
 extern void exception_handler_entry(void);
 extern void exception_handler_begin(void);

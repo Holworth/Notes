@@ -3,7 +3,7 @@
 #include "sched.h"
 #include "string.h"
 
-#define PREEMPTIVE_INTERVAL 10
+#define PREEMPTIVE_INTERVAL 1
 
 uint32_t preemptive_cnt;
 
@@ -18,30 +18,28 @@ static void irq_timer()
     // check_sleeping();
         if(queue_is_empty(&sleep_queue))
         {
-            return;
-        }
-        pcb_t* proc=sleep_queue.head;
-        uint32_t timepassed;
-        do
+            //do nothing
+        }else
         {
-            timepassed=time_elapsed-proc->block_time;
-            if(timepassed>proc->sleep_time)
+            pcb_t* proc=sleep_queue.head;
+            uint32_t timepassed;
+            do
             {
-                proc->status=TASK_READY;
-                queue_remove(&sleep_queue,proc);
-                queue_push(&ready_queue, proc);
-            }
-            proc=proc->next;
-        }while(proc!=NULL);
-        return;
+                timepassed=time_elapsed-proc->block_time;
+                if(timepassed>proc->sleep_time)
+                {
+                    proc->status=TASK_READY;
+                    queue_remove(&sleep_queue,proc);
+                    queue_push(&ready_queue, proc);
+                }
+                proc=proc->next;
+            }while(proc!=NULL);
+        }
     }
-    if(preemptive_cnt++==PREEMPTIVE_INTERVAL)
-    {
-        preemptive_cnt=0;
-        do_scheduler();//FIXIT
-        // manual scheduler
 
-    }
+    scheduler();//FIXIT
+    // set_CP0_COMPARE(TIMER_INTERVAL) in preemptive_scheduler();
+    return;
 }
 
 void interrupt_helper(uint32_t status, uint32_t cause)

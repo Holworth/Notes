@@ -62,10 +62,20 @@ static void init_pcb()
     // Load task list.
     queue_init(&ready_queue);
 	last_used_process_id=0;
-    int task_num=num_lock_tasks;
-    struct task_info **tasks_used =lock_tasks;
+	exception_handler_p=&exception_handler;
+
+	//task1
     // int task_num=num_sched1_tasks;
     // struct task_info **tasks_used =sched1_tasks;
+	
+	//task2
+    // int task_num=num_lock_tasks;
+    // struct task_info **tasks_used =lock_tasks;
+
+	//task3
+    int task_num=num_sched1_tasks;
+    struct task_info **tasks_used =sched1_tasks;
+
 	int i;
     for(i=0;i<task_num;i++)
     {
@@ -94,28 +104,36 @@ static void init_pcb()
 
 static void init_exception_handler()
 {
+	int i=0;
+	for(i=0;i<32;i++)
+	{
+		exception_handler[i]=&handle_other;
+	}
+	exception_handler[0]=&handle_int;
+	exception_handler[8]=&handle_syscall;
+	memcpy(0x80000180,exception_handler_entry,(exception_handler_end-exception_handler_begin));
 }
 
 static void init_exception()
 {
 	//ref: P57
 	//http://course.ucas.ac.cn/access/content/group/149542/%E4%BD%9C%E4%B8%9A%E8%B5%84%E6%96%99%E6%9B%B4%E6%96%B0/%E9%BE%99%E8%8A%AF2F%E5%A4%84%E7%90%86%E5%99%A8%E6%89%8B%E5%86%8C_v0.1.pdf
+	// 将例外处理代码拷贝到例外处理入口、 初始化例外向量表，初始化 CP0_STATUS、CP0_COUNT、CP0_COMPARE 等异常处理相关寄存
 
 	// 1. Get CP0_STATUS
-	uint32_t cp0_get=get_CP0_STATUS();
+	uint32_t cp0_status=get_CP0_STATUS();
+
 	// 2. Disable all interrupt
-	interrupt_disable();
-	// asm("mfc0    a0, CP0_STATUS\n"\
-    // 	"ori     a0, 0x1\n"\
-    // 	"mtc0    a0, CP0_STATUS\n"\
-    // 	"nop\n");
+	set_CP0_STATUS(cp0_status&0xFFFFFFFE);
+
 	// 3. Copy the level 2 exception handling code to 0x80000180
-	memcpy(0x80000180,exception_handler_entry,(exception_handler_end-exception_handler_begin));
+	init_exception_handler();
+	
 	// 4. reset CP0_COMPARE & CP0_COUNT register
-	reset_count_compare();//TODO
-	// 将例外处理代码拷贝到例外处理入口、 初始化例外向量表，初始化 CP0_STATUS、CP0_COUNT、CP0_COMPARE 等异常处理相关寄存
-	// interrupt_enable();
-	//TODO ???
+	// reset_count_compare();//TODO
+	// set_CP0_COMPARE(0);
+	set_CP0_COUNT(0);
+
 }
 
 static void init_syscall(void)
@@ -179,15 +197,23 @@ void __attribute__((section(".entry_function"))) _start(void)
 		printk("> [INIT] SCREEN initialization succeeded.\n");
 	#endif
 
-	// TODO Enable interrupt
+	// Enable interrupt
+	// interrupt_enable_init();
+
+	uint32_t cp0_status=get_CP0_STATUS();
+	set_CP0_STATUS(cp0_status&0x10008001);
+	set_CP0_COMPARE(TIMER_INTERVAL);
+	set_CP0_COUNT(0);
+	// while(breakpoint);
 	
 	while (1)
 	{
 		// (QAQQQQQQQQQQQ)
 		// If you do non-preemptive scheduling, you need to use it to surrender control
 		// printk("> [INIT] in while() loop.\n");
-		// while(breakpoint);
-		do_scheduler();
+		init_scheduler();
+		info("init_scheduler() called more than 1");
+		// do_scheduler();
 	};
 	return;
 }

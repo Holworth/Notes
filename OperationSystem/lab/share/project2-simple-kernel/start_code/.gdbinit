@@ -1,6 +1,9 @@
 # Author: Huaqiang Wang
-# Last Mod: 2018.10.18
+# Last Mod: 2018.10.20
 # .gdbinit for OS lab of UCAS 
+
+# 关闭命令确认
+set confirm off
 
 # 保存历史命令
 set history filename ~/.gdb_history
@@ -27,12 +30,13 @@ target remote localhost:50010
 
 # 调试准备
 # b *main
-# b *0xa0800200
 display /i $pc
 symbol-file main
 
-# 手动从头开始
-# set $pc=0xa0800200
+# 等待连接
+#b *0xa0800200
+# TODO: 在这里设置断点:
+c
 
 # 附注
 # 可以用“disas /m fun”（disas是disassemble命令缩写）命令将函数代码和汇编指令映射起来

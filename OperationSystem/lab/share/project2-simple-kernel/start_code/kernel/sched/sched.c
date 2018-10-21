@@ -56,6 +56,7 @@ void scheduler(void)
     info("scheduler(void) called");
     check(current_running->pid);
     check(current_running->status==TASK_RUNNING);
+    check(current_running->kernel_context.cp0_epc);
     if(current_running->status==TASK_RUNNING)
     {
         current_running->status=TASK_READY;
@@ -111,19 +112,22 @@ void scheduler(void)
         current_running->kernel_stack_top=alloc_stack();
         current_running->user_stack_top=alloc_stack();
         current_running->kernel_context.pc=current_running->entry;
+        current_running->priority_level=0x0;//TODO
+        current_running->block_time=time_elapsed;
         //ra
         current_running->kernel_context.regs[31]=current_running->entry;
         //sp
         current_running->kernel_context.regs[29]=current_running->kernel_stack_top;
         //cp0
-        current_running->kernel_context.cp0_status=0x30400004;
+        // current_running->kernel_context.cp0_status=0x30400004;//disable interrupt
+        current_running->kernel_context.cp0_status=0x10008001;//???
         current_running->kernel_context.cp0_cause=0x0;
-        current_running->priority_level=0x0;//TODO
-        current_running->block_time=time_elapsed;
+        current_running->kernel_context.cp0_epc=current_running->entry;
     }
     new_proc->status=TASK_RUNNING;
-    check( current_running->kernel_context.regs[31]);
-    check( current_running->kernel_context.regs[29]);
+    check(current_running->kernel_context.regs[31]);
+    check(current_running->kernel_context.regs[29]);
+    check(current_running->kernel_context.cp0_epc);
     return;
     // After return, do_scheduler will:
     // RESTORE_CONTEXT(KERNEL)

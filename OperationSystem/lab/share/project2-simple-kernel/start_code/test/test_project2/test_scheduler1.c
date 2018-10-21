@@ -3,6 +3,8 @@
 #include "test2.h"
 #include "syscall.h"
 
+// #define TEST1
+
 static char blank[] = {"                   "};
 static char plane1[] = {"    ___         _  "};
 static char plane2[] = {"| __\\_\\______/_| "};
@@ -17,7 +19,9 @@ void printk_task1(void)
     {
         vt100_move_cursor(1, print_location);
         printk("> [TASK] This task is to test scheduler. (%d)", i);
-        do_scheduler();
+        #ifdef TEST1
+            do_scheduler();
+        #endif
         // while(markx);
     }
 }
@@ -31,7 +35,9 @@ void printk_task2(void)
     {
         vt100_move_cursor(1, print_location);
         printk("> [TASK] This task is to test scheduler. (%d)", i);
-        do_scheduler();
+        #ifdef TEST1
+            do_scheduler();
+        #endif
     }
 }
 
@@ -57,7 +63,9 @@ void drawing_task1(void)
             printk("%s", plane4);
         }
 
-        do_scheduler();
+        #ifdef TEST1
+            do_scheduler();
+        #endif
 
         vt100_move_cursor(1, j + 0);
         printk("%s", blank);
