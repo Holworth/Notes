@@ -71,8 +71,8 @@ static void init_pcb()
     // struct task_info **tasks_used =lock_tasks;
 
 	//task3
-    int task_num=num_sched1_tasks;
-    struct task_info **tasks_used =sched1_tasks;
+    // int task_num=num_sched1_tasks;
+    // struct task_info **tasks_used =sched1_tasks;
 
 	//task4-1
     // int task_num=num_timer_tasks;
@@ -81,6 +81,12 @@ static void init_pcb()
 	//task4-2
     // int task_num=num_sched2_tasks;
     // struct task_info **tasks_used =sched2_tasks;
+	
+	//task4-3
+	//need to change Makefile
+    int task_num=num_lock_tasks;
+    struct task_info **tasks_used =lock_tasks;
+
 
 	int i;
     for(i=0;i<task_num;i++)
@@ -200,8 +206,11 @@ void __attribute__((section(".entry_function"))) _start(void)
 		printk("> [INIT] init_screen() closed for debugging.\n");
 	#else
 		init_screen();
-		printk("> [INIT] SCREEN initialization succeeded.\n");
+		// printk("> [INIT] SCREEN initialization succeeded.\n");
 	#endif
+
+	printk("> [QAQ_] Lagenaria siceraria OS\n");
+	printk("> [QAQ_] Copyright (C) 2018 Huaqiang Wang\n");
 
 	// Enable interrupt
 	// interrupt_enable_init();

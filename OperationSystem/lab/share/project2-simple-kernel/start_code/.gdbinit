@@ -36,9 +36,9 @@ symbol-file main
 # 等待连接
 b *0xa0800200
 # TODO: 在这里设置断点:
-b printf
-#b do_scheduler
-b fake_scene
+#b sleep_task
+b scheduler
+#b *0x80000180
 c
 
 # 附注

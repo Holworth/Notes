@@ -60,6 +60,7 @@ void scheduler(void)
     check(current_running->pid);
     check(current_running->status==TASK_RUNNING);
     check(current_running->kernel_context.cp0_epc);
+    check(current_running->user_context.cp0_epc);
     if(current_running->status==TASK_RUNNING)
     {
         current_running->status=TASK_READY;
@@ -122,6 +123,7 @@ void scheduler(void)
         current_running->kernel_context.cp0_status=0x0;//close interrupt
         current_running->kernel_context.cp0_cause=0x0;
         current_running->user_context.cp0_status=0x0;
+        current_running->user_context.cp0_cause=0x0;
 
         current_running->kernel_context.regs[31]=fake_scene_addr;
         current_running->user_context.regs[31]=current_running->entry;
@@ -135,6 +137,7 @@ void scheduler(void)
             // 0x10008001:0x0);//set cp0_status
     }
     new_proc->status=TASK_RUNNING;
+    current_running->user_context.cp0_cause=0x0;
     check(current_running->kernel_context.regs[31]);
     check(current_running->kernel_context.regs[29]);
     check(current_running->user_context.regs[31]);

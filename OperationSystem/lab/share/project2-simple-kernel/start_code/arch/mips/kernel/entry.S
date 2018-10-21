@@ -21,12 +21,20 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
     li      k1, 0x10008001
     #or      k0, k0, k1
     mtc0    k1, CP0_STATUS
-    nop
+.endm
+
+.macro INTERRUPT_ENABLE_AND_ERET
+    #mfc0    k0, CP0_STATUS
+    li      k1, 0x10008003
+    #or      k0, k0, k1
+    mtc0    k1, CP0_STATUS
+    eret
 .endm
 
 .macro INTERRUPT_DISABLE
+#   WARNNING: TIME_IRQ NEED CP0_STATUS, DO NOT SET IT AS 0!!!
+#   mtc0    zero, CP0_STATUS
     mfc0    k0, CP0_STATUS
-    #li      k1, 0xFFFF00FE
     li      k1, 0xFFFFFFFE
     and     k0, k1
     mtc0    k0, CP0_STATUS
@@ -199,10 +207,6 @@ END(reset_count_compare)
     nop
     sw k1, OFFSET_EPC(k0)
     
-    #TODO: ???
-#    jal storepc
-#    sw ra, OFFSET_PC(k0)
-# storepc:
     nop
 .endm
 
@@ -262,11 +266,11 @@ END(reset_count_compare)
     lw k1, OFFSET_EPC(k0)
     mtc0 k1, CP0_EPC
     nop
-
-    lw k1, OFFSET_STATUS(k0)
-    mtc0 k1, CP0_STATUS
-    nop
-
+####################################2333333
+#    lw k1, OFFSET_STATUS(k0)
+#    mtc0 k1, CP0_STATUS
+#    nop
+#########################################23
 .endm
 
 # NESTED(init_scheduler, 0, ra)
@@ -305,7 +309,6 @@ exception_handler_begin:
     // Leve2 exception Handler.
     //主要完成例外处理入口相关内容：关中断、保存现场、根据 CP0_CAUSE 寄存器的例外触发状态跳转到中断处理函数（handle_int）
     // DONE close interrupt
-    GET_EPC
     INTERRUPT_DISABLE
     SAVE_CONTEXT(USER)
     // jmp exception_handler[i] which decided by CP0_CAUSE //TODO FIXIT
@@ -316,7 +319,6 @@ exception_handler_begin:
     lw   k1, (k0)
     jalr  k1
     nop
-
 exception_handler_end:
 END(exception_handler_entry)
 
@@ -335,8 +337,7 @@ NESTED(handle_int, 0, sp)
     GET_STATUS
     GET_EPC
     RESET_CLOCK_INT
-    INTERRUPT_ENABLE
-    eret
+    INTERRUPT_ENABLE_AND_ERET
     #jr  ra
 END(handle_int)
 
@@ -345,9 +346,7 @@ NESTED(fake_scene, 0, sp)
     GET_STATUS
     GET_EPC
     RESET_CLOCK_INT
-    INTERRUPT_ENABLE
-    eret
-    #jr  ra
+    INTERRUPT_ENABLE_AND_ERET
 END(fake_scene)
 
 NESTED(handle_syscall, 0, sp)
@@ -363,17 +362,17 @@ NESTED(handle_syscall, 0, sp)
     EPC_PLUS_4
     GET_STATUS
     GET_EPC
-    INTERRUPT_ENABLE
-    eret
+    mtc0  zero, CP0_CAUSE
+    INTERRUPT_ENABLE_AND_ERET
 END(handle_syscall)
 
 NESTED(handle_other, 0, sp)
     // other exception handler
+    jal asm_cp
     RESTORE_CONTEXT(USER)#???
     GET_STATUS
     GET_EPC
-    INTERRUPT_ENABLE
-    eret
+    INTERRUPT_ENABLE_AND_ERET
 END(handle_other)
 
 
