@@ -107,11 +107,19 @@ static void init_pcb()
 		check(pcb[i].pid);
 		check(pcb[i].entry);
     }
+
+	//init empty_pcb_for_init
 	current_running=&empty_pcb_for_init;
 	current_running->pid=0;
 	process_id=0;
 	current_running->status=TASK_EXITED;
 	printk("\n");
+
+	//init pcb_idle
+	pcb_idle.pid=0;
+	pcb_idle.status=TASK_EXITED;
+	pcb_idle.entry=idle;
+	pcb_idle.first_run=1;
 }
 
 static void init_exception_handler()

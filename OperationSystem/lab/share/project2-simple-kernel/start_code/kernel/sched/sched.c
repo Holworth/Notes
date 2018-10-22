@@ -7,6 +7,7 @@
 
 pcb_t pcb[NUM_MAX_TASK];
 pcb_t empty_pcb_for_init;
+pcb_t pcb_idle;
 
 /* current running task PCB */
 pcb_t *current_running=0;
@@ -73,39 +74,42 @@ void scheduler(void)
     pcb_t* new_proc;
     check(queue_is_empty(&ready_queue));    
     //wait for a ready proc
-    while(queue_is_empty(&ready_queue))
+    if(queue_is_empty(&ready_queue))
     {
+        // printk("queue_is_empty(&ready_queue)\n");
+        new_proc=&pcb_idle;
+    }else
+    {
+    #ifdef PRIORITY_SCH
+    //TODO: priority
+        new_proc=ready_queue.head;
+        pcb_t *now_proc=ready_queue.head;
+        uint32_t priority_plus_wait_time_max=
+            new_proc->priority_level
+            -new_proc->block_time
+            +time_elapsed;
+        while(now_proc->next)
+        {
+            now_proc=now_proc->next;
+            uint32_t priority_plus_wait_time_now=
+            now_proc->priority_level
+            -now_proc->block_time
+            +time_elapsed;
+            if(priority_plus_wait_time_now>priority_plus_wait_time_max)
+            {
+                priority_plus_wait_time_max=priority_plus_wait_time_now;
+                new_proc=now_proc;
+            }
+        }
+    #else
+        new_proc=ready_queue.head;
+    #endif
     }
 
-#ifdef PRIORITY_SCH
-//TODO: priority
-    new_proc=ready_queue.head;
-    pcb_t *now_proc=ready_queue.head;
-    uint32_t priority_plus_wait_time_max=
-        new_proc->priority_level
-        -new_proc->block_time
-        +time_elapsed;
-    while(now_proc->next)
-    {
-        now_proc=now_proc->next;
-        uint32_t priority_plus_wait_time_now=
-        now_proc->priority_level
-        -now_proc->block_time
-        +time_elapsed;
-        if(priority_plus_wait_time_now>priority_plus_wait_time_max)
-        {
-            priority_plus_wait_time_max=priority_plus_wait_time_now;
-            new_proc=now_proc;
-        }
-    }
-#else
-    new_proc=ready_queue.head;
-#endif
     process_id=new_proc->pid;
     check(new_proc);
     check(new_proc->pid);
     check(new_proc->entry);
-    queue_dequeue(&ready_queue);
     current_running=new_proc;
 
     // SAVE_CONTEXT(ASM_USER);??
@@ -136,7 +140,11 @@ void scheduler(void)
         // current_running->user_context.cp0_status=(((current_running->type==USER_PROCESS)|(current_running->type==USER_THREAD))?
             // 0x10008001:0x0);//set cp0_status
     }
-    new_proc->status=TASK_RUNNING;
+    if(new_proc->status==TASK_READY)//NOT IDLE
+    {
+        new_proc->status=TASK_RUNNING;
+        queue_dequeue(&ready_queue);
+    }
     current_running->user_context.cp0_cause=0x0;
     check(current_running->kernel_context.regs[31]);
     check(current_running->kernel_context.regs[29]);
@@ -237,17 +245,28 @@ void do_unblock_all(queue_t *queue)
     return;
 }
 
-// void copy_pcb(pcb_t* tgt, pcb_t* src)
-// {
-//     int i;
-//     for(i=0;i<NUM_MAX_TASK;i++)
-//     {
-//         tgt[i]=src[i];
-//     }
-//     return;
-// }
-
 pid_t new_pid()
 {
     return (++last_used_process_id);
+}
+
+
+void other_helper()
+{
+    printk("other_helper(int epc, int status) called.\n");
+    other_check(current_running->kernel_context.cp0_epc);
+    other_check(current_running->kernel_context.cp0_status);
+    other_check(current_running->user_context.cp0_epc);
+    other_check(current_running->user_context.cp0_status);
+    other_check(current_running->user_context.cp0_cause);
+    while(1);
+    return;
+}
+
+void idle()
+{
+    while(1)
+    {
+        printk("> [IDLE] ZzzZZZZZZZZZZZZZZZZZzzzZZZZZ.....\n");
+    }
 }

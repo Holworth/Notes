@@ -154,6 +154,7 @@ extern pid_t last_used_process_id;
 
 extern pcb_t pcb[NUM_MAX_TASK];
 extern pcb_t empty_pcb_for_init;
+extern pcb_t pcb_idle;
 extern uint32_t initial_cp0_status;
 extern uint32_t fake_scene_addr;
 
@@ -163,6 +164,9 @@ void do_sleep(uint32_t);
 void do_block(queue_t *);
 void do_unblock_one(queue_t *);
 void do_unblock_all(queue_t *);
+
+extern void other_helper();
+extern void idle();
 
 // Newly introduced:
 

@@ -13,7 +13,6 @@ static void irq_timer()
     // scheduler, time counter in here to do, emmmmmm maybe.
     // 时钟中断的触发涉及 CP0_COUNT、CP0_COMPARE 寄存器，CP0_COUNT 寄存器的值每个时钟周期会自动增加， 当 CP0_COUNT 和 CP0_COMPARE 寄存器的值相等时会触发一个时钟中断
     time_elapsed++;
-    screen_reflush();
     {
     // check_sleeping();
         if(queue_is_empty(&sleep_queue))
@@ -38,6 +37,8 @@ static void irq_timer()
     }
 
     do_scheduler();//FIXIT
+    
+    screen_reflush();
     // set_CP0_COMPARE(TIMER_INTERVAL) in preemptive_scheduler();
     return;
 }

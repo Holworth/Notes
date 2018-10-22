@@ -368,7 +368,8 @@ END(handle_syscall)
 
 NESTED(handle_other, 0, sp)
     // other exception handler
-    jal asm_cp
+    jal other_helper
+    nop
     RESTORE_CONTEXT(USER)#???
     GET_STATUS
     GET_EPC

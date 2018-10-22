@@ -33,31 +33,32 @@ void do_mutex_lock_acquire(mutex_lock_t *lock)
     {
         //failed
         do_block(&(lock->lock_queue));
+        // printk("\n\nloop\n");
     }
     //succeed
-    if(lock->status==LOCKED)printk("[INFO] lock->status==LOCKED when acquire mutex lock finished.\n");
+    // if(lock->status==LOCKED)printk("[INFO] lock->status==LOCKED when acquire mutex lock finished.\n");
+    lock->status=LOCKED;
     lock->lock_current=current_running;
     current_running->status=TASK_RUNNING;
-    lock->status=LOCKED;
 }
 
 void do_mutex_lock_release(mutex_lock_t *lock)
 {
     if(lock->status==LOCKED)
     {
+        lock->status==UNLOCKED;
         if(!queue_is_empty(&(lock->lock_queue)))
         {
             // do_unblock_one(&(lock->lock_queue));
             do_unblock_high_priority(&(lock->lock_queue));
-            lock->status==LOCKED;
+            // lock->status==LOCKED;
             //this lock is still locked.
         }else
         {
-            lock->status==UNLOCKED;
         }
     }else
     {
         //do nothing;
-        printk("> [ERROR] release empty mutex lock.\n");
+        // printk("> [ERROR] release empty mutex lock.\n");
     }
 }

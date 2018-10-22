@@ -17,12 +17,12 @@ main:
 # 	data size
 #	calculate data size (byte)
 #	imagecrater saved kernel size in sector number here:
-#	lb	$a2,  0xa08001ff
-#	sll	$a2, 9
+	lb	$a2,  0xa08001ff
+	sll	$a2, 9
 
 #   or
 #   for small kernel:
-	li  $a2, 0x00008000
+#	li  $a2, 0x00008000
 
 #normal way
 

@@ -78,7 +78,9 @@
         "mutex": "c",
         "sstream": "c",
         "thread": "c",
-        "unordered_set": "c"
+        "unordered_set": "c",
+        "errno.h": "c",
+        "syscall.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [
