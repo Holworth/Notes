@@ -13,7 +13,7 @@ void sleep_task(void)
 
     while (1)
     {
-        for (i = 0; i < 20; i++)
+        for (i = 0; i < 50; i++)
         {
             sys_move_cursor(1, print_location);
             printf("> [TASK] This task is to test sleep(). (%d)\n", i);

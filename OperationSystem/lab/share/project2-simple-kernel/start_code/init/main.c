@@ -58,6 +58,8 @@ static void init_pcb()
 
     // Load task list.
     queue_init(&ready_queue);
+    queue_init(&block_queue);
+    queue_init(&sleep_queue);
 	last_used_process_id=0;
 	exception_handler_p=&exception_handler;
 	fake_scene_addr=set_fake_scene();

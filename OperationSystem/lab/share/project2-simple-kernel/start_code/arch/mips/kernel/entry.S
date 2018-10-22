@@ -193,7 +193,7 @@ END(reset_count_compare)
     sw k1, OFFSET_HI(k0)
 
     mflo k1
-    sw $31, OFFSET_LO(k0)
+    sw k1, OFFSET_LO(k0)
 
     mfc0 k1, CP0_BADVADDR
     nop

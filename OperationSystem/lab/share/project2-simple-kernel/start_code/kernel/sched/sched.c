@@ -186,7 +186,7 @@ void do_unblock_one(queue_t *queue)
     queue_dequeue(queue);
     unblock_proc->status=TASK_READY;
     //Newly added in 2-4
-    unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
+    // unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
     //----------------------------------
     queue_push(&ready_queue, unblock_proc);
     return;
@@ -217,7 +217,7 @@ void do_unblock_high_priority(queue_t *queue)
     max_priority_proc->status=TASK_READY;
     queue_remove(queue, max_priority_proc);
     // Newly added in 2-4s
-    max_priority_proc->kernel_context.cp0_epc=max_priority_proc->kernel_context.regs[31];
+    // max_priority_proc->kernel_context.cp0_epc=max_priority_proc->kernel_context.regs[31];
     //----------------------------------
     queue_push(&ready_queue, max_priority_proc);
     return;
@@ -263,10 +263,16 @@ void other_helper()
     return;
 }
 
+extern mutex_lock_t mutex_lock;
+
 void idle()
 {
+    printk("> [IDLE] ZzzZZZZZZZZZZZZZZZZZzzzZZZZZ.....\n");
+    other_check(mutex_lock.lock_current);
+    other_check(mutex_lock.lock_queue.head);
+    other_check(mutex_lock.lock_queue.tail);
+    other_check(mutex_lock.status);
     while(1)
     {
-        printk("> [IDLE] ZzzZZZZZZZZZZZZZZZZZzzzZZZZZ.....\n");
     }
 }

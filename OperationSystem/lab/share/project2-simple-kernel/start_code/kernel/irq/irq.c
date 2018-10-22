@@ -2,6 +2,7 @@
 #include "time.h"
 #include "sched.h"
 #include "string.h"
+#include "screen.h"
 
 #define PREEMPTIVE_INTERVAL 1
 
@@ -21,23 +22,32 @@ static void irq_timer()
         }else
         {
             pcb_t* proc=sleep_queue.head;
-            uint32_t timepassed;
+            pcb_t* temp_pcb_p=0;
+            uint32_t timepassed=0;
             do
             {
                 timepassed=time_elapsed-proc->block_time;
                 if(timepassed>proc->sleep_time)
                 {
                     proc->status=TASK_READY;
-                    queue_remove(&sleep_queue,proc);
-                    queue_push(&ready_queue, proc);
+                    temp_pcb_p=proc;
+                    proc=proc->next;
+                    queue_remove(&sleep_queue, temp_pcb_p);
+                    queue_push(&ready_queue, temp_pcb_p);
+                }else
+                {
+                    proc=proc->next;
                 }
-                proc=proc->next;
             }while(proc!=NULL);
         }
     }
 
+    current_running->cursor_x=screen_cursor_x;
+    current_running->cursor_y=screen_cursor_y;
     do_scheduler();//FIXIT
-    
+    screen_cursor_x=current_running->cursor_x;
+    screen_cursor_y=current_running->cursor_y;
+
     screen_reflush();
     // set_CP0_COMPARE(TIMER_INTERVAL) in preemptive_scheduler();
     return;

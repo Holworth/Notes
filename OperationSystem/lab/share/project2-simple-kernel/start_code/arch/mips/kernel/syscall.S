@@ -8,7 +8,5 @@ LEAF(invoke_syscall)
     #or a1, a2, a2
     #or a2, a3, a3
     syscall
-    nop
-    nop
     jr ra
 END(invoke_syscall)
