@@ -60,13 +60,13 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
 .endm
 
 .macro RESET_CLOCK_INT
-    li      k1, 150000
+    li      k1, 1500000
     mtc0    k1, CP0_COMPARE
     mtc0    $0, CP0_COUNT
 .endm
 
 LEAF(reset_clock_int)
-    li      k1, 150000
+    li      k1, 1500000
     mtc0    k1, CP0_COMPARE
     mtc0    $0, CP0_COUNT
 END(reset_clock_int)

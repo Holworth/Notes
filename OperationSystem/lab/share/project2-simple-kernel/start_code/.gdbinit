@@ -37,13 +37,8 @@ symbol-file main
 b *0xa0800200
 # TODO: 在这里设置断点:
 #b sleep_task
-b scheduler
-b other_helper
-b do_mutex_lock_acquire
-b do_mutex_lock_release
-b irq_timer
-b idle
 #b *0x80000180
+b idle
 c
 
 # 附注

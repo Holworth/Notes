@@ -7,12 +7,23 @@
 ```
 sudo chmod +x ./env.sh
 sudo ./env.sh
+sudo chmod +x ./loadboot.sh
 ```
 
 ## 2. 每次debug时运行:
 
 ```
-sudo sh ./debug.sh
+./loadboot.sh
+# 切换终端 (ctrl+alt+1/2/3)
+# 在另一个终端执行
+gdb-multiarch
+
+# 已经可以用了
+# 如果还不会用:
+
+# 回车
+# 切换终端 (ctrl+alt+1/2/3) 返回模拟器
+# loadboot
 ```
 
 ***

@@ -44,6 +44,8 @@ static void irq_timer()
 
     current_running->cursor_x=screen_cursor_x;
     current_running->cursor_y=screen_cursor_y;
+    screen_reflush();
+
     do_scheduler();//FIXIT
     screen_cursor_x=current_running->cursor_x;
     screen_cursor_y=current_running->cursor_y;

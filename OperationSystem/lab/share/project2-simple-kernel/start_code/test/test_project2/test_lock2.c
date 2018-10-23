@@ -102,7 +102,7 @@ void lock_task2(void)
                 mutex_lock_acquire(&mutex_lock);
 #endif
 
-                for (i = 0; i < 20; i++)
+                for (i = 0; i < 30; i++)
                 {
                         sys_move_cursor(1, print_location);
                         printf("> [TASK] Has acquired lock and running.(%d)\n", i);

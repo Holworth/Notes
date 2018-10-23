@@ -46,15 +46,19 @@ void do_mutex_lock_release(mutex_lock_t *lock)
 {
     if(lock->status==LOCKED)
     {
+        //for debug
+        lock->lock_current=0;
+        //
+
         if(!queue_is_empty(&(lock->lock_queue)))
         {
-            // do_unblock_one(&(lock->lock_queue));
-            do_unblock_high_priority(&(lock->lock_queue));
-            // lock->status==LOCKED;
+            do_unblock_one(&(lock->lock_queue));
+            // do_unblock_high_priority(&(lock->lock_queue));
+            //lock->status==LOCKED;
             //this lock is still locked.
         }else
         {
-            lock->status==UNLOCKED;
+            lock->status=UNLOCKED;
         }
     }else
     {
