@@ -86,8 +86,13 @@ static void init_pcb()
 	
 	//task4-3
 	//need to change Makefile
-    int task_num=num_lock_tasks;
-    struct task_info **tasks_used =lock_tasks;
+    // int task_num=num_lock_tasks;
+    // struct task_info **tasks_used =lock_tasks;
+	
+	//task4-all
+	//need to change Makefile
+    int task_num=num_task4_tasks;
+    struct task_info **tasks_used =task4_tasks;
 
 
 	int i;
@@ -225,10 +230,10 @@ void __attribute__((section(".entry_function"))) _start(void)
 	// Enable interrupt
 	// interrupt_enable_init();
 
-	uint32_t cp0_status=get_CP0_STATUS();
-	set_CP0_STATUS(cp0_status&0x10008001);
-	set_CP0_COMPARE(TIMER_INTERVAL);
-	set_CP0_COUNT(0);
+	// uint32_t cp0_status=get_CP0_STATUS();
+	// set_CP0_STATUS(cp0_status&0x10008001);
+	// set_CP0_COMPARE(TIMER_INTERVAL);
+	// set_CP0_COUNT(0);
 	// while(breakpoint);
 	
 	while (1)

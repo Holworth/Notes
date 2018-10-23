@@ -152,14 +152,10 @@ void scheduler(void)
     check(current_running->user_context.regs[29]);
     check(current_running->user_context.cp0_epc);
     return;
-    // After return, do_scheduler will:
-    // RESTORE_CONTEXT(KERNEL)
-    // jr      ra?? proceed
 }
 
 void do_sleep(uint32_t sleep_time)
 {
-    // TODO sleep(seconds)
     current_running->sleep_time=sleep_time;
     do_block(&sleep_queue);
 }

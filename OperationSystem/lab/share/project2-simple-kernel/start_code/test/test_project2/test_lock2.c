@@ -16,7 +16,8 @@ mutex_lock_t mutex_lock;
 
 void lock_task1(void)
 {
-        int print_location = 1;
+        int print_location = 3;
+        int cnt=0;
         while (1)
         {
                 int i;
@@ -37,7 +38,7 @@ void lock_task1(void)
                 printf("%s", blank);
 
                 sys_move_cursor(1, print_location);
-                printf("> [TASK] Applying for a lock.\n");
+                printf("> [TASK] Applying for a lock. (%d)\n", cnt++);
 
 #ifdef SPIN_LOCK
                 spin_lock_acquire(&spin_lock);
@@ -71,7 +72,8 @@ void lock_task1(void)
 
 void lock_task2(void)
 {
-        int print_location = 2;
+        int print_location = 4;
+        int cnt=0;
         while (1)
         {
                 int i;
@@ -92,7 +94,7 @@ void lock_task2(void)
                 printf("%s", blank);
 
                 sys_move_cursor(1, print_location);
-                printf("> [TASK] Applying for a lock.\n");
+                printf("> [TASK] Applying for a lock. (%d)\n", cnt++);
 
 #ifdef SPIN_LOCK
                 spin_lock_acquire(&spin_lock);

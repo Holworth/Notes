@@ -41,4 +41,8 @@ extern int num_timer_tasks;
 extern struct task_info *sched2_tasks[16];
 extern int num_sched2_tasks;
 
+extern struct task_info *task4_tasks[16];
+extern int num_task4_tasks;
+
+
 #endif

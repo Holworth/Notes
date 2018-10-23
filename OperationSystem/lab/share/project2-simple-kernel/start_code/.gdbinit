@@ -39,6 +39,7 @@ b *0xa0800200
 #b sleep_task
 #b *0x80000180
 b idle
+b lock_task1
 c
 
 # 附注

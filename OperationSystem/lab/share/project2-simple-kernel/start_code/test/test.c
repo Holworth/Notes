@@ -32,3 +32,7 @@ struct task_info task2_10 = {(uint32_t)&drawing_task2, USER_PROCESS};
 struct task_info *sched2_tasks[16] = {&task2_8, &task2_9, &task2_10};
 int num_sched2_tasks = 3;
 
+struct task_info *task4_tasks[16] = {&task2_8, &task2_9, &task2_10, &task2_6, &task2_7, &task2_4, &task2_5};
+int num_task4_tasks = (3+2+2);
+
+

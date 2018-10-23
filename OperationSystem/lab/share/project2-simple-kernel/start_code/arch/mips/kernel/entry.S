@@ -43,6 +43,7 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
 .endm
 
 .macro GET_EPC
+    # for debug
     mfc0    k0, CP0_EPC
     nop
 .endm
@@ -60,13 +61,13 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
 .endm
 
 .macro RESET_CLOCK_INT
-    li      k1, 1500000
+    li      k1, 150000
     mtc0    k1, CP0_COMPARE
     mtc0    $0, CP0_COUNT
 .endm
 
 LEAF(reset_clock_int)
-    li      k1, 1500000
+    li      k1, 150000
     mtc0    k1, CP0_COMPARE
     mtc0    $0, CP0_COUNT
 END(reset_clock_int)
@@ -117,12 +118,6 @@ LEAF(set_CP0_COUNT)
     jr  ra
 END(set_CP0_COUNT)
 
-LEAF(interrupt_enable)
-    INTERRUPT_ENABLE
-    nop
-    jr  ra
-END(interrupt_enable)
-
 LEAF(interrupt_enable_init)
 #TODO: FIXIT
     mfc0    k0, CP0_STATUS
@@ -131,6 +126,14 @@ LEAF(interrupt_enable_init)
     nop
     jr  ra
 END(interrupt_enable_init)
+
+LEAF(interrupt_enable)
+    mfc0  k0, CP0_STATUS
+    ori   k0, 0x1
+    mtc0  k0, CP0_STATUS
+    nop
+    jr  ra
+END(interrupt_enable)
 
 LEAF(interrupt_disable)
     INTERRUPT_DISABLE
@@ -341,14 +344,6 @@ NESTED(handle_int, 0, sp)
     #jr  ra
 END(handle_int)
 
-NESTED(fake_scene, 0, sp)
-    RESTORE_CONTEXT(USER)#???
-    GET_STATUS
-    GET_EPC
-    RESET_CLOCK_INT
-    INTERRUPT_ENABLE_AND_ERET
-END(fake_scene)
-
 NESTED(handle_syscall, 0, sp)
     // system call handler
     //TODO
@@ -362,7 +357,6 @@ NESTED(handle_syscall, 0, sp)
     EPC_PLUS_4
     GET_STATUS
     GET_EPC
-    mtc0  zero, CP0_CAUSE
     INTERRUPT_ENABLE_AND_ERET
 END(handle_syscall)
 
@@ -376,4 +370,11 @@ NESTED(handle_other, 0, sp)
     INTERRUPT_ENABLE_AND_ERET
 END(handle_other)
 
+NESTED(fake_scene, 0, sp)
+    RESTORE_CONTEXT(USER)#???
+    GET_STATUS
+    GET_EPC
+    RESET_CLOCK_INT
+    INTERRUPT_ENABLE_AND_ERET
+END(fake_scene)
 

@@ -14,7 +14,7 @@ sudo chmod +x ./loadboot.sh
 
 ```
 ./loadboot.sh
-# 切换终端 (ctrl+alt+1/2/3)
+# 切换终端 (ctrl+alt+F1/F2/F3)
 # 在另一个终端执行
 gdb-multiarch
 

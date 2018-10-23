@@ -8,8 +8,9 @@ static char blank[] = {"                                                "};
 void sleep_task(void)
 {
     int i;
-    int print_location = 1;
+    int print_location = 5;
     int sleep_time = 5;
+    int cnt=0;
 
     while (1)
     {
@@ -27,5 +28,8 @@ void sleep_task(void)
 
         sys_move_cursor(1, print_location);
         printf("%s", blank);
+
+        sys_move_cursor(1, 7);
+        printf("> [Task] Sleeped proc wakeuped. (%d)\n", cnt++);
     }
 }
