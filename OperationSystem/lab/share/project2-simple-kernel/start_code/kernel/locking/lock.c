@@ -33,13 +33,11 @@ void do_mutex_lock_acquire(mutex_lock_t *lock)
     {
         //failed
         do_block(&(lock->lock_queue));
-        // printk("\n\nloop\n");
     }
     //succeed
-    // if(lock->status==LOCKED)printk("[INFO] lock->status==LOCKED when acquire mutex lock finished.\n");
     lock->status=LOCKED;
     lock->lock_current=current_running;
-    // current_running->status=TASK_RUNNING;
+    current_running->status=TASK_RUNNING;
 }
 
 void do_mutex_lock_release(mutex_lock_t *lock)

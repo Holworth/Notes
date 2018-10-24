@@ -47,6 +47,16 @@ typedef struct mutex_lock
     lock_status_t status;
 } mutex_lock_t;
 
+typedef struct mutexs_lock
+{
+    // void* lock_current;
+    // lock_status_t status;
+    queue_t lock_queue;
+    int lock_accquired_cnt;
+    int upperbound;
+    // lock_status_t =(lock_accquired_cnt<upperbound)?UNLOCKED:LOCKED;
+} mutexs_lock_t;
+
 /* init lock */
 void spin_lock_init(spin_lock_t *lock);
 void spin_lock_acquire(spin_lock_t *lock);
