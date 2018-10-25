@@ -104,6 +104,27 @@ typedef struct pcb
     /* process priority level */
     int priority_level;
 
+    /* process timeslice */
+    int timeslice;
+
+    /* process timeslice left */
+    int timeslice_left;
+
+    /* data saved for original priority_level and timeslice */
+    //--------------------------------------
+    /* process priority level */
+    int priority_level_set;
+    /* process timeslice */
+    int timeslice_set;
+    //--------------------------------------
+
+    /* data saved for atuomatically get priority_level and timeslice */
+    //---------------------------------------
+    int time_int_cnt;
+    int sys_int_cnt;
+    //---------------------------------------
+
+
     /* block time */
     uint32_t block_time;
 

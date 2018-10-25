@@ -91,8 +91,13 @@ static void init_pcb()
 	
 	//task4-all
 	//need to change Makefile
-    int task_num=num_task4_tasks;
-    struct task_info **tasks_used =task4_tasks;
+    // int task_num=num_task4_tasks;
+    // struct task_info **tasks_used =task4_tasks;
+
+	//task_extra
+	//need to change Makefile
+    int task_num=num_task5_tasks;
+    struct task_info **tasks_used =task5_tasks;
 
 
 	int i;
@@ -105,6 +110,8 @@ static void init_pcb()
         pcb[i].status=TASK_READY;
         pcb[i].entry=tasks_used[i]->entry_point;
         pcb[i].first_run=1;
+        pcb[i].priority_level_set=priority_set[i];
+        pcb[i].timeslice_set=timeslice_set[i];
         queue_push(&ready_queue,(void*)&(pcb[i]));
 		//alloc stack in scheduler if 1st run
         // pcb[i].kernel_stack_top=alloc_stack();
@@ -118,6 +125,9 @@ static void init_pcb()
 	//init empty_pcb_for_init
 	current_running=&empty_pcb_for_init;
 	current_running->pid=0;
+	current_running->timeslice=1;
+	current_running->timeslice_left=1;
+	current_running->priority_level=1;
 	process_id=0;
 	current_running->status=TASK_EXITED;
 	printk("\n");

@@ -9,6 +9,8 @@
 void system_call_helper(int fn, int arg1, int arg2, int arg3)
 {
     // syscall[fn](arg1, arg2, arg3)
+    // if(current_running->sys_int_cnt<100000)current_running->sys_int_cnt++;
+    // current_running->sys_int_cnt++;
     syscall[fn](arg1, arg2, arg3);
 }
 

@@ -119,7 +119,9 @@ void scheduler(void)
         current_running->first_run=0;
         current_running->kernel_stack_top=alloc_stack();
         current_running->user_stack_top=alloc_stack();
-        current_running->priority_level=0x0;//TODO
+        current_running->priority_level=current_running->priority_level_set;
+        current_running->timeslice=current_running->timeslice_set;
+        current_running->timeslice_left=current_running->timeslice_set;
         current_running->block_time=time_elapsed;
         //pc(useless)
         // current_running->kernel_context.pc=current_running->entry;
@@ -165,6 +167,7 @@ void do_block(queue_t *queue)
     // block the current_running task into the queue
     current_running->status=TASK_BLOCKED;
     current_running->block_time=time_elapsed;
+    current_running->sys_int_cnt++;
     queue_push(queue, current_running);
     do_scheduler();
 }
@@ -195,18 +198,26 @@ void do_unblock_high_priority(queue_t *queue)
     if(queue_is_empty(queue))
     {
         printk("> [INFO] do_unblock_high_priority() an empty queue\n");
-        return;
         while(queue_is_empty(queue));
+        return;
     }
     pcb_t* unblock_proc=queue->head;
     pcb_t* max_priority_proc=queue->head;
-    int max_priority_level=((pcb_t*)queue->head)->priority_level;
+    int max_priority_level=
+        ((pcb_t*)queue->head)->priority_level
+        +time_elapsed
+        -((pcb_t*)queue->head)->block_time;
     while(unblock_proc->next!=NULL)
     {
         unblock_proc=unblock_proc->next;
-        if(unblock_proc->priority_level>max_priority_level)
+        int total_level=
+            unblock_proc->priority_level
+            +time_elapsed
+            -unblock_proc->block_time;
+
+        if(total_level>max_priority_level)
         {
-            max_priority_level=unblock_proc->priority_level;
+            max_priority_level=total_level;
             max_priority_proc=unblock_proc;
         }
     }

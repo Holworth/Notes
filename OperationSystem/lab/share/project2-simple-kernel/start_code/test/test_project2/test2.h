@@ -11,6 +11,9 @@ void drawing_task1(void);
 // task2 test task
 void lock_task1(void);
 void lock_task2(void);
+void lock_task3(void);
+void lock_task4(void);
+void lock_task5(void);
 
 // task3 test task
 void printf_task1(void);
