@@ -5,7 +5,7 @@
 #include "screen.h"
 
 // #define PREEMPTIVE_INTERVAL 1
-#define AUTO_UPDATE_PRIORITY
+// #define AUTO_UPDATE_PRIORITY
 
 uint32_t preemptive_cnt;
 
