@@ -10,7 +10,7 @@ Homework related documents will be pushed after due of the homework.
 
 ## MAINTAINMENT
 
-This project is maintened by auto-run shellscript in `/dev`.
+This project is maintained by auto-run shellscript in `/dev`.
 
 ## FOLDER ARCHITECTURE
 
