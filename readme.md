@@ -8,6 +8,8 @@ Homework related documents will be pushed after due of the homework.
 
 **WARNNING: IF YOU ARE CURRENT TAKING CS CLASSES IN UCAS, YOU MAY BE CHARGED WITH PLAGIARISM FOR COPYING SOURCE CODES FROM THIS PROJECT.**
 
+> I have warned you. -- Xun Lu
+
 ## MAINTAINMENT
 
 This project is maintained by auto-run shellscript in `/dev`.

@@ -76,6 +76,22 @@ Teller_Service()
     V(free_teller);
     return;
 }
+
+main
+{
+    Service_Init();
+    Thread1
+    {
+        while(1)Customer_Service();
+    }
+
+    Thread1
+    {
+        while(1)Teller_Service();
+    }
+}
+
+
 ```
 
 ## 3.
