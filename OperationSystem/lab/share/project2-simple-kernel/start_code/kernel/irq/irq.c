@@ -4,7 +4,6 @@
 #include "string.h"
 #include "screen.h"
 
-// #define PREEMPTIVE_INTERVAL 1
 // #define AUTO_UPDATE_PRIORITY
 
 uint32_t preemptive_cnt;
@@ -50,11 +49,11 @@ static void auto_update_priority()
 {
     if(current_running->sys_int_cnt>2*(current_running->time_int_cnt))
     {
-        current_running->priority_level++;
+        current_running->priority_level=current_running->priority_level_set+1;
     }
     if(current_running->sys_int_cnt*2<(current_running->time_int_cnt))
     {
-        current_running->timeslice++;
+        current_running->timeslice=current_running->timeslice_set+1;
     }
     return;
 }

@@ -143,6 +143,12 @@ typedef struct pcb
     /* Process first run */
     int first_run;
 
+    /* Process run counter */
+    int run_cnt;
+
+    /* Reserved for debug */
+    int reserved;
+
     //进程锁设计说明
     //进程唤醒按照不同的优先级进行, 同时进程锁在被触发之后, 对应不同的锁建立不同锁的等待队列. 如果锁解除时当前进程的剩余锁数为0, 则会将其设法加入运行队列中.
 

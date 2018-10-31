@@ -36,8 +36,8 @@ struct task_info *task4_tasks[16] = {&task2_8, &task2_9, &task2_10, &task2_6, &t
 int num_task4_tasks = (3+2+2);
 
 
-int timeslice_set[NUM_MAX_TASK]={1,2,1,3,2,1,1,1,1,1,1,1,1,1,1,1};
-int priority_set[NUM_MAX_TASK]={1,1,1,3,2,1,1,1,1,1,1,1,1,1,1,1};
+int timeslice_set[NUM_MAX_TASK]={1,2,1,3,2,1,2,1,1,1,1,1,1,1,1,1};
+int priority_set[NUM_MAX_TASK]= {1,1,1,3,2,1,1,1,1,1,1,1,1,1,1,1};
 
 struct task_info task2_e1={(uint32_t)&lock_task3, USER_PROCESS};
 struct task_info task2_e2={(uint32_t)&lock_task4, USER_PROCESS};

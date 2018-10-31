@@ -38,8 +38,9 @@ b *0xa0800200
 # TODO: 在这里设置断点:
 #b sleep_task
 #b *0x80000180
-b idle
-b lock_task1
+#b idle
+#b lock_task1
+b *0xa08034fc
 c
 
 # 附注

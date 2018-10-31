@@ -5,6 +5,8 @@
 #include "queue.h"
 #include "screen.h"
 
+#define PRIORITY_SCH
+
 pcb_t pcb[NUM_MAX_TASK];
 pcb_t empty_pcb_for_init;
 pcb_t pcb_idle;
@@ -65,10 +67,12 @@ void scheduler(void)
     if(current_running->status==TASK_RUNNING)
     {
         current_running->status=TASK_READY;
+        current_running->block_time=time_elapsed;
         queue_push(&ready_queue, current_running);//add old proc into ready queue;
     }
     // status mod will happen before do_scheduler()
-    //     current_running->status=TASK_BLOCKED, etc;//TODO
+    // current_running->status=TASK_BLOCKED, etc;//TODO
+    current_running->run_cnt++;
 
 
     pcb_t* new_proc;
@@ -88,17 +92,20 @@ void scheduler(void)
             new_proc->priority_level
             -new_proc->block_time
             +time_elapsed;
-        while(now_proc->next)
+        if(now_proc!=NULL)
         {
-            now_proc=now_proc->next;
-            uint32_t priority_plus_wait_time_now=
-            now_proc->priority_level
-            -now_proc->block_time
-            +time_elapsed;
-            if(priority_plus_wait_time_now>priority_plus_wait_time_max)
+            while(now_proc->next)
             {
-                priority_plus_wait_time_max=priority_plus_wait_time_now;
-                new_proc=now_proc;
+                now_proc=now_proc->next;
+                uint32_t priority_plus_wait_time_now=
+                now_proc->priority_level
+                -now_proc->block_time
+                +time_elapsed;
+                if(priority_plus_wait_time_now>priority_plus_wait_time_max)
+                {
+                    priority_plus_wait_time_max=priority_plus_wait_time_now;
+                    new_proc=now_proc;
+                }
             }
         }
     #else
@@ -127,9 +134,9 @@ void scheduler(void)
         // current_running->kernel_context.pc=current_running->entry;
         // current_running->kernel_context.cp0_status=0x30400004;//disable interrupt
         current_running->kernel_context.cp0_status=0x0;//close interrupt
-        current_running->kernel_context.cp0_cause=0x0;
+        // current_running->kernel_context.cp0_cause=0x0;
         current_running->user_context.cp0_status=0x0;
-        current_running->user_context.cp0_cause=0x0;
+        // current_running->user_context.cp0_cause=0x0;
 
         current_running->kernel_context.regs[31]=fake_scene_addr;
         current_running->user_context.regs[31]=current_running->entry;
@@ -145,7 +152,16 @@ void scheduler(void)
     if(new_proc->status==TASK_READY)//NOT IDLE
     {
         new_proc->status=TASK_RUNNING;
-        queue_dequeue(&ready_queue);
+        check(current_running->next);
+        check(current_running->prev);
+        check(current_running);
+        queue_remove(&ready_queue, new_proc);
+        // If need faster speed, use the following code:
+        // #ifdef PRIORITY_SCH
+        //     queue_remove(&ready_queue, new_proc);
+        // #else
+        //     queue_dequeue(&ready_queue);
+        // #endif
     }
     current_running->user_context.cp0_cause=0x0;
     check(current_running->kernel_context.regs[31]);
@@ -266,6 +282,13 @@ void other_helper()
     other_check(current_running->user_context.cp0_epc);
     other_check(current_running->user_context.cp0_status);
     other_check(current_running->user_context.cp0_cause);
+    other_check(current_running->pid);
+    other_check(current_running->block_time);
+    other_check(current_running->run_cnt);
+    other_check(current_running->reserved);
+    other_check(current_running->sys_int_cnt);
+    other_check(current_running->time_int_cnt);
+    other_check(current_running->status);
     while(1);
     return;
 }

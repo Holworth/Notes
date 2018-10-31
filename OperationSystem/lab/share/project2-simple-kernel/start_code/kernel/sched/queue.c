@@ -82,7 +82,7 @@ void *queue_remove(queue_t *queue, void *item)
     else
     {
         ((item_t *)(_item->prev))->next = _item->next;
-        ((item_t *)(pcb->next))->prev = _item->prev;
+        ((item_t *)(_item->next))->prev = _item->prev;
     }
 
     _item->prev = NULL;
