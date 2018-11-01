@@ -3,7 +3,7 @@ title: OS Homework6
 ---
 
 
-# 操作系统 作业6
+# 操作系统 作业6(勘误)
 
 * 王华强
 * 2016K8009929035
@@ -17,7 +17,7 @@ A system has four processes and five allocatable resources. The current allocati
 ```
             Allocated        Maximum        Available
 Process A    1 0 2 1 1        1 1 2 1 3        0 0 x 1 1
-Process B    2 0 1 1 0         2 2 2 1 0
+Process B    2 0 1 1 0        2 2 2 1 0
 Process C    1 1 0 1 0        2 1 3 1 0
 Process D    1 1 1 1 0        1 1 2 2 1
 ```
@@ -45,7 +45,7 @@ Process D    0 0 1 1
 
 当前没有可以安全执行的进程, 因此设定x至少为1. 
 
-当x=1时, 安全队列为:(Process D, Process A, Process B, Process C), 对应可用资源向量为:(1,1,1,2)->(2,1,3,3)->(4,1,4,4)->(5,2,4,5).
+当x=1时, 安全队列为:(Process D, Process A, Process C, Process B), 对应可用资源向量为:(1,1,2,2)->(2,1,4,3)->(3,2,4,4)->(5,2,5,5).
 
 因此x=1即满足要求, $x_{min}$=1;
 

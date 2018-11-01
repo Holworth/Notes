@@ -5,7 +5,7 @@
 #include "queue.h"
 #include "screen.h"
 
-#define PRIORITY_SCH
+// #define PRIORITY_SCH
 
 pcb_t pcb[NUM_MAX_TASK];
 pcb_t empty_pcb_for_init;
@@ -134,9 +134,9 @@ void scheduler(void)
         // current_running->kernel_context.pc=current_running->entry;
         // current_running->kernel_context.cp0_status=0x30400004;//disable interrupt
         current_running->kernel_context.cp0_status=0x0;//close interrupt
-        // current_running->kernel_context.cp0_cause=0x0;
+        current_running->kernel_context.cp0_cause=0x0;
         current_running->user_context.cp0_status=0x0;
-        // current_running->user_context.cp0_cause=0x0;
+        current_running->user_context.cp0_cause=0x0;
 
         current_running->kernel_context.regs[31]=fake_scene_addr;
         current_running->user_context.regs[31]=current_running->entry;
@@ -155,13 +155,13 @@ void scheduler(void)
         check(current_running->next);
         check(current_running->prev);
         check(current_running);
-        queue_remove(&ready_queue, new_proc);
+        // queue_remove(&ready_queue, new_proc);
         // If need faster speed, use the following code:
-        // #ifdef PRIORITY_SCH
-        //     queue_remove(&ready_queue, new_proc);
-        // #else
-        //     queue_dequeue(&ready_queue);
-        // #endif
+        #ifdef PRIORITY_SCH
+            queue_remove(&ready_queue, new_proc);
+        #else
+            queue_dequeue(&ready_queue);
+        #endif
     }
     current_running->user_context.cp0_cause=0x0;
     check(current_running->kernel_context.regs[31]);

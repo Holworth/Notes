@@ -333,7 +333,9 @@ NESTED(handle_int, 0, sp)
     mfc0 a0, CP0_STATUS
     mfc0 a1, CP0_CAUSE
     nop
+    addiu sp,sp,-8
     jal interrupt_helper
+    addiu sp,sp,8
     nop
     #RESTORE_CONTEXT(KERNEL)#??
     RESTORE_CONTEXT(USER)#???
