@@ -99,6 +99,11 @@ static void init_pcb()
     int task_num=num_task5_tasks;
     struct task_info **tasks_used =task5_tasks;
 
+	//task_shell
+	//need to change Makefile
+    // int task_num=1;
+    // struct task_info **tasks_used =shell_tasks;
+
 
 	int i;
     for(i=0;i<task_num;i++)
@@ -234,8 +239,8 @@ void __attribute__((section(".entry_function"))) _start(void)
 		// printk("> [INIT] SCREEN initialization succeeded.\n");
 	#endif
 
-	printk("> [QAQ_] Lagenaria siceraria OS\n");
-	printk("> [QAQ_] Copyright (C) 2018 Huaqiang Wang\n");
+	printk("> Lagenaria siceraria OS\n");
+	printk("> Copyright (C) 2018 Huaqiang Wang\n");
 
 	// Enable interrupt
 	// interrupt_enable_init();

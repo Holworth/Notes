@@ -80,7 +80,8 @@
         "thread": "c",
         "unordered_set": "c",
         "errno.h": "c",
-        "syscall.h": "c"
+        "syscall.h": "c",
+        "sched.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

@@ -10,6 +10,50 @@ title: OS Homework7
 
 ***
 
+## 作业6-1勘误. 数算错了, 但是之前的结果是对的.
+
+A system has four processes and five allocatable resources. The current allocation and maximum needs are as follows:
+
+```
+            Allocated        Maximum        Available
+Process A    1 0 2 1 1        1 1 2 1 3        0 0 x 1 1
+Process B    2 0 1 1 0        2 2 2 1 0
+Process C    1 1 0 1 0        2 1 3 1 0
+Process D    1 1 1 1 0        1 1 2 2 1
+```
+What is the smallest value of x for which this is a safe state?
+
+此题中进程A需要资源5的最大值为5, 超过了资源5的最大可用值(1+1=2), 因此只要进程A在等待队列中, 任何x的值此状态都是不安全的.
+
+不考虑资源5的解法如下:
+
+```
+Process A    1 0 2 1        1 1 2 1        0 0 x 1
+Process B    2 0 1 1        2 2 2 1
+Process C    1 1 0 1        2 1 3 1
+Process D    1 1 1 1        1 1 2 2
+```
+
+资源1,2,3,4的总值为(5,2,4+x,5), 当前可用资源向量为(0,0,x,1), 当前需求矩阵为:
+
+```
+Process A    0 1 0 0
+Process B    0 2 1 0
+Process C    1 0 3 0
+Process D    0 0 1 1
+```
+
+当前没有可以安全执行的进程, 因此设定x至少为1. 
+
+> 原来这里的安全队列和对应可用资源向量算错了
+
+当x=1时, 安全队列为:(Process D, Process A, Process C, Process B), 对应可用资源向量为:(1,1,2,2)->(2,1,4,3)->(3,2,4,4)->(5,2,5,5).
+
+因此x=1即满足要求, $x_{min}$=1;
+
+
+***
+
 ## 1. 设有两个优先级相同的进程P1，P2如下。令信号S1，S2的初值为0，已知z=2，试问P1，P2并发运行结束后x=？y=？z=？
  
 进程P1               进程P2
@@ -56,38 +100,31 @@ Service_Init()
     free_teller=n;//空闲的柜员数
     free_customer=0;//等待服务的顾客数
     number=0;//给顾客编号用的全局变量
+    mutex=1;//可获取的mutex lock
     current_service_number=0;//当前服务到的顾客号码
 }
 
 Customer_Service()
 {
-    customer_number=number++;
-    V(free_customer);
-    P(free_teller);
+    P(mutex);
+        customer_number=number++;//取号
+    V(mutex);
+    V(free_customer);//进入队列
+    P(free_teller);//等待柜员空闲
     do_business;
-    return;
+    return;//跑路
 }
 
-Teller_Service()
+Teller_Service()//n个Teller_Service()同时运行
 {
-    P(free_customer);
-    customer_number=current_service_number++;
-    do_business;
-    V(free_teller);
-    return;
-}
-
-main
-{
-    Service_Init();
-    Thread1
+    while(1)
     {
-        while(1)Customer_Service();
-    }
-
-    Thread1
-    {
-        while(1)Teller_Service();
+        P(free_customer);//等待顾客
+        P(mutex);//获得当前顾客编号
+            customer_number=current_service_number++;
+        V(mutex);
+        do_business;
+        V(free_teller);//再次空闲
     }
 }
 
@@ -96,14 +133,15 @@ main
 
 ## 3.
 
-3. 多个线程的规约(Reduce)操作是把每个线程的结果按照某种运算（符合交换律和结合律）两两合并直到得到最终结果的过程。
+多个线程的规约(Reduce)操作是把每个线程的结果按照某种运算（符合交换律和结合律）两两合并直到得到最终结果的过程。
 
 试设计管程monitor实现一个8线程规约的过程，随机初始化16个整数，每个线程通过调用 monitor.getTask 获得2个数，相加后，返回一个数monitor.putResult ，然后再getTask（） 直到全部完成退出，最后打印归约过程和结果。
-	要求：
- 为了模拟不均衡性，每个加法操作要加上随机的时间扰动，变动区间1~10ms。
+	
+要求：
+
+为了模拟不均衡性，每个加法操作要加上随机的时间扰动，变动区间1~10ms。
 		 
-提示： 使用pthread_系列的 cond_wait, cond_signal, mutex 实现管程
-		使用rand（）函数产生随机数，和随机执行时间。
+提示： 使用pthread_系列的 cond_wait, cond_signal, mutex 实现管程使用rand（）函数产生随机数，和随机执行时间。
 
 
 程序设计如下:
@@ -210,8 +248,6 @@ int monitor::is_finished()
     return counter==1;
 }
 
-       
-
 int do_add(int a, int b)
 {
     clock_t delay = CLOCKS_PER_SEC/1000*(rand()%990+10);
@@ -219,7 +255,6 @@ int do_add(int a, int b)
     while((clock()-start)<delay);
     return a+b;
 }
-
 
 void *thread_function(void *arg)
 {
@@ -265,6 +300,9 @@ int main(void)
     exit(0);
 }
 ```
+
+在windows10下使用`g++ -std=c++11 -lpthread`编译通过.
+
 
 正确的运行结果如下:
 
@@ -342,3 +380,4 @@ Add 294702 to intlist in monitor.
 The result is 294702
 (time2 - time1)=1927
 ```
+

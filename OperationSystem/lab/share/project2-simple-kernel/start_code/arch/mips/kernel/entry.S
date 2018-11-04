@@ -91,11 +91,15 @@ LEAF(asm_start)
     jr  ra
 END(asm_start)
 
-LEAF(get_CP0_STATUS)
+LEAF(get_cp0_status)
     mfc0    v0, CP0_STATUS
-    nop
     jr  ra
-END(get_CP0_STATUS)
+END(get_cp0_status)
+
+LEAF(set_cp0_status)
+    mtc0    a0, CP0_STATUS
+    jr  ra
+END(set_cp0_status)
 
 LEAF(set_fake_scene)
     la  v0, fake_scene
@@ -103,10 +107,6 @@ LEAF(set_fake_scene)
     jr  ra
 END(set_fake_scene)
 
-LEAF(set_CP0_STATUS)
-    mtc0    a0, CP0_STATUS
-    jr  ra
-END(set_CP0_STATUS)
 
 LEAF(set_CP0_COMPARE)
     mtc0    a0, CP0_COMPARE
