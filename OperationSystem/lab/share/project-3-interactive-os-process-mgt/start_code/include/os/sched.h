@@ -192,6 +192,11 @@ void do_block(queue_t *);
 void do_unblock_one(queue_t *);
 void do_unblock_all(queue_t *);
 
+void do_spawn(struct task_info * task);
+void do_kill(pid_t pid);
+void do_exit();
+void do_wait(pid_t pid);
+
 extern void other_helper();
 extern void idle();
 
@@ -203,6 +208,38 @@ pid_t new_pid();
 // extern pid_t last_used_process_id;
 // extern queue_t ready_queue; //deled, use ready_queue instead
 // extern queue_t block_queue;
+
+#define STACKSIZE 32
+struct int_stack
+{
+    int point;
+    uint32_t data[STACKSIZE];
+};
+
+struct int_stack freed_stack;
+
+struct int_stack lock_stack;
+
+int stack_empty()
+{
+    return int_stack->point==0;
+}
+
+int stack_full(struct *int_stack)
+{
+    return int_stack->point==STACK_SIZE;
+}
+
+int stack_push(struct int_stack* stack,uint32_t data)
+{
+    stack->data[stack->point++]=data;
+}
+
+uint32_t stack_pop(struct int_stack* stack)
+{
+    return stack->data[stack->point--];
+}
+
 
 
 #endif

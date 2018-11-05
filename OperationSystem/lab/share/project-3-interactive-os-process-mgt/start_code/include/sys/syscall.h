@@ -48,6 +48,11 @@
 #define SYSCALL_CURSOR 22
 #define SYSCALL_REFLUSH 23
 
+#define SYSCALL_SPAWN 24
+#define SYSCALL_KILL 25
+#define SYSCALL_EXIT 26
+#define SYSCALL_WAIT 27
+
 #define SYSCALL_MUTEX_LOCK_INIT 30
 #define SYSCALL_MUTEX_LOCK_ACQUIRE 31
 #define SYSCALL_MUTEX_LOCK_RELEASE 32
@@ -72,5 +77,11 @@ void sys_reflush();
 void mutex_lock_init(mutex_lock_t *);
 void mutex_lock_acquire(mutex_lock_t *);
 void mutex_lock_release(mutex_lock_t *);
+
+void sys_spawn(struct task_info * task);
+void sys_kill(pid_t pid);
+void sys_exit();
+void sys_wait(pid_t pid);
+
 
 #endif

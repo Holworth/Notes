@@ -25,6 +25,7 @@ void do_mutex_lock_init(mutex_lock_t *lock)
     queue_init(&(lock->lock_queue));
     lock->lock_current=0;
     lock->status=UNLOCKED;
+    stack_push(&lock_stack, (uint32_t)lock);
 }
 
 void do_mutex_lock_acquire(mutex_lock_t *lock)

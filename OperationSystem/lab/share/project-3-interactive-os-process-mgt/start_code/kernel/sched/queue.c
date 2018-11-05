@@ -35,6 +35,7 @@ void queue_push(queue_t *queue, void *item)
         _item->prev = queue->tail;
         queue->tail = item;
     }
+    item->current_queue=queue;
 }
 
 void *queue_dequeue(queue_t *queue)
@@ -54,6 +55,8 @@ void *queue_dequeue(queue_t *queue)
 
     temp->prev = NULL;
     temp->next = NULL;
+
+    item->current_queue=NULL;
 
     return (void *)temp;
 }
@@ -85,6 +88,7 @@ void *queue_remove(queue_t *queue, void *item)
         ((item_t *)(_item->next))->prev = _item->prev;
     }
 
+    _item->current_queue=NULL;
     _item->prev = NULL;
     _item->next = NULL;
 

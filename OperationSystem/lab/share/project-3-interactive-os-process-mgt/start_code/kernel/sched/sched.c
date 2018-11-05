@@ -4,6 +4,7 @@
 #include "sched.h"
 #include "queue.h"
 #include "screen.h"
+#include "lock.h"
 
 // #define PRIORITY_SCH
 
@@ -266,6 +267,79 @@ void do_unblock_all(queue_t *queue)
         queue_push(&ready_queue, unblock_proc);
     }
     return;
+}
+
+inline void free_proc_resource(pcb_t* pcbp)
+{
+    //free stack
+    stack_push(&freed_stack, pcbp->kernel_stack_top);
+    stack_push(&freed_stack, pcbp->user_stack_top);
+
+    //free lock
+    int end=lock_stack.point;
+    int i=0;
+    for(i=0;i<end;i++)
+    {
+        (mutex_lock_t*) mlockp=lock_stack.data[i];
+        if(mlockp->lock_current==pcbp)do_mutex_lock_release(mlockp);
+    }
+
+    //free ready_queue
+    int pcbi=ready_queue.head;
+    while(pcbi)
+    {
+        if(pcbi==pcbp)queue_remove(&ready_queue,pcbp);
+        pcbi=pcbi->next;
+    }
+    
+    pcbi=sleep_queue.head;
+    //free sleep_queue
+    while(pcbi)
+    {
+        if(pcbi==pcbp)queue_remove(&sleep_queue,pcbp);
+        pcbi=pcbi->next;
+    }
+
+    //free wait_queue
+    TODO
+
+
+    //set status
+    pcbp->status=TASK_EXITED;
+}
+
+//TODO
+void do_spawn(struct task_info * task)
+{
+
+}
+
+void do_kill(pid_t pid)
+{
+    pcb* tgt_pcb=0;
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if(pcb[i].pid==pid)tgt_pcb=&pcb[i];
+    }
+    if(tgt_pcb)
+        free_proc_resource(tgt_pcb);
+    else
+        printk("DO_KILL FAILED.\n");
+}
+
+void do_exit()
+{
+    current_running->status=TASK_EXITED;
+    current_running->block_time=time_elapsed;
+    free_proc_resource(current_running);
+    do_scheduler();
+}
+
+void do_wait(pid_t pid)
+{
+wait_queue
+TODO
 }
 
 pid_t new_pid()

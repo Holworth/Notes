@@ -43,11 +43,25 @@
 
 uint32_t stack_base_now = STACK_BASE;
 
+uint32_t free_stack(uint32_t addr)
+{
+	stack_push(&freed_stack,addr);
+}
+
 uint32_t alloc_stack()
 {
     // uint32_t t=stack_base_now;
-    stack_base_now-=STACK_SIZE;
-    return stack_base_now;
+
+	if(stack_empty(&freed_stack))
+	{
+		stack_base_now-=STACK_SIZE;
+		return stack_base_now;
+	}
+	else
+	{
+		return stack_pop(&freed_stack);
+	}
+
 }
 
 static void init_pcb()

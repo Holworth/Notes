@@ -81,7 +81,9 @@
         "unordered_set": "c",
         "errno.h": "c",
         "syscall.h": "c",
-        "sched.h": "c"
+        "sched.h": "c",
+        "common.h": "c",
+        "screen.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

@@ -68,3 +68,23 @@ void mutex_lock_release(mutex_lock_t *lock)
 {
     invoke_syscall(SYSCALL_MUTEX_LOCK_RELEASE, (int)lock, IGNORE, IGNORE);
 }
+
+void sys_spawn(struct task_info * task)
+{
+    invoke_syscall(SYSCALL_SPAWN, task, IGNORE, IGNORE);
+}
+
+void sys_kill(pid_t pid)
+{
+    invoke_syscall(SYSCALL_KILL, pid, IGNORE, IGNORE);
+}
+
+void sys_exit()
+{
+    invoke_syscall(SYSCALL_EXIT, IGNORE, IGNORE, IGNORE);
+}
+
+void sys_wait(pid_t pid)
+{
+    invoke_syscall(SYSCALL_EXIT, pid, IGNORE, IGNORE);
+}

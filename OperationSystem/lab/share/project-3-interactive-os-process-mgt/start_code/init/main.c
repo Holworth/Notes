@@ -43,6 +43,28 @@
 
 uint32_t stack_base_now = STACK_BASE;
 
+uint32_t free_stack(uint32_t addr)
+{
+	stack_push(&freed_stack,addr);
+}
+
+uint32_t alloc_stack()
+{
+    // uint32_t t=stack_base_now;
+
+	if(stack_empty(&freed_stack))
+	{
+		stack_base_now-=STACK_SIZE;
+		return stack_base_now;
+	}
+	else
+	{
+		return stack_pop(&freed_stack);
+	}
+
+}
+
+
 uint32_t alloc_stack()
 {
     // uint32_t t=stack_base_now;
@@ -187,11 +209,16 @@ static void init_syscall(void)
 	syscall[SYSCALL_UNBLOCK_ONE]=&do_unblock_one;
 	syscall[SYSCALL_UNBLOCK_ALL]=&do_unblock_all;
 
-	// FIXIT:
 	syscall[SYSCALL_WRITE]=&screen_write;
 	// syscall[SYSCALL_READ]=&sys_read;???
 	syscall[SYSCALL_CURSOR]=&screen_move_cursor;
 	syscall[SYSCALL_REFLUSH]=&screen_reflush;
+	
+	syscall[SYSCALL_SPAWN]=&do_spawn;
+	syscall[SYSCALL_KILL]=&do_kill;
+	syscall[SYSCALL_EXIT]=&do_exit;
+	syscall[SYSCALL_WAIT]=&do_wait;
+
 	syscall[SYSCALL_MUTEX_LOCK_INIT]=&do_mutex_lock_init;
 	syscall[SYSCALL_MUTEX_LOCK_ACQUIRE]=&do_mutex_lock_acquire;
 	syscall[SYSCALL_MUTEX_LOCK_RELEASE]=&do_mutex_lock_release;
