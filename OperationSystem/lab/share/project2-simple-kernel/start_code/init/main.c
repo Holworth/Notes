@@ -211,6 +211,16 @@ static void init_syscall(void)
 	syscall[SYSCALL_MUTEX_LOCK_ACQUIRE]=&do_mutex_lock_acquire;
 	syscall[SYSCALL_MUTEX_LOCK_RELEASE]=&do_mutex_lock_release;
 
+	syscall[SYSCALL_SEMAPHORE_INIT]=&do_semaphore_init;
+	syscall[SYSCALL_SEMAPHORE_UP]=&do_semaphore_up;
+	syscall[SYSCALL_SEMAPHORE_DOWN]=&do_semaphore_down;
+	syscall[SYSCALL_CONDITION_INIT]=&do_condition_init;
+	syscall[SYSCALL_CONDITION_WAIT]=&do_condition_wait;
+	syscall[SYSCALL_CONDITION_SIGNAL]=&do_condition_signal;
+	syscall[SYSCALL_CONDITION_BROADCAST]=&do_condition_broadcast;
+	syscall[SYSCALL_BARRIER_INIT]=&do_barrier_init;
+	syscall[SYSCALL_BARRIER_WAIT]=&do_barrier_wait;
+
 	return;
 }
 

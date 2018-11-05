@@ -1,4 +1,5 @@
 #include "lock.h"
+#include "sync.h"
 #include "sched.h"
 #include "common.h"
 #include "screen.h"
@@ -86,5 +87,50 @@ void sys_exit()
 
 void sys_wait(pid_t pid)
 {
-    invoke_syscall(SYSCALL_EXIT, pid, IGNORE, IGNORE);
+    invoke_syscall(SYSCALL_WAIT, pid, IGNORE, IGNORE);
+}
+
+void sys_semaphore_init(semaphore_t *s, int val)
+{
+    invoke_syscall(SYSCALL_SEMAPHORE_INIT, s, val, IGNORE);
+}
+
+void sys_semaphore_up(semaphore_t *s)
+{
+    invoke_syscall(SYSCALL_SEMAPHORE_UP, s, IGNORE, IGNORE);
+}
+
+void sys_semaphore_down(semaphore_t *s)
+{
+    invoke_syscall(SYSCALL_SEMAPHORE_DOWN, s, IGNORE, IGNORE);
+}
+
+void sys_condition_init(condition_t *condition)
+{
+    invoke_syscall(SYSCALL_CONDITION_INIT, condition, IGNORE, IGNORE);
+}
+
+void sys_condition_wait(mutex_lock_t *lock, condition_t *condition)
+{
+    invoke_syscall(SYSCALL_CONDITION_WAIT, lock, condition, IGNORE);
+}
+
+void sys_condition_signal(condition_t *condition)
+{
+    invoke_syscall(SYSCALL_CONDITION_SIGNAL, condition, IGNORE, IGNORE);
+}
+
+void sys_condition_broadcast(condition_t *condition)
+{
+    invoke_syscall(SYSCALL_CONDITION_BROADCAST, condition, IGNORE, IGNORE);
+}
+
+void sys_barrier_init(barrier_t *barrier, int goal)
+{
+    invoke_syscall(SYSCALL_BARRIER_INIT, barrier, goal, IGNORE);
+}
+
+void sys_barrier_wait(barrier_t *barrier)
+{
+    invoke_syscall(SYSCALL_BARRIER_WAIT, barrier, IGNORE, IGNORE);
 }
