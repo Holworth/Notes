@@ -17,7 +17,7 @@ SRC_SHELL   = ./test/test_shell.c
 
 SRC_TEST	= ./test/test.c
 SRC_TEST2	= ./test/test_project2/test_scheduler1.c ./test/test_project2/test_scheduler2.c ./test/test_project2/test_lock4.c ./test/test_project2/test_sleep.c ./test/test_project2/test_timer.c 
-# SRC_TEST3	= ./test/test_project3/test_barrier.c ./test/test_project3/test_condition.c ./test/test_project3/test_kill.c ./test/test_project3/test_sanguo.c ./test/test_project3/test_semaphore.c  
+SRC_TEST3	= ./test/test_project3/test_barrier.c ./test/test_project3/test_condition.c ./test/test_project3/test_kill.c ./test/test_project3/test_sanguo.c ./test/test_project3/test_semaphore.c  
 
 SRC_IMAGE	= ./tools/createimage.c
 

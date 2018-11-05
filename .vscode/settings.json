@@ -83,7 +83,10 @@
         "syscall.h": "c",
         "sched.h": "c",
         "common.h": "c",
-        "screen.h": "c"
+        "screen.h": "c",
+        "type.h": "c",
+        "sem.h": "c",
+        "queue.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "cSpell.words": [

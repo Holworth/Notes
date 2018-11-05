@@ -82,6 +82,14 @@ static void init_pcb()
     queue_init(&ready_queue);
     queue_init(&block_queue);
     queue_init(&sleep_queue);
+    queue_init(&wait_queue);
+
+	// Setup queue stack.
+	stack_push(&queue_stack, &ready_queue);
+    stack_push(&queue_stack, &block_queue);
+    stack_push(&queue_stack, &sleep_queue);
+    stack_push(&queue_stack, &wait_queue);
+	
 	last_used_process_id=0;
 	exception_handler_p=&exception_handler;
 	fake_scene_addr=set_fake_scene();

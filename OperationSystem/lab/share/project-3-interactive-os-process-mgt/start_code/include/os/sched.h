@@ -149,6 +149,13 @@ typedef struct pcb
     /* Reserved for debug */
     int reserved;
 
+    /* Wait PID */
+    pid_t wait_pid;
+
+    /* Current Queue */
+    // queue_t* current_queue;
+    // use lock stack instead.
+
     //进程锁设计说明
     //进程唤醒按照不同的优先级进行, 同时进程锁在被触发之后, 对应不同的锁建立不同锁的等待队列. 如果锁解除时当前进程的剩余锁数为0, 则会将其设法加入运行队列中.
 
@@ -208,38 +215,6 @@ pid_t new_pid();
 // extern pid_t last_used_process_id;
 // extern queue_t ready_queue; //deled, use ready_queue instead
 // extern queue_t block_queue;
-
-#define STACKSIZE 32
-struct int_stack
-{
-    int point;
-    uint32_t data[STACKSIZE];
-};
-
-struct int_stack freed_stack;
-
-struct int_stack lock_stack;
-
-int stack_empty()
-{
-    return int_stack->point==0;
-}
-
-int stack_full(struct *int_stack)
-{
-    return int_stack->point==STACK_SIZE;
-}
-
-int stack_push(struct int_stack* stack,uint32_t data)
-{
-    stack->data[stack->point++]=data;
-}
-
-uint32_t stack_pop(struct int_stack* stack)
-{
-    return stack->data[stack->point--];
-}
-
 
 
 #endif

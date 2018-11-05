@@ -26,6 +26,7 @@ void do_mutex_lock_init(mutex_lock_t *lock)
     lock->lock_current=0;
     lock->status=UNLOCKED;
     stack_push(&lock_stack, (uint32_t)lock);
+    stack_push(&queue_stack, &lock->lock_queue);
 }
 
 void do_mutex_lock_acquire(mutex_lock_t *lock)
@@ -51,8 +52,8 @@ void do_mutex_lock_release(mutex_lock_t *lock)
 
         if(!queue_is_empty(&(lock->lock_queue)))
         {
-            // do_unblock_one(&(lock->lock_queue));
-            do_unblock_high_priority(&(lock->lock_queue));
+            do_unblock_one(&(lock->lock_queue));
+            // do_unblock_high_priority(&(lock->lock_queue));
             //lock->status==LOCKED;
             //this lock is still locked.
         }else

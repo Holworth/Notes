@@ -6,6 +6,7 @@
 
 typedef struct condition
 {
+    queue_t queue;
 } condition_t;
 
 void do_condition_init(condition_t *condition);

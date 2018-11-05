@@ -25,6 +25,7 @@ pid_t last_used_process_id = 0;
 queue_t ready_queue;
 queue_t block_queue;
 queue_t sleep_queue;
+queue_t wait_queue;
 
 /* addr for fake scene for the 1st proc*/
 uint32_t fake_scene_addr;
@@ -189,14 +190,29 @@ void do_block(queue_t *queue)
     do_scheduler();
 }
 
+void do_unblock(queue_t *queue, pcb_t* pcbp)
+{
+    // unblock the head task from the queue
+    if(queue_is_empty(queue))
+    {
+        error("UNBLOCK_EMPTY_QUEUE");
+    }
+    pcb_t* unblock_proc=pcbp;
+    queue_remove(queue, pcbp);
+    unblock_proc->status=TASK_READY;
+    //Newly added in 2-4
+    // unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
+    //----------------------------------
+    queue_push(&ready_queue, unblock_proc);
+    return;
+}
+
 void do_unblock_one(queue_t *queue)
 {
     // unblock the head task from the queue
     if(queue_is_empty(queue))
     {
-        printk("> [INFO] do_unblock_one() an empty queue\n");
-        return;
-        while(queue_is_empty(queue));
+        error("UNBLOCK_EMPTY_QUEUE");
     }
     pcb_t* unblock_proc=queue->head;
     queue_dequeue(queue);
@@ -214,9 +230,7 @@ void do_unblock_high_priority(queue_t *queue)
     // unblock the task from the queue
     if(queue_is_empty(queue))
     {
-        printk("> [INFO] do_unblock_high_priority() an empty queue\n");
-        while(queue_is_empty(queue));
-        return;
+        error("UNBLOCK_EMPTY_QUEUE");
     }
     pcb_t* unblock_proc=queue->head;
     pcb_t* max_priority_proc=queue->head;
@@ -275,7 +289,7 @@ inline void free_proc_resource(pcb_t* pcbp)
     stack_push(&freed_stack, pcbp->kernel_stack_top);
     stack_push(&freed_stack, pcbp->user_stack_top);
 
-    //free lock
+    //free current lock
     int end=lock_stack.point;
     int i=0;
     for(i=0;i<end;i++)
@@ -284,34 +298,85 @@ inline void free_proc_resource(pcb_t* pcbp)
         if(mlockp->lock_current==pcbp)do_mutex_lock_release(mlockp);
     }
 
-    //free ready_queue
-    int pcbi=ready_queue.head;
-    while(pcbi)
+    //free all queues
+    int queue_num=queue_stack.point;
+    for(i=0;i<queue_num;i++)
     {
-        if(pcbi==pcbp)queue_remove(&ready_queue,pcbp);
-        pcbi=pcbi->next;
+        queue_t* queuei = (queue_t*)queue_stack.data[i];
+        int pcbi=queuei->head;
+        while(pcbi)
+        {
+            if(pcbi==pcbp)queue_remove(queuei, pcbp);
+            pcbi=pcbi->next;
+        }
     }
+
+    // //free ready_queue
+    // int pcbi=ready_queue.head;
+    // while(pcbi)
+    // {
+    //     if(pcbi==pcbp)queue_remove(&ready_queue,pcbp);
+    //     pcbi=pcbi->next;
+    // }
     
-    pcbi=sleep_queue.head;
-    //free sleep_queue
-    while(pcbi)
-    {
-        if(pcbi==pcbp)queue_remove(&sleep_queue,pcbp);
-        pcbi=pcbi->next;
-    }
+    // pcbi=sleep_queue.head;
+    // //free sleep_queue
+    // while(pcbi)
+    // {
+    //     if(pcbi==pcbp)queue_remove(&sleep_queue,pcbp);
+    //     pcbi=pcbi->next;
+    // }
 
     //free wait_queue
-    TODO
-
+    //DONE outside
 
     //set status
     pcbp->status=TASK_EXITED;
 }
 
+int find_free_pcb()
+{
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if(!pcb[i].valid)return i;
+    }
+    return -1;
+}
+
 //TODO
 void do_spawn(struct task_info * task)
 {
+    int i=-1;
+    i=find_free_pcb();
+    if(i==-1)error("PCB_FULL");
 
+    pcb[i].valid=1;
+    pcb[i].pid=new_pid();
+    pcb[i].type=task->type;
+    pcb[i].status=TASK_READY;
+    pcb[i].entry=task->entry_point;
+    pcb[i].first_run=1;
+    pcb[i].priority_level_set=priority_set[i];
+    pcb[i].timeslice_set=timeslice_set[i];
+    queue_push(&ready_queue,(void*)&(pcb[i]));
+    //alloc stack in scheduler if 1st run
+    // pcb[i].kernel_stack_top=alloc_stack();
+    // pcb[i].user_stack_top=alloc_stack();
+    check(i);
+    check(&pcb[i]);
+    check(pcb[i].pid);
+    check(pcb[i].entry);
+}
+
+void wakeup_wait(pid_t pid)
+{
+    pcb_t* i=wait_queue.head;
+    while(i)
+    {
+        if(i->wait_pid==pid)do_unblock_one();
+        i=i->next;
+    }
 }
 
 void do_kill(pid_t pid)
@@ -323,7 +388,10 @@ void do_kill(pid_t pid)
         if(pcb[i].pid==pid)tgt_pcb=&pcb[i];
     }
     if(tgt_pcb)
+    {
         free_proc_resource(tgt_pcb);
+        wakeup_wait(pid);
+    }
     else
         printk("DO_KILL FAILED.\n");
 }
@@ -331,15 +399,17 @@ void do_kill(pid_t pid)
 void do_exit()
 {
     current_running->status=TASK_EXITED;
+    current_running->valid=0;
     current_running->block_time=time_elapsed;
     free_proc_resource(current_running);
+    wakeup_wait(current_running->pid);
     do_scheduler();
 }
 
 void do_wait(pid_t pid)
 {
-wait_queue
-TODO
+    current_running->wait_pid=pid;
+    do_block(&wait_queue);
 }
 
 pid_t new_pid()
@@ -347,24 +417,30 @@ pid_t new_pid()
     return (++last_used_process_id);
 }
 
-
-void other_helper()
+int error(char* error_name)
 {
-    printk("other_helper(int epc, int status) called.\n");
+    printk("# [ERROR] %s\n",error_name);
+    other_check(current_running->pid);
+    other_check(current_running->status);
     other_check(current_running->kernel_context.cp0_epc);
     other_check(current_running->kernel_context.cp0_status);
     other_check(current_running->user_context.cp0_epc);
     other_check(current_running->user_context.cp0_status);
     other_check(current_running->user_context.cp0_cause);
-    other_check(current_running->pid);
-    other_check(current_running->block_time);
-    other_check(current_running->run_cnt);
-    other_check(current_running->reserved);
-    other_check(current_running->sys_int_cnt);
-    other_check(current_running->time_int_cnt);
-    other_check(current_running->status);
+    error_ps();
+    // other_check(current_running->block_time);
+    // other_check(current_running->run_cnt);
+    // other_check(current_running->reserved);
+    // other_check(current_running->sys_int_cnt);
+    // other_check(current_running->time_int_cnt);
     while(1);
     return;
+}
+
+
+void other_helper()
+{
+    error("OTHER_HELPER");
 }
 
 extern mutex_lock_t mutex_lock;
@@ -379,4 +455,17 @@ void idle()
     while(1)
     {
     }
+}
+
+int proc_exist(pid_t pid)
+{
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if(pcb[i].status!=TASK_EXITED)
+        {
+            if(pcb[i].pid==pid)return 1;
+        }
+    }
+    return 0;
 }

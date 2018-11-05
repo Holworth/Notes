@@ -69,4 +69,40 @@ void *queue_remove(queue_t *queue, void *item);
 // /* remove this item and return next item */
 // void *list_remove(list_t *queue, void *item);
 
+
+#define STACKSIZE 32
+struct int_stack
+{
+    int point;
+    uint32_t data[STACKSIZE];
+};
+
+struct int_stack freed_stack;
+
+struct int_stack lock_stack;
+
+struct int_stack queue_stack;
+
+int stack_empty()
+{
+    return int_stack->point==0;
+}
+
+int stack_full(struct *int_stack)
+{
+    return int_stack->point==STACK_SIZE;
+}
+
+int stack_push(struct int_stack* stack,uint32_t data)
+{
+    stack->data[stack->point++]=data;
+}
+
+uint32_t stack_pop(struct int_stack* stack)
+{
+    return stack->data[stack->point--];
+}
+
+
+
 #endif

@@ -3,9 +3,11 @@
 
 typedef struct mailbox
 {
-
+    
 } mailbox_t;
 
+//Use linked list? array?
+//Use array-linklist;
 
 void mbox_init();
 mailbox_t *mbox_open(char *);

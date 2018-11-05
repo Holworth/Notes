@@ -206,6 +206,7 @@ static void init_syscall(void)
 	// syscall[SYSCALL_READ]=&sys_read;???
 	syscall[SYSCALL_CURSOR]=&screen_move_cursor;
 	syscall[SYSCALL_REFLUSH]=&screen_reflush;
+	
 	syscall[SYSCALL_MUTEX_LOCK_INIT]=&do_mutex_lock_init;
 	syscall[SYSCALL_MUTEX_LOCK_ACQUIRE]=&do_mutex_lock_acquire;
 	syscall[SYSCALL_MUTEX_LOCK_RELEASE]=&do_mutex_lock_release;
