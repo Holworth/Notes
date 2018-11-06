@@ -1,0 +1,26 @@
+jal n43_j_test          #j
+jal n44_bgez_test       #bgez
+jal n45_bgtz_test       #bgtz
+jal n46_blez_test       #blez
+jal n47_bltz_test       #bltz
+jal n48_bltzal_test     #bltzal
+jal n49_bgezal_test     #bgezal
+jal n50_jalr_test       #jalr
+jal n51_j_ds_test       #j delay slot
+jal n52_bgez_ds_test    #bgez delay slot
+jal n53_bgtz_ds_test    #bgtz delay slot
+jal n54_blez_ds_test    #blez delay slot
+jal n55_bltz_ds_test    #bltz delay slot
+jal n56_bltzal_ds_test  #bltzal delay slot
+jal n57_bgezal_ds_test  #bgezal delay slot
+jal n58_jalr_ds_test    #jalr delay slot
+jal n59_lb_test         #lb
+jal n60_lbu_test        #lbu
+jal n61_lh_test         #lh
+jal n62_lhu_test        #lhu
+jal n63_lwl_test        #lwl
+jal n64_lwr_test        #lwr
+jal n65_sb_test         #sb
+jal n66_sh_test         #sh
+jal n67_swl_test        #swl
+jal n68_swr_test        #swr
