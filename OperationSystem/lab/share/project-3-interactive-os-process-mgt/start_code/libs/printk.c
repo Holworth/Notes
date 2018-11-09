@@ -220,7 +220,6 @@ int printk(const char *fmt, ...)
 
 int printf(const char *fmt, ...)
 {
-	//TODO FIXIT
 	int ret;
 	va_list va;
 	char buff[256];
@@ -231,5 +230,20 @@ int printf(const char *fmt, ...)
 
 	buff[ret] = '\0';
 	sys_write(buff);
+	return ret;
+}
+
+int printsys(const char *fmt, ...)
+{
+	int ret;
+	va_list va;
+	char buff[256];
+
+	va_start(va, fmt);
+	ret = mini_vsnprintf(buff, 256, fmt, va);
+	va_end(va);
+
+	buff[ret] = '\0';
+	screen_write(buff);
 	return ret;
 }

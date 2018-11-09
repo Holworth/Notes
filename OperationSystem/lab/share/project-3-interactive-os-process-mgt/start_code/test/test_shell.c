@@ -31,6 +31,7 @@
 #include "syscall.h"
 #include "time.h"
 #include "sched.h"
+#include "string.h"
 
 static void disable_interrupt()
 {
@@ -59,25 +60,25 @@ static char read_uart_ch(void)
     return ch;
 }
 
-struct task_info task1 = {"task1", (uint32_t)&ready_to_exit_task, USER_PROCESS};
-struct task_info task2 = {"task2", (uint32_t)&wait_lock_task, USER_PROCESS};
-struct task_info task3 = {"task3", (uint32_t)&wait_exit_task, USER_PROCESS};
+struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS,1,1};
+struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS,1,1};
+struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS,1,1};
 
-struct task_info task4 = {"task4", (uint32_t)&semaphore_add_task1, USER_PROCESS};
-struct task_info task5 = {"task5", (uint32_t)&semaphore_add_task2, USER_PROCESS};
-struct task_info task6 = {"task6", (uint32_t)&semaphore_add_task3, USER_PROCESS};
+struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS,1,1};
+struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS,1,1};
+struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS,1,1};
 
-struct task_info task7 = {"task7", (uint32_t)&producer_task, USER_PROCESS};
-struct task_info task8 = {"task8", (uint32_t)&consumer_task1, USER_PROCESS};
-struct task_info task9 = {"task9", (uint32_t)&consumer_task2, USER_PROCESS};
+struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS,1,1};
+struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS,1,1};
+struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS,1,1};
 
-struct task_info task10 = {"task10", (uint32_t)&barrier_task1, USER_PROCESS};
-struct task_info task11 = {"task11", (uint32_t)&barrier_task2, USER_PROCESS};
-struct task_info task12 = {"task12", (uint32_t)&barrier_task3, USER_PROCESS};
+struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS,1,1};
+struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS,1,1};
+struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS,1,1};
 
-struct task_info task13 = {"SunQuan",(uint32_t)&SunQuan, USER_PROCESS};
-struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS};
-struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS};
+struct task_info task13 = {"SunQuan",(uint32_t)&SunQuan, USER_PROCESS,1,1};
+struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS,1,1};
+struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS,1,1};
 
 static struct task_info *test_tasks[16] = {&task1, &task2, &task3,
                                            &task4, &task5, &task6,
@@ -89,7 +90,7 @@ static int num_test_tasks = 15;
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
     int i;
-    for (i = 1; i <= task_num; i++)
+    for (i =1; i <= task_num; i++)
     {
         printk("\n> [Shell] Writing pcb %d.\n", i);
         pcb[i].valid = 1;
@@ -98,8 +99,8 @@ void init_other_tasks(int task_num, struct task_info **tasks_used)
         pcb[i].status = TASK_READY;
         pcb[i].entry = tasks_used[i - 1]->entry_point;
         pcb[i].first_run = 1;
-        pcb[i].priority_level_set = priority_set[i];
-        pcb[i].timeslice_set = timeslice_set[i];
+        pcb[i].priority_level_set = tasks_used[i - 1]->priority;
+        pcb[i].timeslice_set = tasks_used[i - 1]->timeslice;
         queue_push(&ready_queue, (void *)&(pcb[i]));
         //alloc stack in scheduler if 1st run
         // pcb[i].kernel_stack_top=alloc_stack();
@@ -111,11 +112,11 @@ void init_other_tasks(int task_num, struct task_info **tasks_used)
     }
 }
 
-#define SHELL_LINE_POSITION 20
+#define SHELL_LINE_POSITION 15
 #define SHELL_BUFFER_SIZE 40
 #define SHELL_LINE_SIZE 40
 #define SHELL_HISTORY 40
-#define SHELL_SCREEN_HEIGHT 5
+#define SHELL_SCREEN_HEIGHT 15
 char shell_buffer[SHELL_BUFFER_SIZE];
 char shell_history[SHELL_HISTORY][SHELL_LINE_SIZE];
 char argc;
@@ -127,8 +128,12 @@ int shell_inline_position;
 
 inline void shell_drawline()
 {
+    int cursor_x_now=screen_cursor_x;
+    int cursor_y_now=screen_cursor_y;
     sys_move_cursor(1, SHELL_LINE_POSITION);
-    printf("--------------SHELL------------ run_time_now:%d\n", time_elapsed);
+    printf("---------------Lagenaria Siceraria OS:SHELL--------------- run_time_now:%d\n", time_elapsed);
+    screen_cursor_y=cursor_y_now;
+    screen_cursor_x=cursor_x_now;
     return;
 }
 
@@ -153,43 +158,117 @@ inline void shell_update_current_line()
     printf("> root@LSOS:%s", shell_buffer);
 }
 
-inline loop_sub(int shell_history_cnt)
+// inline loop_sub(int shell_history_cnt)
+// {
+//     if(shell_history_cnt)
+//     return shell_history_cnt--;
+//     shell_history_cnt=SHELL_HISTORY-1;
+// }
+
+// #define SHELL_PRINT_START \
+// shell_line_position++;\
+// sys_move_cursor(1,SHELL_LINE_POSITION+1+shell_line_position);
+// #define SHELL_PRINT_END \
+// if(shell_line_position<SHELL_SCREEN_HEIGHT);\
+// else\
+// {\
+//     shell_line_position=SHELL_SCREEN_HEIGHT-1;\
+//     disable_interrupt();\
+//     screen_scroll(SHELL_LINE_POSITION+1,SHELL_LINE_POSITION+SHELL_SCREEN_HEIGHT);\
+//     enable_interrupt();\
+// }\
+
+// Shell embedded commands:
+
+inline void cmd_echo()
 {
-    if(shell_history_cnt)
-    return shell_history_cnt--;
-    shell_history_cnt=SHELL_HISTORY-1;
+    int i=1;
+    while(i<argc)
+    {
+        // shell_print(argv[i++]);
+        printf("%s\n",argv[i++]);
+    }
 }
 
-inline void shell_print(char *string)
+inline void cmd_clear()
 {
-    if (shell_line_position < SHELL_SCREEN_HEIGHT)
+    // shell_line_position=0;
+    // int i=0
+    // for(i=0;i<=SHELL_SCREEN_HEIGHT;i++)
+    // {
+    //     sys_move_cursor(1,SHELL_LINE_POSITION+i);
+    //     printf("                                                   \n");
+    // }
+    disable_interrupt();
+    screen_clear_area(SHELL_LINE_POSITION, SHELL_LINE_POSITION+SHELL_SCREEN_HEIGHT);
+    enable_interrupt();
+    return;
+}
+
+inline void cmd_ps()
+{
+    sys_ps();
+}
+
+inline void cmd_about()
+{
+	printf(" Lagenaria Siceraria OS\n");
+	printf(" Copyright (C) 2018 Huaqiang Wang\n");
+}
+
+inline void cmd_history()
+{
+    //TODO
+	printf(" Lagenaria Siceraria OS\n");
+	printf(" Copyright (C) 2018 Huaqiang Wang\n");
+}
+
+inline void cmd_exec()
+{
+    if(argc==1)
     {
-        printf("%s", string);
-        shell_line_position++;
-        shell_history_cnt++;
-        if (shell_history_cnt >= SHELL_HISTORY)
-        {
-            shell_history_cnt = 0;
-        }
-        strcpy(shell_history[shell_history_cnt],string);
+        printf("No enough args for exec.\n");
+        return;
+    }
+    int i;
+    for(i=1;i<=(argc-1);i++)
+    {
+        int num=atoi(argv[i]);
+        printf("Exec task: %d\n", num);
+        sys_spawn(test_tasks[num]);
+    }
+}
+
+
+
+inline void cmd_kill()
+{
+    int kill_id=atoi(argv[1]);
+    if(kill_id==current_running->pid)
+    {
+        printf("#Shell: You wanna kill yourself? That's not socialism.\n");
+        return;
+    }
+    if(proc_exist(kill_id))
+    {
+        sys_kill(kill_id);
     }
     else
     {
-        strcpy(shell_history[shell_history_cnt],string);
-        int i=SHELL_SCREEN_HEIGHT;
-        int reverse_point=shell_history_cnt;
-        while(i>0)
-        {
-            sys_move_cursor(1,SHELL_LINE_POSITION+i);
-            printf("%s",shell_history[reverse_point]);
-            loop_sub(reverse_point);
-        }
-        shell_history_cnt++;
-        if (shell_history_cnt >= SHELL_HISTORY)
-        {
-            shell_history_cnt = 0;
-        }
+        printf("#Shell: Process does not exist.\n");
     }
+    return;
+}
+
+inline void cmd_reboot()
+{
+    disable_interrupt();
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        pcb[i].valid=0;
+    }
+    asm("jal _start\n nop\n");
 }
 
 inline void shell_interpret_cmd()
@@ -220,11 +299,7 @@ inline void shell_interpret_cmd()
     //strcmp();return 0 if eq
 
     // Use key tree here to make it faster
-    if(!strcmp(argv[0],"echo"))
-    {
-        cmd_echo();
-        return;
-    }
+
     if(!strcmp(argv[0],"echo"))
     {
         cmd_echo();
@@ -260,117 +335,47 @@ inline void shell_interpret_cmd()
         cmd_kill();
         return;
     }
+    if(!strcmp(argv[0],"reboot"))
+    {
+        cmd_reboot();
+        return;
+    }
     //TODO
+    if(shell_inline_position!=0)
+        printsys("Can not interpret command: %s\n", shell_buffer);
+    else
+        1;
+        // printsys("\n");
 }
 
-// Shell embedded commands:
-
-inline void cmd_echo()
+inline void shell_newline()
 {
-    int i=1;
-    while(i<argc)
-    {
-        shell_print(argv[i++]);
-    }
+    printf("> root@LSOS# ");
 }
 
-inline void cmd_clear()
+inline void show_ascii(char ch)
 {
-    shell_line_position=0;
-    int i=0
-    for(i=0;i<=SHELL_SCREEN_HEIGHT;i++)
-    {
-        sys_move_cursor(1,SHELL_LINE_POSITION+i);
-        printf("                                                   \n");
-    }
+
+    FLOAT_PRINT_START(SCREEN_WIDTH-15, 1);
+    printf("|ascii: %d|",ch);
+    FLOAT_PRINT_END(SCREEN_WIDTH-15, 1);
     return;
 }
 
-char* str_running="RUNNING";
-char* str_ready="READY";
-char* str_blocked="BLOCKED";
-char* str_sleep="SLEEPING";
-char* str_exit="EXITED";
-char* str_unknown="UNKNOWN";
 
-inline char* status_to_str(task_status_t status)
-{
-    switch(status)
-    {
-        case TASK_RUNNING: return str_running;
-        case TASK_READY: return str_ready;
-        case TASK_BLOCKED: return str_blocked;
-        case TASK_EXITED: return str_exited;
-        return str_unknown;
-    }
-}
 
-inline void cmd_ps()
-{
-    printf("[Process Table] --------------------\n");
-    int i=0;
-    int cnt=0;
-    for(;i<NUM_MAX_TASK;i++)
-    {
-        if(pcb[i].valid)
-        {
-            printf("[%d] PID: %d  STATUS: %s",cnt++,pcb[i].pid,status_to_str(pcb[i].status));
-        }
-    }
-}
-
-void error_ps()
-{
-    printk("[Process Table] --------------------\n");
-    int i=0;
-    int cnt=0;
-    for(;i<NUM_MAX_TASK;i++)
-    {
-        if(pcb[i].valid)
-        {
-            printk("[%d] PID: %d  STATUS: %s",cnt++,pcb[i].pid,status_to_str(pcb[i].status));
-        }
-    }
-}
-
-inline void cmd_about()
-{
-	printf(" Lagenaria Siceraria OS\n");
-	printf(" Copyright (C) 2018 Huaqiang Wang\n");
-}
-
-inline void cmd_history()
-{
-    //TODO
-	printf(" Lagenaria Siceraria OS\n");
-	printf(" Copyright (C) 2018 Huaqiang Wang\n");
-}
-
-inline void cmd_exec()
-{
-    sys_spawn(test_tasks[argv[1]]);
-}
-
-inline void cmd_kill()
-{
-    if(proc_exist(argv[1]))
-    {
-        sys_kill(argv[1]);
-    }
-    else
-    {
-        shell_print("#Shell: Process does not exist.");
-    }
-}
 
 // Shell itself
 void test_shell()
 {
+    // while(1);
     disable_interrupt();
     // init_other_tasks(num_task5_tasks,task5_tasks);
     enable_interrupt();
-
+    cmd_clear();
     shell_drawline();
+    sys_move_cursor(1, SHELL_LINE_POSITION+1);
+    shell_newline();
 
     while (1)
     {
@@ -379,24 +384,31 @@ void test_shell()
         char ch = read_uart_ch();
         enable_interrupt();
         if(!ch)continue;
-        sys_move_cursor(SHELL_LINE_POSITION + 2);
-        printf("%c", ch);
 
         // TODO solve command
-        if (ch != '\n')
+        if (ch != 13)//
         {
-            shell_drawline();
             shell_add_to_buffer(ch);
-            sys_move_cursor(1, shell_line_position + SHELL_LINE_POSITION + 1);
-            shell_update_current_line();
+            screen_write_ch(ch);
+            //get ascii
+            show_ascii(ch);
         }
         else
         {
             disable_interrupt();
             shell_add_to_buffer('\0');
-            char temp[50] = "> root@LSOS:", shell_buffer;
-            shell_print(temp);
+            screen_write_ch('\n');
+            shell_inline_position=0;
             enable_interrupt();
+            shell_interpret_cmd();
+
+            disable_interrupt();
+            screen_reflush();
+            enable_interrupt();
+
+            shell_line_position++;
+            shell_newline();
         }
+        shell_drawline();
     }
 }

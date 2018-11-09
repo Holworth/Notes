@@ -49,9 +49,10 @@ extern struct task_info *task5_tasks[16];
 extern int num_task5_tasks;
 
 extern struct task_info *shell_tasks[16];
+extern int num_shell_tasks;
 
-extern int timeslice_set[NUM_MAX_TASK];
-extern int priority_set[NUM_MAX_TASK];
+// extern int timeslice_set[NUM_MAX_TASK];
+// extern int priority_set[NUM_MAX_TASK];
 
 
 #endif

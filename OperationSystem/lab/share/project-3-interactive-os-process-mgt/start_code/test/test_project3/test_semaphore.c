@@ -13,14 +13,14 @@ void semaphore_add_task1(void)
     int print_location = 0;
     // int sum_up = 0;
 
-    semaphore_init(&semaphore, 1);
+    sys_semaphore_init(&semaphore, 1);
 
     for (i = 0; i < 10; i++)
     {
-        semaphore_down(&semaphore); // semaphore.value--
+        sys_semaphore_down(&semaphore); // semaphore.value--
         // semaphore = 0
         global_count++; 
-        semaphore_up(&semaphore);
+        sys_semaphore_up(&semaphore);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] current global value %d. (%d)", global_count, i + 1);
@@ -39,10 +39,10 @@ void semaphore_add_task2(void)
 
     for (i = 0; i < 20; i++)
     {
-        semaphore_down(&semaphore); // semaphore.value--
+        sys_semaphore_down(&semaphore); // semaphore.value--
         // semaphore = 0
         global_count++; 
-        semaphore_up(&semaphore);
+        sys_semaphore_up(&semaphore);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] current global value %d. (%d)", global_count, i + 1);
@@ -61,10 +61,10 @@ void semaphore_add_task3(void)
 
     for (i = 0; i < 30; i++)
     {
-        semaphore_down(&semaphore); // semaphore.value--
+        sys_semaphore_down(&semaphore); // semaphore.value--
         // semaphore = 0
         global_count++; 
-        semaphore_up(&semaphore);
+        sys_semaphore_up(&semaphore);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] current global value %d. (%d)", global_count, i + 1);

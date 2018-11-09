@@ -9,7 +9,9 @@ SRC_DRIVER	= ./drivers/screen.c
 SRC_INIT 	= ./init/main.c
 SRC_INT		= ./kernel/irq/irq.c
 SRC_LOCK	= ./kernel/locking/lock.c
-SRC_SCHED	= ./kernel/sched/sched.c ./kernel/sched/queue.c ./kernel/sched/time.c
+SRC_SYNC    = ./kernel/locking/cond.c ./kernel/locking/sem.c ./kernel/locking/barrier.c
+SRC_SCHED	= ./kernel/sched/sched.c ./kernel/sched/queue.c \
+				./kernel/sched/vector.c ./kernel/sched/stack.c ./kernel/sched/time.c
 SRC_SYSCALL	= ./kernel/syscall/syscall.c
 SRC_LIBS	= ./libs/string.c ./libs/printk.c
 
@@ -18,16 +20,17 @@ SRC_SHELL   = ./test/test_shell.c
 SRC_TEST	= ./test/test.c
 SRC_TEST2	= ./test/test_project2/test_scheduler1.c ./test/test_project2/test_scheduler2.c ./test/test_project2/test_lock4.c ./test/test_project2/test_sleep.c ./test/test_project2/test_timer.c 
 SRC_TEST3	= ./test/test_project3/test_barrier.c ./test/test_project3/test_condition.c ./test/test_project3/test_kill.c ./test/test_project3/test_sanguo.c ./test/test_project3/test_semaphore.c  
+SRC_MBOXLIB = ./libs/mailbox.c
 
 SRC_IMAGE	= ./tools/createimage.c
 
 bootblock: $(SRC_BOOT)
 	${CC} -G 0 -O2 -fno-pic -mno-abicalls -fno-builtin -nostdinc -mips3 -Ttext=0xffffffffa0800000 -N -o bootblock $(SRC_BOOT) -nostdlib -e main -Wl,-m -Wl,elf32ltsmip -T ld.script
 
-main : $(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_LIBS) $(SRC_TEST) $(SRC_TEST2) $(SRC_SHELL) 
+main : $(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_LIBS) $(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) $(SRC_SHELL) 
 	${CC} -G 0 -O0 -Iinclude -Ilibs -Iarch/mips/include -Idrivers -Iinclude/os -Iinclude/sys -Itest -Itest/test_project2 -Itest/test_project3 \
 	-fno-pic -mno-abicalls -fno-builtin -nostdinc -mips3 -Ttext=0xffffffffa0800200 -N -o main \
-	$(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_PROC) $(SRC_LIBS) $(SRC_TEST) $(SRC_TEST2) \
+	$(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_PROC) $(SRC_LIBS) $(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) \
 	$(SRC_SHELL) -nostdlib -Wl,-m -Wl,elf32ltsmip -T ld.script		
 
 createimage: $(SRC_IMAGE)

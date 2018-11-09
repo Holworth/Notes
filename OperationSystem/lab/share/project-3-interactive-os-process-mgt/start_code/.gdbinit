@@ -34,13 +34,20 @@ display /i $pc
 symbol-file main
 
 # 等待连接
-b *0xa0800200
+#b *0xa0800200
 # TODO: 在这里设置断点:
 #b sleep_task
 #b *0x80000180
+#b scheduler
 #b idle
 #b lock_task1
-b *0xa08034fc
+#b *0xa08034fc
+#b irq_timer
+#b free_proc_resource
+#b producer_task
+#b sys_condition_init
+#b do_condition_broadcast
+b SunQuan
 c
 
 # 附注

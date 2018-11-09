@@ -1,6 +1,7 @@
 #include "queue.h"
 #include "sched.h"
-
+#include "vector.h"
+#include "stack.h"
 typedef pcb_t item_t;
 
 void queue_init(queue_t *queue)
@@ -35,7 +36,7 @@ void queue_push(queue_t *queue, void *item)
         _item->prev = queue->tail;
         queue->tail = item;
     }
-    item->current_queue=queue;
+    _item->current_queue=queue;
 }
 
 void *queue_dequeue(queue_t *queue)
@@ -56,9 +57,22 @@ void *queue_dequeue(queue_t *queue)
     temp->prev = NULL;
     temp->next = NULL;
 
-    item->current_queue=NULL;
+    temp->current_queue=NULL;
 
     return (void *)temp;
+}
+
+/* test if an item exists in queue */
+int queue_exist(queue_t *queue, void *item)
+{
+    if(queue==0)return 0;
+    item_t *now = queue->head;
+    while(now)
+    {
+        if(item==now)return 1;
+        now=now->next;
+    }
+    return 0;
 }
 
 /* remove this item and return next item */

@@ -31,6 +31,7 @@
 #include "type.h"
 #include "sync.h"
 #include "queue.h"
+#include "sched.h"
 
 #define IGNORE 0
 #define NUM_SYSCALLS 64
@@ -57,41 +58,57 @@
 #define SYSCALL_MUTEX_LOCK_ACQUIRE 31
 #define SYSCALL_MUTEX_LOCK_RELEASE 32
 
-#define SYSCALL_SEMAPHORE_INIT 13
-#define SYSCALL_SEMAPHORE_UP 14
-#define SYSCALL_SEMAPHORE_DOWN 15
-#define SYSCALL_CONDITION_INIT 16
-#define SYSCALL_CONDITION_WAIT 17
-#define SYSCALL_CONDITION_SIGNAL 18
-#define SYSCALL_CONDITION_BROADCAST 19
-#define SYSCALL_BARRIER_INIT 28
-#define SYSCALL_BARRIER_WAIT 29
+#define SYSCALL_SEMAPHORE_INIT 33
+#define SYSCALL_SEMAPHORE_UP 34
+#define SYSCALL_SEMAPHORE_DOWN 35
+#define SYSCALL_CONDITION_INIT 36
+#define SYSCALL_CONDITION_WAIT 37
+#define SYSCALL_CONDITION_SIGNAL 38
+#define SYSCALL_CONDITION_BROADCAST 39
+#define SYSCALL_BARRIER_INIT 40
+#define SYSCALL_BARRIER_WAIT 41
+
+#define SYSCALL_PS 42
+#define SYSCALL_GETPID 43
+
+
 
 /* syscall function pointer */
 int (*syscall[NUM_SYSCALLS])();
 
-void system_call_helper(int, int, int, int);
+int system_call_helper(int, int, int, int);
 extern int invoke_syscall(int, int, int, int);
 
-void sys_nop();
-void sys_sleep(uint32_t);
+int sys_nop();
+int sys_sleep(uint32_t);
 
-void sys_block(queue_t *);
-void sys_unblock_one(queue_t *);
-void sys_unblock_all(queue_t *);
+int sys_block(queue_t *);
+int sys_unblock_one(queue_t *);
+int sys_unblock_all(queue_t *);
 
-void sys_write(char *);
-void sys_move_cursor(int, int);
-void sys_reflush();
+int sys_write(char *);
+int sys_move_cursor(int, int);
+int sys_reflush();
 
-void mutex_lock_init(mutex_lock_t *);
-void mutex_lock_acquire(mutex_lock_t *);
-void mutex_lock_release(mutex_lock_t *);
+int mutex_lock_init(mutex_lock_t *);
+int mutex_lock_acquire(mutex_lock_t *);
+int mutex_lock_release(mutex_lock_t *);
 
-void sys_spawn(struct task_info * task);
-void sys_kill(pid_t pid);
-void sys_exit();
-void sys_wait(pid_t pid);
+int sys_spawn(struct task_info * task);
+int sys_kill(pid_t pid);
+int sys_exit();
+int sys_wait(pid_t pid);
 
+int sys_semaphore_init(semaphore_t *s, int val);
+int sys_semaphore_up(semaphore_t *s);
+int sys_semaphore_down(semaphore_t *s);
+int sys_condition_init(condition_t *condition);
+int sys_condition_wait(mutex_lock_t *lock, condition_t *condition);
+int sys_condition_signal(condition_t *condition);
+int sys_condition_broadcast(condition_t *condition);
+int sys_barrier_init(barrier_t *barrier, int goal);
+int sys_barrier_wait(barrier_t *barrier);
+int sys_ps();
+int sys_getpid();
 
 #endif

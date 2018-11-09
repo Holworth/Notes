@@ -52,7 +52,7 @@ void wait_exit_task()
     sys_move_cursor(0, print_location);
     printf("> [TASK] I want to wait task (pid=2) to exit.");
 
-    sys_waitpid(2); //test waitpid
+    sys_wait(2); //test waitpid
 
     sys_move_cursor(0, print_location);
     printf("> [TASK] Task (pid=2) has exited.                ");

@@ -16,7 +16,7 @@ void barrier_task1(void)
     if (!is_init)
     {
         is_init = 1;
-        barrier_init(&barrier, num_task);
+        sys_barrier_init(&barrier, num_task);
     }
 
     for (i = 0;; i++)
@@ -24,7 +24,7 @@ void barrier_task1(void)
         sys_move_cursor(0, print_location);
         printf("> [TASK] Ready to enter the barrier.(%d)", i);
 
-        barrier_wait(&barrier);
+        sys_barrier_wait(&barrier);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] Exited barrier (%d).           ", i);
@@ -41,7 +41,7 @@ void barrier_task2(void)
     if (!is_init)
     {
         is_init = 1;
-        barrier_init(&barrier, num_task);
+        sys_barrier_init(&barrier, num_task);
     }
 
     for (i = 0;; i++)
@@ -49,7 +49,7 @@ void barrier_task2(void)
         sys_move_cursor(0, print_location);
         printf("> [TASK] Ready to enter the barrier.(%d)", i);
 
-        barrier_wait(&barrier);
+        sys_barrier_wait(&barrier);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] Exited barrier (%d).           ", i);
@@ -66,7 +66,7 @@ void barrier_task3(void)
     if (!is_init)
     {
         is_init = 1;
-        barrier_init(&barrier, num_task);
+        sys_barrier_init(&barrier, num_task);
     }
 
     for (i = 0;; i++)
@@ -74,7 +74,7 @@ void barrier_task3(void)
         sys_move_cursor(0, print_location);
         printf("> [TASK] Ready to enter the barrier.(%d)", i);
 
-        barrier_wait(&barrier);
+        sys_barrier_wait(&barrier);
 
         sys_move_cursor(0, print_location);
         printf("> [TASK] Exited barrier (%d).           ", i);

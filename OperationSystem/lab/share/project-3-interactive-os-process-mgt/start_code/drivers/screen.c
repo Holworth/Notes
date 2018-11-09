@@ -62,6 +62,15 @@ static void screen_scroll(int line1, int line2)
 /* write a char */
 void screen_write_ch(char ch)
 {
+    //newly added
+    if (screen_cursor_y >= SCREEN_HEIGHT)
+    {
+        screen_scroll(SCREEN_HEIGHT / 2 + 1, SCREEN_HEIGHT - 1);
+        screen_cursor_x = 0;
+        screen_cursor_y = SCREEN_HEIGHT - 1;
+    }
+    //
+
     if (ch == '\n')
     {
         screen_cursor_x = 0;
@@ -117,12 +126,31 @@ void init_screen(void)
     screen_clear(0, SCREEN_HEIGHT - 1);
 }
 
-// clear line1 to line2
+// clear all
 void screen_clear(int line1, int line2)
 {
     int i, j;
 
     for (i = 0; i < SCREEN_HEIGHT; i++)
+    {
+        for (j = 0; j < SCREEN_WIDTH; j++)
+        {
+            new_screen[i * SCREEN_WIDTH + j] = ' ';
+            old_screen[i * SCREEN_WIDTH + j] = 0;
+        }
+    }
+
+    screen_cursor_x = 0;
+    screen_cursor_y = 0;
+    screen_reflush();
+}
+
+// clear area line1 to line2
+void screen_clear_area(int line1, int line2)
+{
+    int i, j;
+
+    for (i = line1; i < line2; i++)
     {
         for (j = 0; j < SCREEN_WIDTH; j++)
         {

@@ -5,6 +5,7 @@
 #include "queue.h"
 #include "screen.h"
 #include "lock.h"
+#include "test.h"
 
 // #define PRIORITY_SCH
 
@@ -50,6 +51,52 @@ static void check_sleeping()
         proc=proc->next;
     }while(proc!=NULL);
     return;
+}
+
+void prepare_proc(pcb_t* pcbp, struct task_info * task)
+{
+    printk("\n");
+    pcbp->valid=1;
+    pcbp->pid=new_pid();
+    pcbp->type=task->type;
+    pcbp->status=TASK_READY;
+    pcbp->entry=task->entry_point;
+    pcbp->first_run=1;
+    //TODO
+    // pcbp->priority_level_set=priority_set;
+    pcbp->priority_level_set=task->priority;
+    // pcbp->timeslice_set=timeslice_set;
+    pcbp->timeslice_set=task->timeslice;
+
+    pcbp->kernel_stack_top=alloc_stack();
+    pcbp->user_stack_top=alloc_stack();
+    pcbp->priority_level=pcbp->priority_level_set;
+    pcbp->timeslice=pcbp->timeslice_set;
+    pcbp->timeslice_left=pcbp->timeslice_set;
+    pcbp->block_time=time_elapsed;
+
+    pcbp->kernel_context.cp0_status=0x0;//close interrupt
+    pcbp->kernel_context.cp0_cause=0x0;
+    pcbp->user_context.cp0_status=0x10008002;
+    pcbp->user_context.cp0_cause=0x0;
+
+    pcbp->kernel_context.regs[31]=fake_scene_addr;
+    pcbp->user_context.regs[31]=pcbp->entry;
+    pcbp->kernel_context.regs[29]=pcbp->kernel_stack_top;
+    pcbp->user_context.regs[29]=pcbp->user_stack_top;
+    pcbp->user_context.cp0_epc=pcbp->entry;//set entry
+
+    pcbp->name=task->name;
+
+    queue_init(&pcbp->wait_queue);
+
+    queue_push(&ready_queue,(void*)(pcbp));
+
+    check(pcbp);
+    check(pcbp->pid);
+    check(pcbp->entry);
+    check(pcbp->name);
+
 }
 
 void scheduler(void)
@@ -121,35 +168,9 @@ void scheduler(void)
     check(new_proc->entry);
     current_running=new_proc;
 
-    // SAVE_CONTEXT(ASM_USER);??
-    // RESTORE_CONTEXT(ASM_USER);??
     if(current_running->first_run)
     {
         current_running->first_run=0;
-        current_running->kernel_stack_top=alloc_stack();
-        current_running->user_stack_top=alloc_stack();
-        current_running->priority_level=current_running->priority_level_set;
-        current_running->timeslice=current_running->timeslice_set;
-        current_running->timeslice_left=current_running->timeslice_set;
-        current_running->block_time=time_elapsed;
-        //pc(useless)
-        // current_running->kernel_context.pc=current_running->entry;
-        // current_running->kernel_context.cp0_status=0x30400004;//disable interrupt
-        current_running->kernel_context.cp0_status=0x0;//close interrupt
-        current_running->kernel_context.cp0_cause=0x0;
-        current_running->user_context.cp0_status=0x10008002;
-        current_running->user_context.cp0_cause=0x0;
-
-        current_running->kernel_context.regs[31]=fake_scene_addr;
-        current_running->user_context.regs[31]=current_running->entry;
-        current_running->kernel_context.regs[29]=current_running->kernel_stack_top;
-        current_running->user_context.regs[29]=current_running->user_stack_top;
-        current_running->user_context.cp0_epc=current_running->entry;//set entry
-
-        //if kernel: disable interrupt
-        //if user:   enable interrupt
-        // current_running->user_context.cp0_status=(((current_running->type==USER_PROCESS)|(current_running->type==USER_THREAD))?
-            // 0x10008001:0x0);//set cp0_status
     }
     if(new_proc->status==TASK_READY)//NOT IDLE
     {
@@ -171,16 +192,17 @@ void scheduler(void)
     check(current_running->user_context.regs[31]);
     check(current_running->user_context.regs[29]);
     check(current_running->user_context.cp0_epc);
+    check(current_running->user_context.cp0_status);
     return;
 }
 
-void do_sleep(uint32_t sleep_time)
+int do_sleep(uint32_t sleep_time)
 {
     current_running->sleep_time=sleep_time;
     do_block(&sleep_queue);
 }
 
-void do_block(queue_t *queue)
+int do_block(queue_t *queue)
 {
     // block the current_running task into the queue
     current_running->status=TASK_BLOCKED;
@@ -190,7 +212,7 @@ void do_block(queue_t *queue)
     do_scheduler();
 }
 
-void do_unblock(queue_t *queue, pcb_t* pcbp)
+int do_unblock(queue_t *queue, pcb_t* pcbp)
 {
     // unblock the head task from the queue
     if(queue_is_empty(queue))
@@ -204,10 +226,10 @@ void do_unblock(queue_t *queue, pcb_t* pcbp)
     // unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
     //----------------------------------
     queue_push(&ready_queue, unblock_proc);
-    return;
+    return 0;
 }
 
-void do_unblock_one(queue_t *queue)
+int do_unblock_one(queue_t *queue)
 {
     // unblock the head task from the queue
     if(queue_is_empty(queue))
@@ -221,11 +243,11 @@ void do_unblock_one(queue_t *queue)
     // unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
     //----------------------------------
     queue_push(&ready_queue, unblock_proc);
-    return;
+    return 0;
 }
 
 //TODO
-void do_unblock_high_priority(queue_t *queue)
+int do_unblock_high_priority(queue_t *queue)
 {
     // unblock the task from the queue
     if(queue_is_empty(queue))
@@ -254,33 +276,27 @@ void do_unblock_high_priority(queue_t *queue)
     }
     max_priority_proc->status=TASK_READY;
     queue_remove(queue, max_priority_proc);
-    // Newly added in 2-4s
-    // max_priority_proc->kernel_context.cp0_epc=max_priority_proc->kernel_context.regs[31];
-    //----------------------------------
     queue_push(&ready_queue, max_priority_proc);
-    return;
+    return 0;
 }
 
-void do_unblock_all(queue_t *queue)
+int 
+do_unblock_all(queue_t *queue)
 {
     // unblock all task in the queue
     if(queue_is_empty(queue))
     {
-        printk("> [INFO] do_unblock_all() an empty queue\n");
-        return;
-        while(queue_is_empty(queue));
+        // printk("> [INFO] do_unblock_all() an empty queue\n");
+        return 0;
     }
     while(!queue_is_empty(queue))
     {
         pcb_t* unblock_proc=queue->head;
         unblock_proc->status=TASK_READY;
-        // Newly added in 2-4s
-        unblock_proc->kernel_context.cp0_epc=unblock_proc->kernel_context.regs[31];
-        //----------------------------------
         queue_dequeue(queue);
         queue_push(&ready_queue, unblock_proc);
     }
-    return;
+    return 0;
 }
 
 inline void free_proc_resource(pcb_t* pcbp)
@@ -290,48 +306,22 @@ inline void free_proc_resource(pcb_t* pcbp)
     stack_push(&freed_stack, pcbp->user_stack_top);
 
     //free current lock
-    int end=lock_stack.point;
-    int i=0;
-    for(i=0;i<end;i++)
+    //TODO!!!
+
+    //free current queues
+    queue_t* queuei = pcbp->current_queue;
+    if(queue_exist(queuei, pcbp))
     {
-        (mutex_lock_t*) mlockp=lock_stack.data[i];
-        if(mlockp->lock_current==pcbp)do_mutex_lock_release(mlockp);
+        queue_remove(queuei, pcbp);
     }
-
-    //free all queues
-    int queue_num=queue_stack.point;
-    for(i=0;i<queue_num;i++)
-    {
-        queue_t* queuei = (queue_t*)queue_stack.data[i];
-        int pcbi=queuei->head;
-        while(pcbi)
-        {
-            if(pcbi==pcbp)queue_remove(queuei, pcbp);
-            pcbi=pcbi->next;
-        }
-    }
-
-    // //free ready_queue
-    // int pcbi=ready_queue.head;
-    // while(pcbi)
-    // {
-    //     if(pcbi==pcbp)queue_remove(&ready_queue,pcbp);
-    //     pcbi=pcbi->next;
-    // }
-    
-    // pcbi=sleep_queue.head;
-    // //free sleep_queue
-    // while(pcbi)
-    // {
-    //     if(pcbi==pcbp)queue_remove(&sleep_queue,pcbp);
-    //     pcbi=pcbi->next;
-    // }
-
-    //free wait_queue
-    //DONE outside
 
     //set status
     pcbp->status=TASK_EXITED;
+    //free pcb
+    pcbp->valid=0;
+
+    //free proc waiting for it to end
+    do_unblock_all(&pcbp->wait_queue);
 }
 
 int find_free_pcb()
@@ -345,43 +335,32 @@ int find_free_pcb()
 }
 
 //TODO
-void do_spawn(struct task_info * task)
+int do_spawn(struct task_info * task)
 {
     int i=-1;
     i=find_free_pcb();
-    if(i==-1)error("PCB_FULL");
-
-    pcb[i].valid=1;
-    pcb[i].pid=new_pid();
-    pcb[i].type=task->type;
-    pcb[i].status=TASK_READY;
-    pcb[i].entry=task->entry_point;
-    pcb[i].first_run=1;
-    pcb[i].priority_level_set=priority_set[i];
-    pcb[i].timeslice_set=timeslice_set[i];
-    queue_push(&ready_queue,(void*)&(pcb[i]));
-    //alloc stack in scheduler if 1st run
-    // pcb[i].kernel_stack_top=alloc_stack();
-    // pcb[i].user_stack_top=alloc_stack();
-    check(i);
-    check(&pcb[i]);
-    check(pcb[i].pid);
-    check(pcb[i].entry);
-}
-
-void wakeup_wait(pid_t pid)
-{
-    pcb_t* i=wait_queue.head;
-    while(i)
+    if(i==-1)
     {
-        if(i->wait_pid==pid)do_unblock_one();
-        i=i->next;
+        printsys("error: pcb full.\n");
     }
+
+    prepare_proc(&pcb[i],task);
+    return 0;
 }
 
-void do_kill(pid_t pid)
+// void wakeup_wait(pid_t pid)
+// {
+//     pcb_t* i=wait_queue.head;
+//     while(i)
+//     {
+//         if(i->wait_pid==pid)do_unblock_one();
+//         i=i->next;
+//     }
+// }
+
+int do_kill(pid_t pid)
 {
-    pcb* tgt_pcb=0;
+    pcb_t * tgt_pcb=0;
     int i;
     for(i=0;i<NUM_MAX_TASK;i++)
     {
@@ -390,26 +369,34 @@ void do_kill(pid_t pid)
     if(tgt_pcb)
     {
         free_proc_resource(tgt_pcb);
-        wakeup_wait(pid);
     }
     else
-        printk("DO_KILL FAILED.\n");
+        printsys("DO_KILL FAILED.\n");
 }
 
-void do_exit()
+int do_exit()
 {
-    current_running->status=TASK_EXITED;
-    current_running->valid=0;
-    current_running->block_time=time_elapsed;
     free_proc_resource(current_running);
-    wakeup_wait(current_running->pid);
     do_scheduler();
 }
 
-void do_wait(pid_t pid)
+int do_wait(pid_t pid)
 {
-    current_running->wait_pid=pid;
-    do_block(&wait_queue);
+    //If pid not running: just run;
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if(pcb[i].valid&&(pcb[i].pid==pid))
+        {
+            current_running->wait_pid=pid;
+            do_block(&pcb[i].wait_queue);
+            current_running->wait_pid=NULL;
+            return;
+        }
+    }
+    printsys("error: pid %d does not exist.\n", pid);
+    return;
+    
 }
 
 pid_t new_pid()
@@ -459,6 +446,7 @@ void idle()
 
 int proc_exist(pid_t pid)
 {
+    if (pid==0)return 0;
     int i;
     for(i=0;i<NUM_MAX_TASK;i++)
     {
@@ -468,4 +456,64 @@ int proc_exist(pid_t pid)
         }
     }
     return 0;
+}
+
+
+char* str_running="RUNNING";
+char* str_ready="READY";
+char* str_blocked="BLOCKED";
+char* str_sleep="SLEEPING";
+char* str_exit="EXITED";
+char* str_unknown="UNKNOWN";
+
+inline char* status_to_str(task_status_t status)
+{
+    switch(status)
+    {
+        case TASK_RUNNING: return str_running;
+        case TASK_READY: return str_ready;
+        case TASK_BLOCKED: return str_blocked;
+        case TASK_EXITED: return str_exit;
+        return str_unknown;
+    }
+}
+
+int do_ps()
+{
+    printsys("[Process Table] --------------------\n");
+    int i=0;
+    int cnt=0;
+    for(;i<NUM_MAX_TASK;i++)
+    {
+        if(pcb[i].valid)
+        {
+            printsys("[%d] PID: %d  STATUS: %s  NAME: %s\n",cnt++,pcb[i].pid,status_to_str(pcb[i].status), pcb[i].name);
+        }
+    }
+}
+
+
+void error_ps()
+{
+    printk("\n[Process Table] --------------------\n");
+    int i=0;
+    int cnt=0;
+    for(;i<NUM_MAX_TASK;i++)
+    {
+        if(pcb[i].valid)
+        {
+            printk("[%d] PID: %d  STATUS: %s  NAME: %s\n",cnt++,pcb[i].pid,status_to_str(pcb[i].status), pcb[i].name);
+            // printk("[%d]\n",cnt++);
+            // printk("NAME: %s\n", pcb[i].name);
+            // printk("PID: %d\n",pcb[i].pid);
+            // printk("STATUS: %s\n",status_to_str(pcb[i].status));
+            // check(pcb[i].user_context.cp0_epc);
+        }
+    }
+}
+
+
+int do_getpid()
+{
+    return current_running->pid;
 }

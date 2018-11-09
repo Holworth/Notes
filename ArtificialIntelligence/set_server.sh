@@ -1,3 +1,11 @@
+#scp C:\Users\autum\download2\Anaconda2-5.3.0-Linux-x86_64.sh pubuser@124.16.70.252:/home/pubuser
+
+
+useradd -d /home/pubuser -m pubuser
+passwd pubuser
+
+su pubuser
+
 conda info --envs
 conda create -n tensorflow --clone root
 source activate tensorflow

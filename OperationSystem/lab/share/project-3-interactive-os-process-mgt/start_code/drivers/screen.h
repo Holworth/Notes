@@ -40,6 +40,7 @@ void init_screen(void);
 
 /* clear screen */
 void screen_clear(int, int);
+void screen_clear_area(int, int);
 
 /* reflush screen buffer */
 void screen_reflush(void);

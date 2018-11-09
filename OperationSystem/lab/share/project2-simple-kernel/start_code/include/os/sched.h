@@ -175,6 +175,10 @@ extern queue_t block_queue;
 /* sleep queue to sleep */
 extern queue_t sleep_queue;
 
+/* wait for pid queue */
+extern queue_t wait_queue;
+
+
 /* current running task PCB */
 extern pcb_t *current_running;
 extern pid_t process_id;

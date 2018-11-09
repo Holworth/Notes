@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "start_code"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"sched.h": "c",
+			"queue.h": "c",
+			"time.h": "c",
+			"syscall.h": "c",
+			"screen.h": "c",
+			"test.h": "c",
+			"stdio.h": "c",
+			"string.h": "c"
+		}
+	}
+}

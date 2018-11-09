@@ -2,18 +2,20 @@
 #define INCLUDE_MAIL_BOX_
 
 #include "queue.h"
-#include "sem.h"
+#include "sync.h"
 
-#define MAILBOX_SIZE 40
+#define MAILBOX_SIZE 100
 typedef struct mailbox
 {
     char name[25];
     char content[MAILBOX_SIZE];
-    semaphore_t  full;
-    semaphore_t  empty;
-    int  valid;
-    //for debug
-    int length;
+    condition_t  not_full;
+    condition_t  not_empty;
+    int valid;
+    int quote;
+    int size;
+    int size_used;
+    mutex_lock_t mutex_lock;
 } mailbox_t;
 
 //Use linked list? array?

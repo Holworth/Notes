@@ -31,6 +31,8 @@
 
 #include "type.h"
 #include "queue.h"
+#include "vector.h"
+#include "stack.h"
 
 #define NUM_MAX_TASK 16
 #define ASM_USER 156
@@ -153,22 +155,36 @@ typedef struct pcb
     pid_t wait_pid;
 
     /* Current Queue */
-    // queue_t* current_queue;
-    // use lock stack instead.
+    queue_t* current_queue;
+    
+    /* Lock Stack */
+    vector_t lock_stack;
 
-    //进程锁设计说明
-    //进程唤醒按照不同的优先级进行, 同时进程锁在被触发之后, 对应不同的锁建立不同锁的等待队列. 如果锁解除时当前进程的剩余锁数为0, 则会将其设法加入运行队列中.
+    /* Wait Queue */
+    queue_t wait_queue;
+    //Process waiting for current process to end;
 
-    //补充: 进程时间片耗尽之后和进程被block(sleep/acquire lock failed)的处理方式略有区别(返回地址的处理)
-
+    /* Process Name */
+    char* name;
 } pcb_t;
 
 /* task information, used to init PCB */
 typedef struct task_info
 {
+    char* name;
     uint32_t entry_point;
     task_type_t type;
+    int priority;
+    int timeslice;
 } task_info_t;
+
+/* task information, used to init PCB */
+// typedef struct task_info_with_name
+// {
+//     uint32_t entry_point;
+//     task_type_t type;
+//     char* name;
+// } task_info_name_t;
 
 /* ready queue to run */
 extern queue_t ready_queue;
@@ -178,6 +194,9 @@ extern queue_t block_queue;
 
 /* sleep queue to sleep */
 extern queue_t sleep_queue;
+
+/* wait for pid queue */
+extern queue_t wait_queue;
 
 /* current running task PCB */
 extern pcb_t *current_running;
@@ -193,16 +212,31 @@ extern uint32_t initial_cp0_status;
 extern uint32_t fake_scene_addr;
 
 void do_scheduler(void);
-void do_sleep(uint32_t);
+int  do_sleep(uint32_t);
 
-void do_block(queue_t *);
-void do_unblock_one(queue_t *);
-void do_unblock_all(queue_t *);
+int do_block(queue_t *);
+int do_unblock_one(queue_t *);
+int do_unblock_all(queue_t *);
 
-void do_spawn(struct task_info * task);
-void do_kill(pid_t pid);
-void do_exit();
-void do_wait(pid_t pid);
+int do_spawn(struct task_info * task);
+int do_kill(pid_t pid);
+int do_exit();
+int do_wait(pid_t pid);
+
+int do_ps();
+int do_getpid();
+
+// TODO
+// void do_semaphore_init();
+// void do_semaphore_up();
+// void do_semaphore_down();
+// void do_condition_init();
+// void do_condition_wait();
+// void do_condition_signal();
+// void do_condition_broadcast();
+// void do_barrier_init();
+// void do_barrier_wait();
+#include "sync.h"
 
 extern void other_helper();
 extern void idle();
@@ -216,5 +250,6 @@ pid_t new_pid();
 // extern queue_t ready_queue; //deled, use ready_queue instead
 // extern queue_t block_queue;
 
+void prepare_proc(pcb_t* pcbp, struct task_info * task);
 
 #endif

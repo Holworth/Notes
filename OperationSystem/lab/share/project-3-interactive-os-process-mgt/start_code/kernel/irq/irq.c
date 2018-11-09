@@ -11,7 +11,10 @@ uint32_t preemptive_cnt;
 static int timeslice_runout()
 {
     current_running->timeslice_left--;
-    if(current_running->timeslice_left)return 0;
+    if(current_running->timeslice_left>0)
+    {
+        return 0;
+    }
     current_running->timeslice_left=current_running->timeslice;
     return 1;
 }

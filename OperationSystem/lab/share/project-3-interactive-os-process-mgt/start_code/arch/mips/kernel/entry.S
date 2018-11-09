@@ -276,6 +276,69 @@ END(reset_count_compare)
 #########################################23
 .endm
 
+.macro SYSCALL_RESTORE_CONTEXT offset
+    // TODO restore context
+    lw k0, current_running
+    addi k0, \offset
+    lw $0, OFFSET_REG0(k0)
+    lw $1, OFFSET_REG1(k0)
+    #lw $2, OFFSET_REG2(k0) #v0
+    lw $3, OFFSET_REG3(k0)
+    lw $4, OFFSET_REG4(k0)
+    lw $5, OFFSET_REG5(k0)
+    lw $6, OFFSET_REG6(k0)
+    lw $7, OFFSET_REG7(k0)
+    lw $8, OFFSET_REG8(k0)
+    lw $9, OFFSET_REG9(k0)
+    lw $10, OFFSET_REG10(k0)
+    lw $11, OFFSET_REG11(k0)
+    lw $12, OFFSET_REG12(k0)
+    lw $13, OFFSET_REG13(k0)
+    lw $14, OFFSET_REG14(k0)
+    lw $15, OFFSET_REG15(k0)
+    lw $16, OFFSET_REG16(k0)
+    lw $17, OFFSET_REG17(k0)
+    lw $18, OFFSET_REG18(k0)
+    lw $19, OFFSET_REG19(k0)
+    lw $20, OFFSET_REG20(k0)
+    lw $21, OFFSET_REG21(k0)
+    lw $22, OFFSET_REG22(k0)
+    lw $23, OFFSET_REG23(k0)
+    lw $24, OFFSET_REG24(k0)
+    lw $25, OFFSET_REG25(k0)
+
+
+    lw $28, OFFSET_REG28(k0)
+    lw $29, OFFSET_REG29(k0)
+    lw $30, OFFSET_REG30(k0)
+    lw $31, OFFSET_REG31(k0)
+
+
+    lw k1, OFFSET_HI(k0)
+    mthi k1
+
+    lw k1, OFFSET_LO(k0)
+    mtlo k1
+
+    lw k1, OFFSET_BADVADDR(k0)
+    mtc0 k1, CP0_BADVADDR
+    nop
+
+    lw k1, OFFSET_CAUSE(k0)
+    mtc0 k1, CP0_CAUSE
+    nop
+    
+    mtc0 zero, CP0_STATUS
+    lw k1, OFFSET_EPC(k0)
+    mtc0 k1, CP0_EPC
+    nop
+####################################2333333
+    lw k1, OFFSET_STATUS(k0)
+    mtc0 k1, CP0_STATUS
+    nop
+#########################################23
+.endm
+
 # NESTED(init_scheduler, 0, ra)
 #     INTERRUPT_DISABLE
 #     SAVE_CONTEXT(KERNEL)
@@ -355,7 +418,7 @@ NESTED(handle_syscall, 0, sp)
     #or a1, v0, v0
     jal system_call_helper
     nop
-    RESTORE_CONTEXT(USER)
+    SYSCALL_RESTORE_CONTEXT(USER)
     EPC_PLUS_4
     GET_STATUS
     GET_EPC

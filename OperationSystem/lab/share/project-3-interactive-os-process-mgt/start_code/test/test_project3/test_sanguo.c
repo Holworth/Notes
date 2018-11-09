@@ -38,7 +38,7 @@ void SunQuan(void)
 
         sys_move_cursor(0, 0);
         printf("[SunQuan](%d): I'm waiting for Liubei (%d)          ", myPid, liubei);
-        sys_waitpid(liubei);
+        sys_wait(liubei);
 
         sys_move_cursor(0, 0);
         printf("[SunQuan](%d): I'm coming to save you, LiuBei!", myPid);
@@ -75,7 +75,7 @@ void LiuBei(void)
 
         sys_move_cursor(0, 1);
         printf("[LiuBei](%d): I'm waiting for SunQuan (%d)    ", myPid, aramis);
-        sys_waitpid(aramis);
+        sys_wait(aramis);
 
         sys_move_cursor(0, 1);
         printf("[LiuBei](%d): I'm coming to save you, SunQuan!", myPid);

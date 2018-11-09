@@ -118,7 +118,6 @@ static void init_pcb()
     // int task_num=1;
     // struct task_info **tasks_used =shell_tasks;
 
-
 	int i;
     for(i=0;i<task_num;i++)
     {
