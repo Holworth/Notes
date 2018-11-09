@@ -43,11 +43,13 @@ symbol-file main
 #b lock_task1
 #b *0xa08034fc
 #b irq_timer
-#b free_proc_resource
+b free_proc_resource
 #b producer_task
 #b sys_condition_init
-#b do_condition_broadcast
+b do_condition_broadcast
+b do_condition_wait
 b SunQuan
+b LiuBei
 c
 
 # 附注

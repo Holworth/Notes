@@ -158,7 +158,7 @@ typedef struct pcb
     queue_t* current_queue;
     
     /* Lock Stack */
-    vector_t lock_stack;
+    vector_t lock_vector;
 
     /* Wait Queue */
     queue_t wait_queue;

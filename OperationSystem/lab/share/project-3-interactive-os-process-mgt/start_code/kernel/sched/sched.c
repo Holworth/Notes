@@ -92,6 +92,8 @@ void prepare_proc(pcb_t* pcbp, struct task_info * task)
 
     queue_push(&ready_queue,(void*)(pcbp));
 
+    vector_init(&pcbp->lock_vector);
+
     check(pcbp);
     check(pcbp->pid);
     check(pcbp->entry);
@@ -322,6 +324,12 @@ inline void free_proc_resource(pcb_t* pcbp)
 
     //free proc waiting for it to end
     do_unblock_all(&pcbp->wait_queue);
+
+    //free all locks it holds
+    while(!vector_is_empty(&pcbp->lock_vector))
+    {
+        do_mutex_lock_release(pcbp->lock_vector.head->data);
+    }
 }
 
 int find_free_pcb()

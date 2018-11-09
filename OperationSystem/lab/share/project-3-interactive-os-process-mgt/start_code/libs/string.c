@@ -17,6 +17,14 @@ void memcpy(uint8_t *dest, uint8_t *src, uint32_t len)
 	}
 }
 
+void mmemcpy(char *dest, char *src, int len)
+{
+	for (; len != 0; len--)
+	{
+		*dest++ = *src++;
+	}
+}
+
 void memset(void *dest, uint8_t val, uint32_t len)
 {
 	uint8_t *dst = (uint8_t *)dest;

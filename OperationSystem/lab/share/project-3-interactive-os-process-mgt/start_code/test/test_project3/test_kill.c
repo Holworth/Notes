@@ -14,6 +14,9 @@ void ready_to_exit_task()
 {
     int i = 0, print_location = 0;
 
+    mutex_lock_init(&lock1);
+    mutex_lock_init(&lock2);
+
     mutex_lock_acquire(&lock1);
     mutex_lock_acquire(&lock2);
 
@@ -52,7 +55,7 @@ void wait_exit_task()
     sys_move_cursor(0, print_location);
     printf("> [TASK] I want to wait task (pid=2) to exit.");
 
-    sys_wait(2); //test waitpid
+    sys_wait(3); //test waitpid
 
     sys_move_cursor(0, print_location);
     printf("> [TASK] Task (pid=2) has exited.                ");

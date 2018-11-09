@@ -134,8 +134,8 @@ void CaoCao(void)
             printf("[CaoCao]biu biu biu ~~~~~~ AAAAAAAA Liubei is dead QAQ.");
             sys_kill(liubei);
             
-            sys_move_cursor(0, 6);
             mbox_recv(subLiuBei, &liubei, sizeof(pid_t));
+            sys_move_cursor(0, 6);
             printf("[CaoCao](%d): Oops! LiuBei(%d) is alive again! ", myPid, liubei);
             break;
         }

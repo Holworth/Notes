@@ -272,6 +272,7 @@ void __attribute__((section(".entry_function"))) _start(void)
     // printk("> [INIT] SCREEN initialization succeeded.\n");
     #endif
 
+    vt100_move_cursor(1, 10);
     printk("> Lagenaria Siceraria OS\n");
     printk("> Copyright (C) 2018 Huaqiang Wang\n");
 

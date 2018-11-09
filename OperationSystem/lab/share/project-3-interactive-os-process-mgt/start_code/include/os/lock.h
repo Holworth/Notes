@@ -29,6 +29,7 @@
 #define INCLUDE_LOCK_H_
 
 #include "queue.h"
+#include "vector.h"
 
 typedef enum {
     UNLOCKED,
@@ -45,6 +46,7 @@ typedef struct mutex_lock
     void* lock_current;
     queue_t lock_queue;
     lock_status_t status;
+    vector_node_t vector_node;
 } mutex_lock_t;
 
 typedef struct mutexs_lock
@@ -54,6 +56,7 @@ typedef struct mutexs_lock
     queue_t lock_queue;
     int lock_accquired_cnt;
     int upperbound;
+    vector_node_t vector_node;
     // lock_status_t =(lock_accquired_cnt<upperbound)?UNLOCKED:LOCKED;
 } mutexs_lock_t;
 

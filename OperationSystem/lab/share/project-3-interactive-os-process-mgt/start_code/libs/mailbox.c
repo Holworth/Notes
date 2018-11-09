@@ -30,6 +30,8 @@ mailbox_t *mbox_open(char *name)
         if(!strcmp(mboxs[i].name,name))
         {
             mboxs[i].quote++;
+            mutex_lock_release(&mailbox_lock);
+            // printk("Find mbox %s\n",name);
             return &mboxs[i];
         }
         if(!mboxs[i].valid)
@@ -38,13 +40,18 @@ mailbox_t *mbox_open(char *name)
         }
     }
     if(find_empty==-1)error("MBOXS_FULL");
+
+    //Create new mailbox.
     mboxs[find_empty].quote++;
     mboxs[find_empty].valid=1;
     mboxs[find_empty].size=MAILBOX_SIZE;
     mboxs[find_empty].size_used=0;
-    // do_semaphore_init(mboxs[find_empty].full,0);
-    // do_semaphore_init(mboxs[find_empty].empty,1);
+    strcpy(&mboxs[find_empty].name, name);
+    do_condition_init(&mboxs[find_empty].not_full);
+    do_condition_init(&mboxs[find_empty].not_empty);
+    // printk("Created mbox %s\n",name);
     mutex_lock_release(&mailbox_lock);
+
     return &mboxs[find_empty];
 }
 
@@ -63,11 +70,14 @@ void mbox_close(mailbox_t *mailbox)
 void mbox_send(mailbox_t *mailbox, void *msg, int msg_length)
 {
     mutex_lock_acquire(&mailbox->mutex_lock);
-    while(mailbox->size_used+msg_length<mailbox->size)
+    while((mailbox->size_used+msg_length)>mailbox->size)
     {
-        sys_condition_wait(&mailbox->mutex_lock, mailbox->not_full);
+        sys_condition_wait(&mailbox->mutex_lock, &mailbox->not_full);
     }
-    memcpy((uint8_t*)&mailbox->content+mailbox->size_used,(uint8_t*)msg,(uint32_t)msg_length);
+    // printk("%x\n",((uint8_t*)&mailbox->content+mailbox->size_used));
+    // printk("%x\n",(uint8_t*)msg);
+    // printk("%x\n",(uint32_t)msg_length);
+    mmemcpy(((uint8_t*)&(mailbox->content)+mailbox->size_used),(uint8_t*)msg,(uint32_t)msg_length);
     mailbox->size_used+=msg_length;
     sys_condition_broadcast(&mailbox->not_empty);
     mutex_lock_release(&mailbox->mutex_lock);
@@ -75,13 +85,14 @@ void mbox_send(mailbox_t *mailbox, void *msg, int msg_length)
 
 void mbox_recv(mailbox_t *mailbox, void *msg, int msg_length)
 {
-    mutex_lock_acquire(&mailbox_lock);
-    while(mailbox->size_used+msg_length<mailbox->size)
+    mutex_lock_acquire(&mailbox->mutex_lock);
+    // printk("mailbox->size_used: %d\n",mailbox->size_used);
+    while(mailbox->size_used<msg_length)
     {
-        sys_condition_wait(&mailbox->mutex_lock, mailbox->not_empty);
+        sys_condition_wait(&mailbox->mutex_lock, &mailbox->not_empty);
     }
     mailbox->size_used-=msg_length;
-    memcpy((uint8_t*)msg,(uint8_t*)&mailbox->content+mailbox->size_used,(uint32_t)msg_length);
+    mmemcpy((uint8_t*)msg,(uint8_t*)&(mailbox->content)+mailbox->size_used,(uint32_t)msg_length);
     sys_condition_broadcast(&mailbox->not_full);
-    mutex_lock_release(&mailbox_lock);
+    mutex_lock_release(&mailbox->mutex_lock);
 }

@@ -25,6 +25,7 @@ void do_mutex_lock_init(mutex_lock_t *lock)
     queue_init(&(lock->lock_queue));
     lock->lock_current=0;
     lock->status=UNLOCKED;
+    vector_node_init(&lock->vector_node,lock);
 }
 
 void do_mutex_lock_acquire(mutex_lock_t *lock)
@@ -38,6 +39,7 @@ void do_mutex_lock_acquire(mutex_lock_t *lock)
     lock->status=LOCKED;
     lock->lock_current=current_running;
     current_running->status=TASK_RUNNING;
+    vector_push(&current_running->lock_vector, &lock->vector_node);
 }
 
 void do_mutex_lock_release(mutex_lock_t *lock)
@@ -47,6 +49,11 @@ void do_mutex_lock_release(mutex_lock_t *lock)
         //for debug
         lock->lock_current=0;
         //for resource recycle
+        if(vector_exist(&current_running->lock_vector,&lock->vector_node))
+        {
+            vector_remove(&current_running->lock_vector, &lock->vector_node);
+        }
+
         //
 
         if(!queue_is_empty(&(lock->lock_queue)))

@@ -122,7 +122,6 @@ char shell_history[SHELL_HISTORY][SHELL_LINE_SIZE];
 char argc;
 char argv[10][20];
 
-int shell_line_position;
 int shell_history_cnt;
 int shell_inline_position;
 
@@ -202,6 +201,7 @@ inline void cmd_clear()
     disable_interrupt();
     screen_clear_area(SHELL_LINE_POSITION, SHELL_LINE_POSITION+SHELL_SCREEN_HEIGHT);
     enable_interrupt();
+    sys_move_cursor(1,SHELL_LINE_POSITION+1);
     return;
 }
 
@@ -341,7 +341,7 @@ inline void shell_interpret_cmd()
         return;
     }
     //TODO
-    if(shell_inline_position!=0)
+    if(argc!=0)
         printsys("Can not interpret command: %s\n", shell_buffer);
     else
         1;
@@ -406,7 +406,6 @@ void test_shell()
             screen_reflush();
             enable_interrupt();
 
-            shell_line_position++;
             shell_newline();
         }
         shell_drawline();
