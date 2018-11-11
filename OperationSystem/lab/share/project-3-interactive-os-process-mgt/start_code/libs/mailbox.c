@@ -39,7 +39,7 @@ mailbox_t *mbox_open(char *name)
             find_empty=i;
         }
     }
-    if(find_empty==-1)error("MBOXS_FULL");
+    if(find_empty==-1)panic("MBOXS_FULL");
 
     //Create new mailbox.
     mboxs[find_empty].quote++;
@@ -58,7 +58,7 @@ mailbox_t *mbox_open(char *name)
 void mbox_close(mailbox_t *mailbox)
 {
     mutex_lock_acquire(&mailbox_lock);
-    if(!mailbox->valid)error("INVALID_MAILBOX");
+    if(!mailbox->valid)panic("INVALID_MAILBOX");
     mailbox->quote--;
     if(mailbox->quote<=0)
     {

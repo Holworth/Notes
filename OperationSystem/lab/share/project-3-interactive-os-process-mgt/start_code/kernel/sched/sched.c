@@ -219,7 +219,7 @@ int do_unblock(queue_t *queue, pcb_t* pcbp)
     // unblock the head task from the queue
     if(queue_is_empty(queue))
     {
-        error("UNBLOCK_EMPTY_QUEUE");
+        panic("UNBLOCK_EMPTY_QUEUE");
     }
     pcb_t* unblock_proc=pcbp;
     queue_remove(queue, pcbp);
@@ -236,7 +236,7 @@ int do_unblock_one(queue_t *queue)
     // unblock the head task from the queue
     if(queue_is_empty(queue))
     {
-        error("UNBLOCK_EMPTY_QUEUE");
+        panic("UNBLOCK_EMPTY_QUEUE");
     }
     pcb_t* unblock_proc=queue->head;
     queue_dequeue(queue);
@@ -254,7 +254,7 @@ int do_unblock_high_priority(queue_t *queue)
     // unblock the task from the queue
     if(queue_is_empty(queue))
     {
-        error("UNBLOCK_EMPTY_QUEUE");
+        panic("UNBLOCK_EMPTY_QUEUE");
     }
     pcb_t* unblock_proc=queue->head;
     pcb_t* max_priority_proc=queue->head;
@@ -307,9 +307,6 @@ inline void free_proc_resource(pcb_t* pcbp)
     stack_push(&freed_stack, pcbp->kernel_stack_top);
     stack_push(&freed_stack, pcbp->user_stack_top);
 
-    //free current lock
-    //TODO!!!
-
     //free current queues
     queue_t* queuei = pcbp->current_queue;
     if(queue_exist(queuei, pcbp))
@@ -349,7 +346,8 @@ int do_spawn(struct task_info * task)
     i=find_free_pcb();
     if(i==-1)
     {
-        printsys("error: pcb full.\n");
+        printsys("panic: pcb full.\n");
+        return -1;
     }
 
     prepare_proc(&pcb[i],task);
@@ -412,7 +410,7 @@ pid_t new_pid()
     return (++last_used_process_id);
 }
 
-int error(char* error_name)
+int panic(char* error_name)
 {
     printk("# [ERROR] %s\n",error_name);
     other_check(current_running->pid);
@@ -435,7 +433,7 @@ int error(char* error_name)
 
 void other_helper()
 {
-    error("OTHER_HELPER");
+    panic("OTHER_HELPER");
 }
 
 extern mutex_lock_t mutex_lock;
