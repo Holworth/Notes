@@ -60,25 +60,25 @@ static char read_uart_ch(void)
     return ch;
 }
 
-struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS,1,1};
-struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS,1,1};
-struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS,1,1};
+struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS, 1, 1};
+struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS, 1, 1};
+struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS, 1, 1};
 
-struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS,1,1};
-struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS,1,1};
-struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS,1,1};
+struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS, 1, 1};
+struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS, 1, 1};
+struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS, 1, 1};
 
-struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS,1,1};
-struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS,1,1};
-struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS,1,1};
+struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS, 1, 1};
+struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS, 1, 1};
+struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS, 1, 1};
 
-struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS,1,1};
-struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS,1,1};
-struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS,1,1};
+struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS, 1, 1};
+struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS, 1, 1};
+struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS, 1, 1};
 
-struct task_info task13 = {"SunQuan",(uint32_t)&SunQuan, USER_PROCESS,1,1};
-struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS,1,1};
-struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS,1,1};
+struct task_info task13 = {"SunQuan", (uint32_t)&SunQuan, USER_PROCESS, 1, 1};
+struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS, 1, 1};
+struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS, 1, 1};
 
 static struct task_info *test_tasks[16] = {&task1, &task2, &task3,
                                            &task4, &task5, &task6,
@@ -90,7 +90,7 @@ static int num_test_tasks = 15;
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
     int i;
-    for (i =1; i <= task_num; i++)
+    for (i = 1; i <= task_num; i++)
     {
         printk("\n> [Shell] Writing pcb %d.\n", i);
         pcb[i].valid = 1;
@@ -123,16 +123,17 @@ char argc;
 char argv[10][20];
 
 int shell_history_cnt;
+int shell_history_now;
 int shell_inline_position;
 
 inline void shell_drawline()
 {
-    int cursor_x_now=screen_cursor_x;
-    int cursor_y_now=screen_cursor_y;
+    int cursor_x_now = screen_cursor_x;
+    int cursor_y_now = screen_cursor_y;
     sys_move_cursor(1, SHELL_LINE_POSITION);
     printf("---------------Lagenaria Siceraria OS:SHELL--------------- run_time_now:%d\n", time_elapsed);
-    screen_cursor_y=cursor_y_now;
-    screen_cursor_x=cursor_x_now;
+    screen_cursor_y = cursor_y_now;
+    screen_cursor_x = cursor_x_now;
     return;
 }
 
@@ -147,6 +148,79 @@ inline void shell_drawline()
 //     return;
 // }
 
+
+//Shell History
+
+inline int loop_sub(int val)
+{
+    if(val)
+    {
+        val--;
+        return val;
+    }
+    val=SHELL_HISTORY-1;
+    return val;
+}
+
+inline int loop_add(int val)
+{
+    val++;
+    if(val==SHELL_HISTORY)
+        val = 0;
+    return val;
+}
+
+inline void shell_clear_input()
+{
+    while(shell_inline_position>0)
+    {
+        shell_inline_position--;
+        screen_write_ch('\b');
+    }
+}
+
+inline void shell_fake_input(char* input)
+{
+    shell_inline_position=0;
+    strcpy(shell_buffer, input);
+    printf("%s",input);
+    shell_inline_position+=strlen(shell_buffer);
+}
+
+inline void add_to_history()
+{
+    strcpy(shell_history[shell_history_cnt],shell_buffer);
+    shell_history_cnt=loop_add(shell_history_cnt);
+}
+
+inline void get_history()
+{
+    shell_clear_input();
+    shell_fake_input(&shell_history[shell_history_now]);
+    shell_history_now=loop_sub(shell_history_now);
+}
+
+inline void reset_history()//not clear all history!!!
+{
+    shell_history_now=shell_history_cnt;
+}
+
+inline void print_history(int num)
+{
+    printf("Shell History:\n");
+    reset_history();
+    while(num-->0)
+    {
+        shell_history_now=loop_sub(shell_history_now);
+        printf("%d: %s",shell_history_now, shell_history[shell_history_now]);
+        printf("\n");
+    }
+    reset_history();
+}
+
+
+//Shell History End
+
 inline void shell_add_to_buffer(char ch)
 {
     shell_buffer[shell_inline_position++] = ch;
@@ -156,13 +230,6 @@ inline void shell_update_current_line()
 {
     printf("> root@LSOS:%s", shell_buffer);
 }
-
-// inline loop_sub(int shell_history_cnt)
-// {
-//     if(shell_history_cnt)
-//     return shell_history_cnt--;
-//     shell_history_cnt=SHELL_HISTORY-1;
-// }
 
 // #define SHELL_PRINT_START \
 // shell_line_position++;\
@@ -181,11 +248,11 @@ inline void shell_update_current_line()
 
 inline void cmd_echo()
 {
-    int i=1;
-    while(i<argc)
+    int i = 1;
+    while (i < argc)
     {
         // shell_print(argv[i++]);
-        printf("%s\n",argv[i++]);
+        printf("%s\n", argv[i++]);
     }
 }
 
@@ -199,9 +266,9 @@ inline void cmd_clear()
     //     printf("                                                   \n");
     // }
     disable_interrupt();
-    screen_clear_area(SHELL_LINE_POSITION, SHELL_LINE_POSITION+SHELL_SCREEN_HEIGHT);
+    screen_clear_area(SHELL_LINE_POSITION, SHELL_LINE_POSITION + SHELL_SCREEN_HEIGHT);
     enable_interrupt();
-    sys_move_cursor(1,SHELL_LINE_POSITION+1);
+    sys_move_cursor(1, SHELL_LINE_POSITION + 1);
     return;
 }
 
@@ -212,44 +279,49 @@ inline void cmd_ps()
 
 inline void cmd_about()
 {
-	printf(" Lagenaria Siceraria OS\n");
-	printf(" Copyright (C) 2018 Huaqiang Wang\n");
+    printf(" Lagenaria Siceraria OS\n");
+    printf(" Copyright (C) 2018 Huaqiang Wang\n");
 }
 
 inline void cmd_history()
 {
     //TODO
-	printf(" Lagenaria Siceraria OS\n");
-	printf(" Copyright (C) 2018 Huaqiang Wang\n");
+    printf(" Lagenaria Siceraria OS\n");
+    printf(" Copyright (C) 2018 Huaqiang Wang\n");
 }
 
 inline void cmd_exec()
 {
-    if(argc==1)
+    if (argc == 1)
     {
         printf("No enough args for exec.\n");
         return;
     }
     int i;
-    for(i=1;i<=(argc-1);i++)
+    for (i = 1; i <= (argc - 1); i++)
     {
-        int num=atoi(argv[i]);
-        printf("Exec task: %d\n", num);
-        sys_spawn(test_tasks[num]);
+        int num = atoi(argv[i]);
+        if(num<16)
+        {
+            printf("Exec task: %d\n", num);
+            sys_spawn(test_tasks[num]);
+        }
+        else
+        {
+            printf("Exec: Task: %d does not exist!\n", num);
+        }
     }
 }
 
-
-
 inline void cmd_kill()
 {
-    int kill_id=atoi(argv[1]);
-    if(kill_id==current_running->pid)
+    int kill_id = atoi(argv[1]);
+    if (kill_id == current_running->pid)
     {
         printf("#Shell: You wanna kill yourself? That's not socialism.\n");
         return;
     }
-    if(proc_exist(kill_id))
+    if (proc_exist(kill_id))
     {
         sys_kill(kill_id);
     }
@@ -264,35 +336,39 @@ inline void cmd_reboot()
 {
     disable_interrupt();
     int i;
-    for(i=0;i<NUM_MAX_TASK;i++)
+    for (i = 0; i < NUM_MAX_TASK; i++)
     {
-        pcb[i].valid=0;
+        pcb[i].valid = 0;
     }
     asm("jal _start\n nop\n");
 }
 
 inline void shell_interpret_cmd()
 {
-    argc=0;
-    int i=0;
-    int j=0;
-    int in_space=1;
-    while(1)
+    argc = 0;
+    int i = 0;
+    int j = 0;
+    int in_space = 1;
+    while (1)
     {
-        if((shell_buffer[i]==' ')||(shell_buffer[i]=='\t')||(shell_buffer[i]=='\0'))
+        if ((shell_buffer[i] == ' ') || (shell_buffer[i] == '\t') || (shell_buffer[i] == '\0'))
         {
-            if(!in_space)
+            if (!in_space)
             {
-                argv[argc++][j]='\0';
-                j=0;
+                argv[argc++][j] = '\0';
+                j = 0;
             }
-            in_space=1;
-            if((shell_buffer[i]=='\0'))break;
+            in_space = 1;
+            if ((shell_buffer[i] == '\0'))
+            {
+                argv[argc][j] = '\0';
+                break;
+            }
         }
         else
         {
-            in_space=0;
-            argv[argc][j++]=shell_buffer[i];
+            in_space = 0;
+            argv[argc][j++] = shell_buffer[i];
         }
         i++;
     }
@@ -300,52 +376,69 @@ inline void shell_interpret_cmd()
 
     // Use key tree here to make it faster
 
-    if(!strcmp(argv[0],"echo"))
+    FLOAT_PRINT_START(SCREEN_WIDTH - 15, 2);
+    printf("|argc : %d|", argc);
+    FLOAT_PRINT_END(SCREEN_WIDTH - 15, 2);
+
+    // FLOAT_PRINT_START(SCREEN_WIDTH - 15, 3);
+    // printf("|argv0: %s|", argv[0]);
+    // FLOAT_PRINT_END(SCREEN_WIDTH - 15, 3);
+
+    // FLOAT_PRINT_START(1, 4);
+    // printf("|buffr: %s|", shell_buffer);
+    // FLOAT_PRINT_END(1, 4);
+
+    if (!strcmp(argv[0], "echo"))
     {
         cmd_echo();
         return;
     }
-    if(!strcmp(argv[0],"ps"))
+    if (!strcmp(argv[0], "ps"))
     {
         cmd_ps();
         return;
     }
-    if(!strcmp(argv[0],"clear"))
+    if (!strcmp(argv[0], "clear"))
     {
         cmd_clear();
         return;
     }
-    if(!strcmp(argv[0],"cls"))
+    if (!strcmp(argv[0], "cls"))
     {
         cmd_clear();
         return;
     }
-    if(!strcmp(argv[0],"about"))
+    if (!strcmp(argv[0], "about"))
     {
         cmd_about();
         return;
     }
-    if(!strcmp(argv[0],"exec"))
+    if (!strcmp(argv[0], "exec"))
     {
         cmd_exec();
         return;
     }
-    if(!strcmp(argv[0],"kill"))
+    if (!strcmp(argv[0], "kill"))
     {
         cmd_kill();
         return;
     }
-    if(!strcmp(argv[0],"reboot"))
+    if (!strcmp(argv[0], "reboot"))
     {
         cmd_reboot();
         return;
     }
+    if (!strcmp(argv[0], "history"))
+    {
+        print_history(5);
+        return;
+    }
     //TODO
-    if(argc!=0)
-        printsys("Can not interpret command: %s\n", shell_buffer);
+    if (argc != 0)
+        printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
     else
         1;
-        // printsys("\n");
+    // printsys("\n");
 }
 
 inline void shell_newline()
@@ -356,14 +449,11 @@ inline void shell_newline()
 inline void show_ascii(char ch)
 {
 
-    FLOAT_PRINT_START(SCREEN_WIDTH-15, 1);
-    printf("|ascii: %d|",ch);
-    FLOAT_PRINT_END(SCREEN_WIDTH-15, 1);
+    FLOAT_PRINT_START(SCREEN_WIDTH - 15, 1);
+    printf("|ascii: %d|", ch);
+    FLOAT_PRINT_END(SCREEN_WIDTH - 15, 1);
     return;
 }
-
-
-
 
 // Shell itself
 void test_shell()
@@ -374,7 +464,7 @@ void test_shell()
     enable_interrupt();
     cmd_clear();
     shell_drawline();
-    sys_move_cursor(1, SHELL_LINE_POSITION+1);
+    sys_move_cursor(1, SHELL_LINE_POSITION + 1);
     shell_newline();
 
     while (1)
@@ -383,23 +473,48 @@ void test_shell()
         disable_interrupt();
         char ch = read_uart_ch();
         enable_interrupt();
-        if(!ch)continue;
+        if (!ch)
+            continue;
 
         // TODO solve command
-        if (ch != 13)//
+        if(ch==65)//up arrow
+        {
+            get_history();
+        }
+        else if (ch == 127)//in qemu sim
+        {
+            if(shell_inline_position>0)
+            {
+                shell_inline_position--;
+                screen_write_ch('\b');
+                show_ascii(ch);
+            }
+        }
+        else if (ch == 8)//on board
+        {
+            if(shell_inline_position>0)
+            {
+                shell_inline_position--;
+                screen_write_ch('\b');
+                show_ascii(ch);
+            }
+        }
+        else if (ch != 13) //
         {
             shell_add_to_buffer(ch);
             screen_write_ch(ch);
             //get ascii
             show_ascii(ch);
         }
-        else
+        else //ch==13
         {
             disable_interrupt();
             shell_add_to_buffer('\0');
             screen_write_ch('\n');
-            shell_inline_position=0;
+            shell_inline_position = 0;
             enable_interrupt();
+            add_to_history();
+            reset_history();
             shell_interpret_cmd();
 
             disable_interrupt();

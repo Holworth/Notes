@@ -72,3 +72,34 @@ void do_mutex_lock_release(mutex_lock_t *lock)
         // printk("> [ERROR] release empty mutex lock.\n");
     }
 }
+
+void do_other_mutex_lock_release(pcb_t * pcbp,mutex_lock_t *lock)
+{
+    if(lock->status==LOCKED)
+    {
+        //for debug
+        lock->lock_current=0;
+        //for resource recycle
+        if(vector_exist(&pcbp->lock_vector,&lock->vector_node))
+        {
+            vector_remove(&pcbp->lock_vector, &lock->vector_node);
+        }
+
+        //
+
+        if(!queue_is_empty(&(lock->lock_queue)))
+        {
+            do_unblock_one(&(lock->lock_queue));
+            // do_unblock_high_priority(&(lock->lock_queue));
+            //lock->status==LOCKED;
+            //this lock is still locked.
+        }else
+        {
+            lock->status=UNLOCKED;
+        }
+    }else
+    {
+        //do nothing;
+        // printk("> [ERROR] release empty mutex lock.\n");
+    }
+}

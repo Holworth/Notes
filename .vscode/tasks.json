@@ -4,7 +4,7 @@
         {
             "label": "sync",
             "type": "shell",
-            "command": ".\\sync.bat",
+            "command": ".\\dev\\sync.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true

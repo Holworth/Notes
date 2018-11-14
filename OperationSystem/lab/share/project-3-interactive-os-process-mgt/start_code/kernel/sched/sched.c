@@ -325,7 +325,7 @@ inline void free_proc_resource(pcb_t* pcbp)
     //free all locks it holds
     while(!vector_is_empty(&pcbp->lock_vector))
     {
-        do_mutex_lock_release(pcbp->lock_vector.head->data);
+        do_other_mutex_lock_release(pcbp, pcbp->lock_vector.head->data);//bug fixed: 2018.11.14
     }
 }
 
