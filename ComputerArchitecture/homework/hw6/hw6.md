@@ -9,6 +9,10 @@
 
 ## 1. 
 
+(全寝室公用一位室友的可爱主板也是没谁了...所以这道题可能会和其他人的很相似)
+
+![bus.jpg](bus.jpg)
+
 ## 2. 
 
 1. 机械层
@@ -132,6 +136,74 @@ id_width, addr_width指代的是该类中总的id宽度和地址宽度.
 
 ## 4. 
 
+```verilog
+module ABP_BUS#(
+    parameter DATA_WIDTH=32,
+    parameter PSELNUM=1
+)(
+    input pclk,
+    input presetn,
+    input [DATA_WIDTH-1,0]paddr,
+    input [PSELNUM-1:0] pselx,
+    output penable,
+    output pwrite,
+    output [DATA_WIDTH-1:0]prdata,
+    input [DATA_WIDTH-1:0]pwdata
+);
+
+module APB_GPIO#(
+    parameter DATA_WIDTH=32,
+    parameter PSELNUM=1
+)(
+    input pclk,
+    input presetn,
+    input [DATA_WIDTH-1:0]port_direction_in,
+    inout [DATA_WIDTH-1:0]gpio_port,
+    
+    input [DATA_WIDTH-1,0]paddr,
+    input [PSELNUM-1:0] pselx,
+    output penable,
+    output transfered
+)
+//-------------------------------------------
+//remark:
+//do make sure port_direction_in was set as all 1 or all 0
+//to coopration with the APB bus;
+//-------------------------------------------
+
+    wire penable;
+    wire pwrite=port_direction_in!=0;
+    wire [DATA_WIDTH-1:0] prdata;
+    wire [DATA_WIDTH-1:0] pwdata=gpio_port;
+    reg penable_r;
+    assign penable=penable_r;
+    assign transfered={pensel, penable}==2'b11;
+
+    genvar i;
+    generate
+        for(i=0;i<DATA_WIDTH;i=i+1)
+        begin
+            assign gpio_port[i]=port_direction_in[i]?1'bz:prdata[i];
+        end
+    endgenerate
+
+ABP_BUS abp_bus#(
+    32,
+    1
+)(
+    pclk,
+    presetn,
+    paddr,
+    pselx,
+    penable,
+    pwrite,
+    prdata,
+    pwdata
+);
+
+endmodule;
+```
+
 ## 5. DRAM的寻址 
 
 1. 处理器发出线性的内存访问地址
@@ -149,4 +221,38 @@ id_width, addr_width指代的是该类中总的id宽度和地址宽度.
 
 ## 6.
 
-$$2*2^6*2^2*2^15=2^{24}bit=4MB$$
+若认为片选个数为4代表有4个存储芯片:
+
+$$2(2通道)*2^6(通道位宽)*2^2(片选个数为4)*2^15^2(内存中地址线个数15)*2(DDR3)=2^{40}bit=128GB$$
+
+若认为片选个数为4代表有4个片选线:
+
+$$2(2通道)*2^6(通道位宽)*2^4(片选个数为4)*2^15^2(内存中地址线个数15)*2(DDR3)=2^{40}bit=512GB$$
+
+
+<!-- //FSM: generate penable
+//This FSM reflects the State diagram of APB bus
+
+    always@(posedge pclk)begin
+        if(!presetn)begin
+            penable_r<=1'b0;
+        end else begin
+            penable_r<=penable_next;
+        end
+    end
+
+    always@(*)begin
+        case({pensel, penable})
+            2'b00:begin//idle
+                penable_next=1'b0;
+            end
+            2'b10:begin//setup
+                penable_next=1'b1;
+                //ready to transfer
+            end
+            2'b11:begin//enable
+                penable_next=1'b0;
+                //transfer enabled
+            end
+        endcase
+    end -->
