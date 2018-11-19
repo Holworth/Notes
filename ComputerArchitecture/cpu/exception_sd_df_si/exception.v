@@ -5,6 +5,7 @@ module exception_pipe_reg(
 
 );
     wire set_CP0;//1
+    wire read_CP0;//1
     wire [4:0]addr_CP0;//5
     wire [31:0]badaddr;//32
     wire exception_int;//1
@@ -14,6 +15,7 @@ module exception_pipe_reg(
     // wire exception_overflow;//1
     // wire exception_trap;//1
     // wire exception_syscall;//1
+    wire overflow_exception;//1
     wire exception_data;//1
     wire AdEL;
     wire AdES;
@@ -43,11 +45,12 @@ module exception_pass(
     input resetn,
     input [31:0]CP0_wdata,
     input [31:0]MEM_PC,
-    input [7:0]IP
+    input [7:0]IP,
+    output [31:0]CP0_rdata
 );
 
 //IF------------------------------------------------
-exception_pipe_reg IF_ID_exception_pipe_reg();
+// exception_pipe_reg IF_ID_exception_pipe_reg();
 //ID------------------------------------------------
 exception_pipe_reg ID_EX_exception_pipe_reg();
 //EX------------------------------------------------
@@ -67,6 +70,8 @@ wire IP3;
 wire IP2;
 reg IP1;
 reg IP0;
+
+assign {IP7,IP6,IP5,IP4,IP3,IP2}=IP[7:2];
 
 reg IM7;
 reg IM6;
@@ -340,23 +345,41 @@ always@(posedge clk)begin
     end
 end
 
+//CP0_rdata
 
+assign CP0_rdata=
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_STATUS}}&CP0_Status|
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_CAUSE}}&CP0_Cause|
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_BADVADDR}}&CP0_BadVaddr|
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_EPC}}&CP0_EPC|
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_COUNT}}&CP0_Count|
+    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_COMPARE}}&CP0_Compare;
 
 endmodule
 
+
+CP0; 1
+DATA_reg 1
 TODO: 
 
+ID: new inst 1
 ID: All Badaddr: l/s i/d
-ID: reserved
-ID: sys
-ID: trap
-ID: breakpoint
+ID: reserved 
+ID: sys 
+ID: trap 1
+ID: breakpoint 1
 EX: All overflow
 
-data_sram_wen
-div_resetn
+clear pipeline 1
+
+data_sram_wen 1
+div_resetn 1
 mfc0:
 mtc0:
 
-pypass mtc0:
-reg_a_valid: mthi
+pypass mtc0: 1
+reg_a_valid: mthi 1
+
+BD IF
+MEM deal int
+ID: fix inst 1

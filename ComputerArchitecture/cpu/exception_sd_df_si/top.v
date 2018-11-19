@@ -39,6 +39,8 @@ assign inst_sram_wdata=32'b0;
 
 assign data_sram_en=1'b1;
 
+wire clear_pipeline;
+wire [31:0]clear_pipeline_PC;
 
 //----------------------------------------------
 //Import modules
@@ -170,13 +172,20 @@ wire [31:0]PC_jump_alu;
 
 assign jump_nop=~(jump_short|jump_long|jump_alu);
 
-assign IF_PC_in=(resetn)?
-    (bubble|div_stall)?IF_delayslot:
-    (
-    ({32{jump_short}}&PC_jump_short)|
-    ({32{jump_long}}&PC_jump_long)|
-    ({32{jump_alu}}&PC_jump_alu)|
-    ({32{~(jump_short|jump_long|jump_alu)}}&PC_4)):32'hbfc00000;
+assign IF_PC_in=
+    (resetn)?
+    (clear_pipeline?
+        clear_pipeline_PC:
+        (bubble|div_stall)?
+            IF_delayslot:
+            (
+                ({32{jump_short}}&PC_jump_short)|
+                ({32{jump_long}}&PC_jump_long)|
+                ({32{jump_alu}}&PC_jump_alu)|
+                ({32{~(jump_short|jump_long|jump_alu)}}&PC_4)
+            )
+    )
+    :32'hbfc00000;
 
 //d flipflop of IF_delayslot
 always@(posedge clk)begin
@@ -193,6 +202,11 @@ end
 //IF data flow
 always@(posedge clk)begin
     if(!resetn)begin
+        IF_ID_valid<=1'b0;
+        IF_ID_PC_reg<=32'b0;
+        IF_inst_reg<=32'b0;
+    end
+    else if(clear_pipeline)begin
         IF_ID_valid<=1'b0;
         IF_ID_PC_reg<=32'b0;
         IF_inst_reg<=32'b0;
@@ -438,6 +452,11 @@ always@(posedge clk)begin
     else if(ID_EX_allowin)begin
         ID_EX_valid<=ID_EX_valid_in;
     end
+    
+    if(clear_pipeline)begin
+        ID_EX_data<=`bubble;
+        ID_EX_MEM_addr_reg<=32'b0;
+    end else
     if(ID_EX_valid_in&&ID_EX_allowin)begin
         ID_EX_data<=(bubble?`bubble:ID_EX_datain);
         ID_EX_MEM_addr_reg<=ID_MEM_addr;
@@ -504,7 +523,7 @@ wbmux exmux(
 );
 
 assign data_sram_wdata=exmux_output;
-assign data_sram_wen=strb&{4{ID_EX_reg.mem_wen_pick!=0}};
+assign data_sram_wen=(!clear_pipeline)&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
 
 //EX_MEM data
 reg [31:0] EX_MEM_MEM_addr_reg;
@@ -522,6 +541,13 @@ always@(posedge clk)begin
     else if(EX_MEM_allowin)begin
         EX_MEM_valid<=EX_MEM_valid_in;
     end
+
+    if(clear_pipeline)begin
+        EX_MEM_data<=`bubble;
+        // EX_result<=Result;
+        EX_result<=32'b0;
+        EX_MEM_MEM_addr_reg<=32'b0;
+    end else
     if(EX_MEM_valid_in&&EX_MEM_allowin)begin
         EX_MEM_data<=EX_MEM_datain;
         // EX_result<=Result;
@@ -549,7 +575,7 @@ wire div_complete;
 divider divider
 (
     clk, //除法器模块时钟信�?
-    resetn, //夝佝信坷，低电平有效
+    resetn|clear_pipeline, //夝佝信坷，低电平有效
     ID_EX_reg.mul_control[2]|ID_EX_reg.mul_control[3], //除法违算命令，在除法完戝坎，如果外界没有新的除法进入，必须将该信坷置�? 0
     ID_EX_reg.mul_control[2], //控制有符坷除法和无符坷除法的信坷
     ID_EX_reg.A_data, //被除�?
@@ -617,6 +643,7 @@ always@(posedge clk)begin
         WB_reg_control<=4'b0;
         MEM_result<=32'b0;
         MEM_WB_data<=220'b0;
+        mfc0_w<=1'b0;
     end
     else if(MEM_WB_allowin)begin
         MEM_WB_valid<=MEM_WB_valid_in;
@@ -626,11 +653,13 @@ always@(posedge clk)begin
             MEM_WB_data<=MEM_WB_datain;
             MEM_result<=MEM_result_in;
             WB_reg_control<={4{EX_MEM_reg.reg_write}};
+            mfc0_w<=exception.EX_MEM_exception_pipe_reg.read_CP0;
         end
         else begin
             MEM_WB_data<=220'b0;
             MEM_result<=32'b0;
             WB_reg_control<=4'b0;
+            mfc0_w<=1'b0;
         end
     end 
     //WB need only 1 clk cycle, insert a bubble if the next ins does not come.
@@ -639,6 +668,7 @@ always@(posedge clk)begin
         MEM_WB_data<=220'b0;
         MEM_result<=32'b0;
         WB_reg_control<=4'b0;
+        mfc0_w<=1'b0;
     end
 end
 
@@ -706,11 +736,15 @@ end
 
 
 //TODO: regfile_wen now is only 1 bit!!! 
+reg mfc0_w;
+reg [31:0]CP0_rdata_r;
+
 assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};
 assign regfile_wdata=
     {32{mfhi_w}}&HI|
     {32{mflo_w}}&LO|
-    {32{!(mfhi_w|mflo_w)}}&MEM_result;
+    {32{!(mfhi_w|mflo_w)}}&MEM_result|
+    {32{mfc0_w}}&CP0_rdata_r;
 
 //debug interface
 
@@ -848,7 +882,23 @@ assign bubble=jump_with_reg?
     corelation_B3&(~bypass_B3)
 );
 
+//EXCEPTION
 
+wire [7:0]IP=8'b11111111;
+wire [31:0]CP0_rdata;
+
+//clear_pipeline
+assign clear_pipeline=exception.clear_pipeline;
+assign clear_pipeline_PC=exception.clear_pipeline_PC;
+
+exception_pass exception(
+    clk,
+    resetn,
+    EX_MEM_reg.B_data,
+    EX_MEM_reg.PC,
+    IP,
+    CP0_rdata
+);
 
 //Reserved
 //---------------------------------
