@@ -438,8 +438,86 @@ assign ID_EX_datain=ID_data_gen;
 wire [31:0]ID_MEM_addr;
 assign ID_MEM_addr=A_data+ImmSignedExt;
 
+//ID EXCEPTION
+
+// sys
+
+wire 
+
+// reserved
+// badaddr
+// BD
+reg IF_ID_BD_r;
+
+// always@(posedge clk)begin
+//     if(!resetn)begin
+//         IF_ID_BD_r<=1'b0;
+//     end else begin
+//         IF_ID_BD_r<=control.BD;
+//     end
+// end error
+
+wire ID_AdEL=
+    control.lh_op&(ID_MEM_addr[0]!=1'b0)|
+    control.lhu_op&(ID_MEM_addr[0]!=1'b0)|
+    control.lw_op&(ID_MEM_addr[1:0]!=2'b0)|
+    (IF_ID_PC_reg[1:0]!=2'b0);
+wire ID_AdES=
+    control.sh_op&(ID_MEM_addr[0]!=1'b0)|
+    control.sw_op&(ID_MEM_addr[1:0]!=2'b0);
+wire ID_exception_fetch=(IF_ID_PC_reg[1:0]!=2'b0);
+wire ID_exception_data=
+    control.lh_op&(ID_MEM_addr[0]!=1'b0)|
+    control.lhu_op&(ID_MEM_addr[0]!=1'b0)|
+    control.lw_op&(ID_MEM_addr[1:0]!=2'b0)|
+    control.sh_op&(ID_MEM_addr[0]!=1'b0)|
+    control.sw_op&(ID_MEM_addr[1:0]!=2'b0);
+wire ID_exception_reserved=control.RI;//1
+wire ID_exception_instruction=control.Sys|control.Bp;//1
+wire ID_exception_int=0;//1
+wire ID_set_CP0=control.set_CP0;//1
+wire ID_read_CP0=control.read_CP0;//1
+wire [4:0]ID_addr_CP0=ID_inst_in[15:11];//5
+wire [31:0]ID_badaddr=
+    ID_exception_fetch?IF_ID_PC_reg:
+    (ID_exception_data?ID_MEM_addr:32'b0);
+wire ID_Sys=control.Sys;
+wire ID_Bp=control.Bp;
+wire ID_RI=control.RI;
+wire ID_OV=0;
+wire ID_BD=IF_ID_BD_r;//1
+wire ID_eret=control.eret;//1
+wire [4:0]ID_ExcCode=5'b0;//not used
+wire ID_detect_OF=control.detect_OF;
+    
+wire IF_BD_gen=control.BD;
+wire [63:0]ID_exception_gen=
+{
+    ID_set_CP0,//1
+    ID_read_CP0,//1
+    ID_addr_CP0,//5
+    ID_badaddr,//32
+    ID_exception_int,//1
+    ID_exception_fetch,//1
+    ID_exception_reserved,//1
+    ID_exception_instruction,//1
+    ID_exception_data,//1
+    ID_AdEL,
+    ID_AdES,
+    ID_Sys,
+    ID_Bp,
+    ID_RI,
+    ID_OV,
+    ID_BD,//1
+    ID_eret,//1
+    ID_ExcCode,
+    ID_detect_OF
+};
+
+//ID pipe REG
 //ID_EX data
 reg [31:0] ID_EX_MEM_addr_reg;
+
 pipe_reg_interpreter ID_EX_reg(ID_EX_data);
 
 //ID data flow
@@ -448,6 +526,9 @@ always@(posedge clk)begin
         ID_EX_valid<=1'b0;
         ID_EX_MEM_addr_reg<=32'b0;
         ID_EX_data<=220'b0;
+        
+        exception.ID_EX_exception_pipe_reg.data<=64'b0;
+        IF_ID_BD_r<=1'b0;
     end
     else if(ID_EX_allowin)begin
         ID_EX_valid<=ID_EX_valid_in;
@@ -456,16 +537,23 @@ always@(posedge clk)begin
     if(clear_pipeline)begin
         ID_EX_data<=`bubble;
         ID_EX_MEM_addr_reg<=32'b0;
+
+        exception.ID_EX_exception_pipe_reg.data<=64'b0;
+        IF_ID_BD_r<=1'b0;
     end else
     if(ID_EX_valid_in&&ID_EX_allowin)begin
         ID_EX_data<=(bubble?`bubble:ID_EX_datain);
         ID_EX_MEM_addr_reg<=ID_MEM_addr;
+
+        exception.ID_EX_exception_pipe_reg.data<=ID_exception_gen;
+        IF_ID_BD_r<=IF_BD_gen;
     end
     else 
     begin
         if(!div_stall)begin
             ID_EX_data<=`bubble;
             ID_EX_MEM_addr_reg<=32'b0;
+            exception.ID_EX_exception_pipe_reg.data<=64'b0;
         end
     end
 end
@@ -525,6 +613,34 @@ wbmux exmux(
 assign data_sram_wdata=exmux_output;
 assign data_sram_wen=(!clear_pipeline)&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
 
+//EXCEPTION
+
+wire IF_OV=exception.ID_EX_exception_pipe_reg.detect_OF&Overflow;
+wire IF_exception_instruction=IF_OV;//1
+
+wire [63:0] EX_exception_gen=
+{
+    exception.ID_EX_exception_pipe_reg.set_CP0,//1
+    exception.ID_EX_exception_pipe_reg.read_CP0,//1
+    exception.ID_EX_exception_pipe_reg.addr_CP0,//5
+    exception.ID_EX_exception_pipe_reg.badaddr,//32
+    exception.ID_EX_exception_pipe_reg.exception_int,//1
+    exception.ID_EX_exception_pipe_reg.exception_fetch,//1
+    exception.ID_EX_exception_pipe_reg.exception_reserved,//1
+    exception.ID_EX_exception_pipe_reg.exception_instruction|IF_exception_instruction,//1
+    exception.ID_EX_exception_pipe_reg.exception_data,//1
+    exception.ID_EX_exception_pipe_reg.AdEL,
+    exception.ID_EX_exception_pipe_reg.AdES,
+    exception.ID_EX_exception_pipe_reg.Sys,
+    exception.ID_EX_exception_pipe_reg.Bp,
+    exception.ID_EX_exception_pipe_reg.RI,
+    exception.ID_EX_exception_pipe_reg.OV|IF_OV,
+    exception.ID_EX_exception_pipe_reg.BD,//1
+    exception.ID_EX_exception_pipe_reg.eret,//1
+    exception.ID_EX_exception_pipe_reg.ExcCode,
+    exception.ID_EX_exception_pipe_reg.detect_OF
+};
+
 //EX_MEM data
 reg [31:0] EX_MEM_MEM_addr_reg;
 
@@ -537,6 +653,8 @@ always@(posedge clk)begin
         EX_result<=32'b0;
         EX_MEM_MEM_addr_reg<=32'b0;
         EX_MEM_data<=220'b0;
+
+        exception.EX_MEM_exception_pipe_reg<=64'b0;
     end
     else if(EX_MEM_allowin)begin
         EX_MEM_valid<=EX_MEM_valid_in;
@@ -547,12 +665,14 @@ always@(posedge clk)begin
         // EX_result<=Result;
         EX_result<=32'b0;
         EX_MEM_MEM_addr_reg<=32'b0;
+        exception.EX_MEM_exception_pipe_reg<=64'b0;
     end else
     if(EX_MEM_valid_in&&EX_MEM_allowin)begin
         EX_MEM_data<=EX_MEM_datain;
         // EX_result<=Result;
         EX_result<=ID_EX_reg.reg_write_src[1]?(ID_EX_reg.PC+32'd8):Result;
         EX_MEM_MEM_addr_reg<=ID_EX_MEM_addr_reg;
+        exception.EX_MEM_exception_pipe_reg<=EX_exception_gen;
     end
 end
 

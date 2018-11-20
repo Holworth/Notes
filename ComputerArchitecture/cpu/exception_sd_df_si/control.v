@@ -278,7 +278,7 @@ wire mem_write=
 wire set_CP0=mtc0_op;
 wire read_CP0=mfc0_op;
 wire [4:0]addr_CP0=rd;
-wire overflow_exception=add_sop|addi_op|sub_sop;
+wire detect_OF=add_sop|addi_op|sub_sop;
 
 // deal in EX
 // wire exception_int;//1
@@ -298,11 +298,11 @@ wire exception_instruction=syscall_sop|break_sop|eret_op;//1
 // wire AdES;
 wire Sys=syscall_sop;
 wire Bp=break_sop;
-wire RI;
+wire RI=exception_reserved;
 // wire OV;
 
 //IF
-wire BD;//1
+wire BD=jump_short|jump_long|jump_alu;//1 //Next inst is in delay slot;
 wire eret=eret_op;//1
 
 endmodule

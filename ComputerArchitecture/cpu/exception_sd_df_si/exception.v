@@ -15,7 +15,7 @@ module exception_pipe_reg(
     // wire exception_overflow;//1
     // wire exception_trap;//1
     // wire exception_syscall;//1
-    wire overflow_exception;//1
+    // wire overflow_exception;//1
     wire exception_data;//1
     wire AdEL;
     wire AdES;
@@ -26,17 +26,29 @@ module exception_pipe_reg(
     wire BD;//1
     wire eret;//1
     wire [4:0]ExcCode;
+    wire detect_OF;
+
     reg [63:0]data;
     assign {
-        set_CP0,
-        addr_CP0,
-        badaddr,
-        exception_int,
-        exception_fetch,
-        exception_reserved,
-        exception_overflow,
-        exception_trap,
-        exception_syscall
+        set_CP0,//1
+        read_CP0,//1
+        addr_CP0,//5
+        badaddr,//32
+        exception_int,//1
+        exception_fetch,//1
+        exception_reserved,//1
+        exception_instruction,//1
+        exception_data,//1
+        AdEL,
+        AdES,
+        Sys,
+        Bp,
+        RI,
+        OV,
+        BD,//1
+        eret,//1
+        ExcCode,
+        detect_OF
     }=data;
 endmodule
 
@@ -256,13 +268,13 @@ end
 
 //CP0_Cause
 wire [4:0]ExcCode=
-    {5{exception_int}}&5'h00|
+    exception_int?5'h00:(
     {5{EX_MEM_exception_pipe_reg.AdEL}}&5'h04|
     {5{EX_MEM_exception_pipe_reg.AdES}}&5'h05|
     {5{EX_MEM_exception_pipe_reg.Sys}}&5'h08|
     {5{EX_MEM_exception_pipe_reg.Bp}}&5'h09|
     {5{EX_MEM_exception_pipe_reg.RI}}&5'h0a|
-    {5{EX_MEM_exception_pipe_reg.OV}}&5'h0c;
+    {5{EX_MEM_exception_pipe_reg.OV}}&5'h0c);
 
 // wire BD=EX_MEM_exception_pipe_reg.BD;
 reg BD;
@@ -348,38 +360,39 @@ end
 //CP0_rdata
 
 assign CP0_rdata=
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_STATUS}}&CP0_Status|
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_CAUSE}}&CP0_Cause|
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_BADVADDR}}&CP0_BadVaddr|
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_EPC}}&CP0_EPC|
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_COUNT}}&CP0_Count|
-    {32{EX_MEM_exception_pipe_reg.CP0_addr==`CP0_COMPARE}}&CP0_Compare;
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_STATUS}}&CP0_Status|
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_CAUSE}}&CP0_Cause|
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_BADVADDR}}&CP0_BadVaddr|
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_EPC}}&CP0_EPC|
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_COUNT}}&CP0_Count|
+    {32{EX_MEM_exception_pipe_reg.addr_CP0==`CP0_COMPARE}}&CP0_Compare;
 
 endmodule
 
 
-CP0; 1
-DATA_reg 1
-TODO: 
+// TODO: 
 
-ID: new inst 1
-ID: All Badaddr: l/s i/d
-ID: reserved 
-ID: sys 
-ID: trap 1
-ID: breakpoint 1
-EX: All overflow
+// CP0; 1
+// DATA_reg 1
 
-clear pipeline 1
+// ID: new inst 1
+// ID: All Badaddr: l/s i/d 1
+// ID: reserved 1 
+// ID: sys 1
+// ID: trap 1
+// ID: breakpoint 1
+// EX: All overflow 1
 
-data_sram_wen 1
-div_resetn 1
-mfc0:
-mtc0:
+// clear pipeline 1
 
-pypass mtc0: 1
-reg_a_valid: mthi 1
+// data_sram_wen 1
+// div_resetn 1
+// mfc0: 1
+// mtc0: 1
 
-BD IF
-MEM deal int
-ID: fix inst 1
+// pypass mtc0: 1
+// reg_a_valid: mthi 1
+
+// BD IF
+// MEM deal int 1
+// ID: fix inst 1
