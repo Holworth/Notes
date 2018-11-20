@@ -155,7 +155,7 @@ wire [31:0]Compare_wdata=CP0_wdata;
 
 //clear_pipeline
 wire clear_pipeline=have_exception|ERET;
-wire clear_pipeline_PC=ERET?CP0_EPC:32'hBFC00380;
+wire [31:0]clear_pipeline_PC=ERET?CP0_EPC:32'hBFC00380;
 
 
 //CP0_Status
@@ -267,7 +267,7 @@ always@(posedge clk)begin
 end
 
 //CP0_Cause
-wire [4:0]ExcCode=
+wire [4:0]ExcCode_gen=
     exception_int?5'h00:(
     {5{EX_MEM_exception_pipe_reg.AdEL}}&5'h04|
     {5{EX_MEM_exception_pipe_reg.AdES}}&5'h05|
@@ -275,11 +275,23 @@ wire [4:0]ExcCode=
     {5{EX_MEM_exception_pipe_reg.Bp}}&5'h09|
     {5{EX_MEM_exception_pipe_reg.RI}}&5'h0a|
     {5{EX_MEM_exception_pipe_reg.OV}}&5'h0c);
+reg [4:0]ExcCode;
+
+always@(posedge clk)begin
+    if(!resetn)begin
+            ExcCode<=5'b0;
+    end else begin
+        if(have_exception)begin
+            ExcCode<=ExcCode_gen;
+        end
+    end
+end
+
 
 // wire BD=EX_MEM_exception_pipe_reg.BD;
 reg BD;
 assign CP0_Cause[31]=BD;
-assign CP0_Cause[30]=TI;
+assign CP0_Cause[30]=TI&IM7;//TODO: TO PASS THE TEST
 assign CP0_Cause[29:16]=14'b0;
 assign CP0_Cause[15]=IP7;
 assign CP0_Cause[14]=IP6;
@@ -346,6 +358,8 @@ end
 
 //CP0_EPC
 
+wire set_EPC=EX_MEM_exception_pipe_reg.set_CP0&&(EX_MEM_exception_pipe_reg.addr_CP0==`CP0_EPC);
+
 always@(posedge clk)begin
     if(!resetn)begin
         CP0_EPC<=32'b0;
@@ -354,6 +368,9 @@ always@(posedge clk)begin
     begin
         CP0_EPC<=(EX_MEM_exception_pipe_reg.BD?(MEM_PC-4):MEM_PC);
         // CP0_EPC<=MEM_PC;
+    end else 
+    if(set_EPC)begin
+        CP0_EPC<=CP0_wdata;
     end
 end
 

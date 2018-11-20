@@ -61,7 +61,7 @@ module alu(
     assign Zero=({Result}==0);
 
     assign Overflow=
-        ((ALUop==`ALUOP_AND)?
+        ((ALUop==`ALUOP_ADD)?
         (A[`DATA_WIDTH - 1]==B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]):
         (A[`DATA_WIDTH - 1]!=B[`DATA_WIDTH - 1])&&(adder[`DATA_WIDTH - 1]!=A[`DATA_WIDTH - 1]));
     

@@ -192,8 +192,12 @@ always@(posedge clk)begin
     if(!resetn)begin
         IF_delayslot<=32'hbfc00000;
     end
+    // else 
+    // if(clear_pipeline)begin
+    //     IF_delayslot<=32'b0;
+    // end
     else begin
-        IF_delayslot<=(IF_ID_allowout?IF_PC_in:IF_delayslot);
+        IF_delayslot<=((IF_ID_allowout|clear_pipeline)?IF_PC_in:IF_delayslot);
     end
 end
 
@@ -206,14 +210,17 @@ always@(posedge clk)begin
         IF_ID_PC_reg<=32'b0;
         IF_inst_reg<=32'b0;
     end
-    else if(clear_pipeline)begin
-        IF_ID_valid<=1'b0;
+    else begin
+        IF_ID_valid<=
+        (clear_pipeline?1'b0:
+        (IF_ID_allowin?IF_ID_valid_in:IF_ID_valid));
+    end
+
+    if(clear_pipeline)begin
+        // IF_ID_valid<=1'b0;
         IF_ID_PC_reg<=32'b0;
         IF_inst_reg<=32'b0;
-    end
-    else if(IF_ID_allowin)begin
-        IF_ID_valid<=IF_ID_valid_in;
-    end
+    end else
     if(IF_ID_valid_in&&IF_ID_allowin)begin
         IF_ID_PC_reg<=IF_delayslot;
         IF_inst_reg<=inst_sram_rdata;
@@ -441,9 +448,6 @@ assign ID_MEM_addr=A_data+ImmSignedExt;
 //ID EXCEPTION
 
 // sys
-
-wire 
-
 // reserved
 // badaddr
 // BD
@@ -530,8 +534,10 @@ always@(posedge clk)begin
         exception.ID_EX_exception_pipe_reg.data<=64'b0;
         IF_ID_BD_r<=1'b0;
     end
-    else if(ID_EX_allowin)begin
-        ID_EX_valid<=ID_EX_valid_in;
+    else begin
+        ID_EX_valid<=
+            (clear_pipeline?1'b0:
+            (ID_EX_allowin?ID_EX_valid_in:ID_EX_valid));
     end
     
     if(clear_pipeline)begin
@@ -611,7 +617,7 @@ wbmux exmux(
 );
 
 assign data_sram_wdata=exmux_output;
-assign data_sram_wen=(!clear_pipeline)&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
+assign data_sram_wen=({4{!clear_pipeline}})&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
 
 //EXCEPTION
 
@@ -654,7 +660,7 @@ always@(posedge clk)begin
         EX_MEM_MEM_addr_reg<=32'b0;
         EX_MEM_data<=220'b0;
 
-        exception.EX_MEM_exception_pipe_reg<=64'b0;
+        exception.EX_MEM_exception_pipe_reg.data<=64'b0;
     end
     else if(EX_MEM_allowin)begin
         EX_MEM_valid<=EX_MEM_valid_in;
@@ -665,14 +671,14 @@ always@(posedge clk)begin
         // EX_result<=Result;
         EX_result<=32'b0;
         EX_MEM_MEM_addr_reg<=32'b0;
-        exception.EX_MEM_exception_pipe_reg<=64'b0;
+        exception.EX_MEM_exception_pipe_reg.data<=64'b0;
     end else
     if(EX_MEM_valid_in&&EX_MEM_allowin)begin
         EX_MEM_data<=EX_MEM_datain;
         // EX_result<=Result;
         EX_result<=ID_EX_reg.reg_write_src[1]?(ID_EX_reg.PC+32'd8):Result;
         EX_MEM_MEM_addr_reg<=ID_EX_MEM_addr_reg;
-        exception.EX_MEM_exception_pipe_reg<=EX_exception_gen;
+        exception.EX_MEM_exception_pipe_reg.data<=EX_exception_gen;
     end
 end
 
@@ -859,6 +865,15 @@ end
 reg mfc0_w;
 reg [31:0]CP0_rdata_r;
 
+always@(posedge clk)begin
+    if(!resetn)begin
+        CP0_rdata_r<=32'b0;
+    end
+    else begin
+        CP0_rdata_r<=exception.CP0_rdata;
+    end
+end
+
 assign regfile_wen=WB_reg_control&{4{MEM_WB_valid}};
 assign regfile_wdata=
     {32{mfhi_w}}&HI|
@@ -902,17 +917,17 @@ wire corelation_B3=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==MEM_WB_reg.r
 
 
 wire bypass_A1=corelation_A1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
-wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4]);
+wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15]);
 wire bypass_A3=corelation_A3;
 wire bypass_B1=corelation_B1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
-wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4]);
+wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15]);
 wire bypass_B3=corelation_B3;
 
 wire bypass_A1_inst=1'b0;
-wire bypass_A2_inst=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(EX_MEM_reg.mem_read));//ALU_result
+wire bypass_A2_inst=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15])&(!(EX_MEM_reg.mem_read));//ALU_result
 wire bypass_A3_inst=1'b1;
 wire bypass_B1_inst=1'b0;
-wire bypass_B2_inst=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!(EX_MEM_reg.mem_read));//ALU_result
+wire bypass_B2_inst=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15])&(!(EX_MEM_reg.mem_read));//ALU_result
 wire bypass_B3_inst=1'b1;
 
 wire [31:0] bypassed_regfile_rdata1=(bypass_A1?Result:
@@ -921,7 +936,8 @@ wire [31:0] bypassed_regfile_rdata1=(bypass_A1?Result:
         (
         {32{mflo_w}}&LO| 
         {32{mfhi_w}}&HI| 
-        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+        {32{mfc0_w}}&CP0_rdata_r| 
+        {32{~(mfhi_w|mflo_w|mfc0_w)}}&MEM_result):
     regfile_rdata1
     )));
 wire [31:0] bypassed_regfile_rdata2=(bypass_B1?Result:
@@ -930,7 +946,8 @@ wire [31:0] bypassed_regfile_rdata2=(bypass_B1?Result:
     (
         {32{mflo_w}}&LO| 
         {32{mfhi_w}}&HI| 
-        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+        {32{mfc0_w}}&CP0_rdata_r| 
+        {32{~(mfhi_w|mflo_w|mfc0_w)}}&MEM_result):
     regfile_rdata2
     )));
 
@@ -940,7 +957,8 @@ assign bypassed_regfile_rdata1_inst=
         (
         {32{mflo_w}}&LO| 
         {32{mfhi_w}}&HI| 
-        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+        {32{mfc0_w}}&CP0_rdata_r| 
+        {32{~(mfhi_w|mflo_w|mfc0_w)}}&MEM_result):
     regfile_rdata1
     ));
 assign bypassed_regfile_rdata2_inst=
@@ -949,7 +967,8 @@ assign bypassed_regfile_rdata2_inst=
     (
         {32{mflo_w}}&LO| 
         {32{mfhi_w}}&HI| 
-        {32{~(mfhi_w|mflo_w)}}&MEM_result):
+        {32{mfc0_w}}&CP0_rdata_r| 
+        {32{~(mfhi_w|mflo_w|mfc0_w)}}&MEM_result):
     regfile_rdata2
     ));
 // assign bypassed_regfile_rdata1_inst=
@@ -1004,7 +1023,7 @@ assign bubble=jump_with_reg?
 
 //EXCEPTION
 
-wire [7:0]IP=8'b11111111;
+wire [7:0]IP=8'b00000000;
 wire [31:0]CP0_rdata;
 
 //clear_pipeline

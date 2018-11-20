@@ -74,8 +74,8 @@ wire slti_op= opcode==6'b001010;
 wire sltiu_op= opcode==6'b001011;
 wire addi_op= opcode==6'b001000;
 wire eret_op= inst==32'b010000_1_000_0000_0000_0000_0000_011000;
-wire mfc0_op= (opcode==6'b001000)&(rs==5'b00000)&(inst[10:3]==8'b0000000);
-wire mtc0_op= (opcode==6'b001000)&(rs==5'b00100)&(inst[10:3]==8'b0000000);
+wire mfc0_op= (opcode==6'b010000)&(rs==5'b00000)&(inst[10:3]==8'b0000000);
+wire mtc0_op= (opcode==6'b010000)&(rs==5'b00100)&(inst[10:3]==8'b0000000);
 wire r_op= opcode==6'b000000;
 
 assign r_type=r_op;
@@ -104,8 +104,8 @@ wire div_sop=r_type&(function_op==6'b011010)&(inst[15:6]==10'b00000_00000);
 wire divu_sop=r_type&(function_op==6'b011011)&(inst[15:6]==10'b00000_00000);
 wire mult_sop=r_type&(function_op==6'b011000)&(inst[15:6]==10'b00000_00000);
 wire multu_sop=r_type&(function_op==6'b011001)&(inst[15:6]==10'b00000_00000);
-wire mfhi_sop=r_type&(function_op==6'b010000)&(inst[25:16==10'b00000_00000])&(inst[10:6]==5'b00000);
-wire mflo_sop=r_type&(function_op==6'b010010)&(inst[25:16==10'b00000_00000])&(inst[10:6]==5'b00000);
+wire mfhi_sop=r_type&(function_op==6'b010000)&(inst[25:16]==10'b00000_00000)&(inst[10:6]==5'b00000);
+wire mflo_sop=r_type&(function_op==6'b010010)&(inst[25:16]==10'b00000_00000)&(inst[10:6]==5'b00000);
 wire mthi_sop=r_type&(function_op==6'b010001)&(inst[20:6]==15'b000_0000_0000_0000);
 wire mtlo_sop=r_type&(function_op==6'b010011)&(inst[20:6]==15'b000_0000_0000_0000);
 wire break_sop=r_type&(function_op==6'b001101);
@@ -140,7 +140,7 @@ wire alu_b_src_immsigned=addiu_op|slti_op|sltiu_op|addi_op;
 wire alu_b_src_a_immunsigned=andi_op|ori_op|xori_op|lui_op;
 
 wire alu_b_src_PC_8=jal_op;
-wire alu_b_src_reg=r_op|beq_op|bgez_op|blez_op|bltz_op|bne_op|bgtz_op|bgezal_op|bltzal_op|lb_op|lbu_op|lh_op|lhu_op|lw_op|lwl_op|lwr_op|sb_op|sh_op|sw_op|swl_op|swr_op;
+wire alu_b_src_reg=mtc0_op|r_op|beq_op|bgez_op|blez_op|bltz_op|bne_op|bgtz_op|bgezal_op|bltzal_op|lb_op|lbu_op|lh_op|lhu_op|lw_op|lwl_op|lwr_op|sb_op|sh_op|sw_op|swl_op|swr_op;
 
 assign alu_b_src[0]=alu_b_src_immsigned;
 assign alu_b_src[1]=alu_b_src_a_immunsigned;
@@ -218,6 +218,7 @@ wire regw_fsrc_meml=lwl_op;
 wire regw_fsrc_memr=lwr_op;
 wire regw_fsrc_mem=lw_op;
 wire regw_fsrc_lui=0;//use alu instead. so we can do bypass on lui
+wire regw_fsrc_cp0=mfc0_op;
 
 
 assign reg_write_src[0]= regw_fsrc_alu;
@@ -235,7 +236,7 @@ assign reg_write_src[11]= regw_fsrc_meml;
 assign reg_write_src[12]= regw_fsrc_memr;
 assign reg_write_src[13]= regw_fsrc_mem;
 assign reg_write_src[14]= regw_fsrc_lui;
-assign reg_write_src[15]=1'b0;
+assign reg_write_src[15]= regw_fsrc_cp0;
 
 // output [3:0]reg_write_tgt
 wire regw_ftgt_rd=addu_sop|and_sop|jalr_sop|nor_sop|or_sop|sll_sop|sllv_sop|slt_sop|sltu_sop|sra_sop|srav_sop|srl_sop|srlv_sop|subu_sop|xor_sop|add_sop|sub_sop|mfhi_sop|mflo_sop;
