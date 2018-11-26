@@ -201,7 +201,6 @@ always@(posedge clk)begin
     end
 end
 
-
 //d flipflop of IF_inst
 //IF data flow
 always@(posedge clk)begin
@@ -478,7 +477,7 @@ wire ID_exception_data=
     control.sw_op&(ID_MEM_addr[1:0]!=2'b0);
 wire ID_exception_reserved=control.RI;//1
 wire ID_exception_instruction=control.Sys|control.Bp;//1
-wire ID_exception_int=0;//1
+wire ID_exception_int=exception.int_detect;//1
 wire ID_set_CP0=control.set_CP0;//1
 wire ID_read_CP0=control.read_CP0;//1
 wire [4:0]ID_addr_CP0=ID_inst_in[15:11];//5
@@ -617,7 +616,9 @@ wbmux exmux(
 );
 
 assign data_sram_wdata=exmux_output;
-assign data_sram_wen=({4{!clear_pipeline}})&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
+//11.26 bug fixed
+wire block_data_wen=exception.ID_EX_exception_pipe_reg.exception_data|exception.ID_EX_exception_pipe_reg.exception_fetch;
+assign data_sram_wen=({4{(!clear_pipeline)&(!block_data_wen)}})&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
 
 //EXCEPTION
 
@@ -771,9 +772,18 @@ always@(posedge clk)begin
         MEM_WB_data<=220'b0;
         mfc0_w<=1'b0;
     end
-    else if(MEM_WB_allowin)begin
-        MEM_WB_valid<=MEM_WB_valid_in;
+    else begin
+        MEM_WB_valid<=
+            (clear_pipeline?1'b0:
+            (MEM_WB_allowin?MEM_WB_valid_in:MEM_WB_valid));
     end
+
+    if(clear_pipeline)begin
+        MEM_WB_data<=`bubble;
+        MEM_result<=32'b0;
+        WB_reg_control<=4'b0;
+        mfc0_w<=1'b0;
+    end else
     if(MEM_WB_valid_in&&MEM_WB_allowin)begin
         if(!div_stall)begin
             MEM_WB_data<=MEM_WB_datain;
@@ -1036,7 +1046,8 @@ exception_pass exception(
     EX_MEM_reg.B_data,
     EX_MEM_reg.PC,
     IP,
-    CP0_rdata
+    CP0_rdata,
+    EX_MEM_valid
 );
 
 //Reserved

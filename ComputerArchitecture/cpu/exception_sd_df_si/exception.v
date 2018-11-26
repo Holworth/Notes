@@ -58,7 +58,8 @@ module exception_pass(
     input [31:0]CP0_wdata,
     input [31:0]MEM_PC,
     input [7:0]IP,
-    output [31:0]CP0_rdata
+    output [31:0]CP0_rdata,
+    input mem_valid
 );
 
 //IF------------------------------------------------
@@ -121,8 +122,9 @@ wire Count_wen=EX_MEM_exception_pipe_reg.set_CP0&(EX_MEM_exception_pipe_reg.addr
 wire Compare_wen=EX_MEM_exception_pipe_reg.set_CP0&(EX_MEM_exception_pipe_reg.addr_CP0==`CP0_COMPARE);
 
 //EXCEPTION
-wire have_exception=exception_int|exception_fetch|exception_reserved|exception_instruction|exception_data;
-wire exception_int=(HW5|HW4|HW3|HW2|HW1|HW0|SW1|SW0)&(!EXL);
+wire have_exception=(exception_int|exception_fetch|exception_reserved|exception_instruction|exception_data)&mem_valid;
+wire exception_int=(HW5|HW4|HW3|HW2|HW1|HW0|SW1|SW0)&(!EXL)&EX_MEM_exception_pipe_reg.exception_int;
+wire int_detect=(HW5|HW4|HW3|HW2|HW1|HW0|SW1|SW0);//for ID to setup exception_int
 wire exception_fetch=
     EX_MEM_exception_pipe_reg.exception_fetch&
     (!exception_int);
