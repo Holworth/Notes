@@ -3,8 +3,8 @@
 #include <ucas_cde.h>
 
 
-#define lab2_1  0
-#define lab2_2  0
+#define lab2_1  1
+#define lab2_2  1
 #define lab2_3  1
 #define lab4_1  1
 #define lab4_2  1
