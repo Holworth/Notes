@@ -39,17 +39,10 @@ symbol-file main
 #b sleep_task
 #b *0x80000180
 #b scheduler
-#b idle
-#b lock_task1
-#b *0xa08034fc
-#b irq_timer
-b free_proc_resource
-#b producer_task
-#b sys_condition_init
-b do_condition_broadcast
-b do_condition_wait
-b SunQuan
-b LiuBei
+b *0x80000200
+b *0x80000000
+b *0x8007b1cc
+
 c
 
 # 附注

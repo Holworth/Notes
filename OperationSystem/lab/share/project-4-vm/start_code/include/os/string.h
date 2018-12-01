@@ -48,4 +48,6 @@ int strlen(char *src);
 
 int atoi(char*);
 
+int htoi(char*);
+
 #endif

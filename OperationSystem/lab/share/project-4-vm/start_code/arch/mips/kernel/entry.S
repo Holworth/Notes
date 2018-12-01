@@ -388,6 +388,30 @@ exception_handler_begin:
 exception_handler_end:
 END(exception_handler_entry)
 
+
+.global TLBexception_handler_begin
+.global TLBexception_handler_end
+
+NESTED(TLBexception_handler_entry, 0, sp)
+TLBexception_handler_begin:
+	//TLB exception entry
+	//jmp exception_handler[i] which decided by CP0_CAUSE
+
+    //li	k1,	(vpn2<<13)|(asid	&	0xff)
+    //mtc0	k1,	C0_ENHI 																			 #	 设置虚拟页面
+    //li	k1,	(epfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //mtc0	k1,	C0_ENLO0																			 #	 设置偶数物理页面
+    //li	k1,	(opfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //mtc0	k1,	C0_ENLO1	 																		 #	 设置奇数物理页面
+    //li	k1,	0	 																												 #	 设置页面大小为 4KB
+    //mtc0	k1,C0_PAGEMASK
+    //li	k1,	index_of_some_entry												 #	 设置 TLB 表项的索引值
+    //mtc0	k1,	C0_INDEX
+    //tlbwi
+    eret
+TLBexception_handler_end:
+END(TLBexception_handler_entry)
+
 NESTED(handle_int, 0, sp)
     // interrupt handler
     // Leve3 exception Handler.

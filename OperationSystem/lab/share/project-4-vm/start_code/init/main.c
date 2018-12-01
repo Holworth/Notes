@@ -1,3 +1,23 @@
+// ----------------------------------------------------------------
+//                   Lagenaria Siceraria OS
+// ----------------------------------------------------------------
+//              Copyright (C) 2018 Wang Huaqiang 
+//             email : wanghuaqiang16@mails.ucas.ac.cn
+// ----------------------------------------------------------------
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * *
  *            Copyright (C) 2018 Institute of Computing Technology, CAS
  *               Author : Han Shukai (email : hanshukai@ict.ac.cn)
@@ -65,13 +85,20 @@ uint32_t alloc_stack()
 
 }
 
-
 // uint32_t alloc_stack()
 // {
 //     // uint32_t t=stack_base_now;
 //     stack_base_now-=STACK_SIZE;
 //     return stack_base_now;
 // }
+
+static void init_memory()
+{
+	// init_page_table(); 
+	//In task1&2, page table is initialized completely with address mapping, but only virtual pages in task3.
+	// init_TLB();		//only used in P4 task1
+	// init_swap();		//only used in P4 bonus: Page swap mechanism
+}
 
 static void init_pcb()
 {
@@ -256,6 +283,10 @@ void __attribute__((section(".entry_function"))) _start(void)
     init_exception();
     printk("> [INIT] Interrupt processing initialization succeeded.\n");
 
+	// init virtual memory
+	init_memory();
+	printk("> [INIT] Virtual memory initialization succeeded.\n");
+    
     // init system call table (0_0)
     init_syscall();
     printk("> [INIT] System call initialized successfully.\n");
@@ -287,9 +318,6 @@ void __attribute__((section(".entry_function"))) _start(void)
     
     while (1)
     {
-    // (QAQQQQQQQQQQQ)
-    // If you do non-preemptive scheduling, you need to use it to surrender control
-    // printk("> [INIT] in while() loop.\n");
     error_ps();
     do_scheduler();
     info("init_scheduler() called more than 1");

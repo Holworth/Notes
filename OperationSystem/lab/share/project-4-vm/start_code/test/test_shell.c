@@ -1,3 +1,4 @@
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  * * * * * * * * * * *
  *            Copyright (C) 2018 Institute of Computing Technology, CAS
  *               Author : Han Shukai (email : hanshukai@ict.ac.cn)
@@ -60,32 +61,41 @@ static char read_uart_ch(void)
     return ch;
 }
 
-struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS, 1, 1};
-struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS, 1, 1};
-struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS, 1, 1};
 
-struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS, 1, 1};
-struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS, 1, 1};
-struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS, 1, 1};
+// LAB3
+// struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS, 1, 1};
+// struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS, 1, 1};
+// struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS, 1, 1};
 
-struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS, 1, 1};
-struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS, 1, 1};
-struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS, 1, 1};
+// struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS, 1, 1};
+// struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS, 1, 1};
+// struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS, 1, 1};
 
-struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS, 1, 1};
-struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS, 1, 1};
-struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS, 1, 1};
+// struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS, 1, 1};
+// struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS, 1, 1};
+// struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS, 1, 1};
 
-struct task_info task13 = {"SunQuan", (uint32_t)&SunQuan, USER_PROCESS, 1, 1};
-struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS, 1, 1};
-struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS, 1, 1};
+// struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS, 1, 1};
+// struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS, 1, 1};
+// struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS, 1, 1};
 
-static struct task_info *test_tasks[16] = {&task1, &task2, &task3,
-                                           &task4, &task5, &task6,
-                                           &task7, &task8, &task9,
-                                           &task10, &task11, &task12,
-                                           &task13, &task14, &task15};
-static int num_test_tasks = 15;
+// struct task_info task13 = {"SunQuan", (uint32_t)&SunQuan, USER_PROCESS, 1, 1};
+// struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS, 1, 1};
+// struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS, 1, 1};
+
+// static struct task_info *test_tasks[16] = {&task1, &task2, &task3,
+//                                            &task4, &task5, &task6,
+//                                            &task7, &task8, &task9,
+//                                            &task10, &task11, &task12,
+//                                            &task13, &task14, &task15};
+// static int num_test_tasks = 15;
+
+// LAB 4
+
+struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
+struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
+static struct task_info *test_tasks[16] = {&task1, &task2};
+static int num_test_tasks = 2;
 
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
@@ -343,6 +353,34 @@ inline void cmd_reboot()
     asm("jal _start\n nop\n");
 }
 
+inline void cmd_dump()
+{
+    if(argc!=2)
+    {
+        printf("Dump: Invalid arguments. Usage: dump [vaddr (in hex, no 0x)]\n");
+        return;
+    }
+    uint32_t* dumpaddr=(uint32_t *)htoi(argv[1]);
+    uint32_t dumpval=*dumpaddr;
+    printf("Dump addr 0x%x, result: 0x%x, %d\n",dumpaddr,dumpval, dumpval);
+    return;
+}
+
+inline void cmd_set()
+{
+    if(argc!=3)
+    {
+        printf("Set: Invalid arguments.\n");
+        printf("Usage: set [vaddr (in hex, no 0x)] [val (in hex, no 0x)]\n");
+        return;
+    }
+    uint32_t* setaddr=(uint32_t *)htoi(argv[1]);
+    uint32_t setval=htoi(argv[2]);
+    printf("Set addr 0x%x to: 0x%x, %d\n",setaddr ,setval, setval);
+    *(setaddr)=setval;
+    return;
+}
+
 inline void shell_interpret_cmd()
 {
     argc = 0;
@@ -431,6 +469,16 @@ inline void shell_interpret_cmd()
     if (!strcmp(argv[0], "history"))
     {
         print_history(5);
+        return;
+    }
+    if (!strcmp(argv[0], "dump"))
+    {
+        cmd_dump();
+        return;
+    }
+    if (!strcmp(argv[0], "set"))
+    {
+        cmd_set();
         return;
     }
     //TODO

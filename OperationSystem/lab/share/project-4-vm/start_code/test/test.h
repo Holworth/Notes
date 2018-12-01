@@ -27,6 +27,7 @@
 #define INCLUDE_TEST_H_
 
 #include "test3.h"
+#include "test4.h"
 #include "sched.h"
 
 

@@ -1,0 +1,552 @@
+\documentclass{article} % For LaTeX2e
+% \usepackage{nips13submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{textcomp}  % \textcelsius
+
+
+\providecommand{\tightlist}{%
+	\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% \graphicspath{{./fig/}}
+% \usepackage{tikz}
+
+\title{Homework 7}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\author{Wang Huaqiang}
+
+\begin{document}
+
+	\maketitle
+
+
+
+\begin{Huge}
+	\begin{center}
+		Contents
+	\end{center}
+\end{Huge}
+
+
+\begin{itemize}
+\tightlist
+\item
+  \protect\hyperlink{1-question}{1. Question}
+\item
+  \protect\hyperlink{2-lemma}{2. Lemma}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \protect\hyperlink{21-belong-to-ux2fin-in}{2.1. belong to (\(\in\))
+    (in)}
+  \item
+    \protect\hyperlink{22-neg-imply}{2.2. neg imply}
+  \item
+    \protect\hyperlink{23-transitivity1-trans}{2.3. transitivity1
+    (trans)}
+  \item
+    \protect\hyperlink{24-transitivity2-tr}{2.4. transitivity2 (Tr)}
+  \item
+    \protect\hyperlink{25-double-neg}{2.5. double neg}
+  \item
+    \protect\hyperlink{26-reductio}{2.6. reductio}
+  \item
+    \protect\hyperlink{27-confliction}{2.7. confliction}
+  \item
+    \protect\hyperlink{28-and}{2.8. and}
+  \item
+    \protect\hyperlink{29-switch}{2.9. switch}
+  \end{itemize}
+\item
+  \protect\hyperlink{3-proof}{3. Proof}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \protect\hyperlink{31-t1}{3.1. T1}
+  \item
+    \protect\hyperlink{32-t2}{3.2. T2}
+  \item
+    \protect\hyperlink{33-t3}{3.3. T3}
+  \item
+    \protect\hyperlink{34-t4}{3.4. T4}
+  \item
+    \protect\hyperlink{35-t5}{3.5. T5}
+  \item
+    \protect\hyperlink{36-t6}{3.6. T6}
+  \item
+    \protect\hyperlink{37-t7}{3.7. T7}
+  \item
+    \protect\hyperlink{38-t8}{3.8. T8}
+  \end{itemize}
+\end{itemize}
+
+
+\par
+
+\begin{Huge}
+	\begin{center}
+		Remarks
+	\end{center}
+\end{Huge}
+
+
+Made a mistake while trying to convert markdown to tex. So there are some wrong feedlines for formulas.
+
+For example:
+
+\[A\vdash A \vee B, B \vee A \] (T1)
+
+Means:
+
+\[A\vdash A \vee B, B \vee A \quad \quad(T1)\] 
+
+\newpage
+
+\hypertarget{question}{%
+\section{Question}\label{question}}
+
+Prove that:
+
+\[A\vdash A \vee B, B \vee A \] (T1)
+
+\[A\vee B \vdash \dashv B \vee A\] (T2)
+
+\[(A \vee B)\vee C \vdash \dashv A \vee (B \vee C)\] (T3)
+
+\[(A \vee B) \vdash \dashv \neg A \rightarrow B\] (T4)
+
+\[ A \rightarrow B \vdash \dashv \neg A \vee B\] (T5)
+
+\[\neg (A \vee B) \vdash \dashv \neg A \wedge \neg B\] (T6)
+
+\[\neg (A \wedge B) \vdash \dashv \neg A \vee \neg B\] (T7)
+
+\[\emptyset \vdash A \vee \neg A\] (T8)
+
+\hypertarget{lemma}{%
+\section{Lemma}\label{lemma}}
+
+First we prove the following lemmas to simpilify the proof.
+
+\hypertarget{belong-to-in-in}{%
+\subsection{\texorpdfstring{2.1. belong to (\(\in\))
+(in)}{2.1. belong to (\textbackslash{}in) (in)}}\label{belong-to-in-in}}
+
+If:
+
+\[A \in \Sigma\]
+
+Then:
+
+\[\Sigma\vdash A\]
+
+Proof:
+
+Let \(\Sigma'\) be \(\Sigma - A\), then:
+
+\[A\vdash A\](Ref) \[\Sigma', A\vdash A\](+) \[\Sigma \vdash A\] (1,2)
+
+\hypertarget{neg-imply}{%
+\subsection{2.2. neg imply}\label{neg-imply}}
+
+\[\neg A \rightarrow B \vdash \neg B \rightarrow A\]
+
+proof:
+
+\[\neg A \rightarrow B , \neg A, \neg B\vdash \neg A \rightarrow B \](in)
+\[\neg A \rightarrow B , \neg A, \neg B\vdash \neg A\](in)
+
+From 1, 2, \(\rightarrow -\):
+
+\[\neg A \rightarrow B , \neg A, \vdash B\]
+
+\[\neg A \rightarrow B , \neg A, \neg B\vdash B\](3)
+\[\neg A \rightarrow B , \neg A, \neg B\vdash \neg B\](in)
+
+From \(\neg -\), 4 ,5 :
+
+\[\neg A \rightarrow B , \neg B\vdash A\]
+
+From 6, \(rightarrow +\):
+
+\[\neg A \rightarrow B \vdash \neg B \rightarrow A\]
+
+\hypertarget{transitivity1-trans}{%
+\subsection{2.3. transitivity1 (trans)}\label{transitivity1-trans}}
+
+\[A\rightarrow B, B\rightarrow C \vdash A\rightarrow C\] (trans)
+
+Proof:
+
+\[A\rightarrow B, B\rightarrow C , A \vdash A\]
+\[A\rightarrow B, B\rightarrow C , A \vdash A\rightarrow B\]
+\[A\rightarrow B, B\rightarrow C , A \vdash B\]
+\[A\rightarrow B, B\rightarrow C , A \vdash B\rightarrow C\]
+\[A\rightarrow B, B\rightarrow C , A \vdash C\]
+\[A\rightarrow B, B\rightarrow C \vdash A \rightarrow C\]
+
+\hypertarget{transitivity2-tr}{%
+\subsection{2.4. transitivity2 (Tr)}\label{transitivity2-tr}}
+
+IF:
+
+\[\Sigma \vdash \Sigma'\] \[\Sigma' \vdash A\]
+
+Then:
+
+\[\Sigma \vdash A\] (Tr)
+
+\hypertarget{double-neg}{%
+\subsection{2.5. double neg}\label{double-neg}}
+
+\[\neg \neg A \vdash A\](2neg) \[A \vdash \neg \neg A\](2neg)
+
+Proof1:
+
+\[\neg \neg A , \neg A\vdash A\] \[\neg \neg A , \neg A\vdash \neg A\]
+
+From 1, 2, \(\neg-\):
+
+\[\neg \neg A \vdash A\]
+
+Proof2:
+
+\[\neg \neg \neg A \vdash \neg A\](2neg)
+\[A, \neg \neg \neg A \vdash \neg A\](+)
+\[A, \neg \neg \neg A \vdash A\](in)
+
+From \(\neg -\):
+
+\[A \vdash \neg \neg A\]
+
+\hypertarget{reductio}{%
+\subsection{2.6. reductio}\label{reductio}}
+
+If:
+
+\[\Sigma , A \vdash B\] \[\Sigma , A \vdash \neg B\]
+
+Then:
+
+\[\Sigma \vdash \neg A\] (redct)
+
+Proof:
+
+\[\Sigma ,A\vdash B\] \[\neg \neg A \vdash A\]
+
+From 1, 2, Tr:
+
+\[\Sigma \neg \neg A\vdash B\]
+
+Similarily:
+
+\[\neg \neg A \vdash A\] \[\Sigma ,A\vdash \neg B\]
+\[\Sigma \neg \neg A\vdash \neg B\]
+
+Finally, from 3, 6, \(\neg-\):
+
+\[\Sigma \vdash \neg A\]
+
+\hypertarget{confliction}{%
+\subsection{2.7. confliction}\label{confliction}}
+
+\[A, \neg A \vdash B\] (conf) \[A \vdash \neg A  \rightarrow B\] (conf)
+\[\neg A \vdash A  \rightarrow B\] (conf)
+
+Proof:
+
+\[A, \neg A , \neg B\vdash A \] (in)
+\[A, \neg A , \neg B\vdash \neg A \] (in) \[A, \neg A \vdash B\] (1,2)
+
+From 3, \(\rightarrow+\):
+
+\[A \vdash \neg A  \rightarrow B\] \[\neg A \vdash A  \rightarrow B\]
+
+\hypertarget{and}{%
+\subsection{2.8. and}\label{and}}
+
+\[A\wedge B\vdash \dashv A,B\]
+
+Proof:
+
+\[A\wedge B \vdash A\wedge B\] (in)
+
+From 1, \(\wedge-\):
+
+\[A\wedge B \vdash A\] \[A\wedge B \vdash B\] \[A\wedge B \vdash A, B\]
+
+And:
+
+\[A, B\vdash A\] \[A, B\vdash B\]
+
+Then use \(\wedge+\) rule;
+
+\[A, B\vdash A\wedge B\]
+
+\hypertarget{switch}{%
+\subsection{2.9. switch}\label{switch}}
+
+If:
+
+\[A\vdash \dashv A'\]
+
+\[\vdash A\rightarrow B\] \[\vdash C\rightarrow A\] \[\vdash A\vee D\]
+\[\vdash A\wedge E\] \[\vdash \neg A\]
+
+Then it is trival that:
+
+\[\vdash A'\rightarrow B\] \[\vdash C\rightarrow A'\]
+\[\vdash A'\vee D\] \[\vdash A'\wedge E\] \[\vdash \neg A'\]
+
+Therefore, for A, A' in deduction formula, we can switch A and A'.
+
+\hypertarget{proof}{%
+\section{Proof}\label{proof}}
+
+\hypertarget{t1}{%
+\subsection{3.1. T1}\label{t1}}
+
+\[A \vdash A\] (Ref)
+
+\[A \vdash A \vee B\] (1,V+)
+
+\[A \vdash B \vee A\] (1,V+)
+
+\[A\vdash A \vee B, B \vee A \] (3,4)
+
+\hypertarget{t2}{%
+\subsection{3.2. T2}\label{t2}}
+
+To prove:
+
+\[A\vee B \vdash \dashv B \vee A\] (T2)
+
+We only need to prove one direction, for this formula is symmatric.
+
+\[A \vdash B \vee A\] (T1)
+
+\[B \vdash B \vee A\] (T1)
+
+From 1,2,V-:
+
+\[A \vee B \vdash B \vee A \]
+
+Symmatricly:
+
+\[B \vee A \vdash A \vee B\]
+
+As a result:
+
+\[A\vee B \vdash \dashv B \vee A\] (4,5)
+
+\hypertarget{t3}{%
+\subsection{3.3. T3}\label{t3}}
+
+\[C \vdash (B \vee C)\] (T1) \[(B \vee C) \vdash A \vee (B \vee C)\]
+(T1) \[C\vdash A \vee (B \vee C)\] (1,2)
+
+Similarily, we have:
+
+\[A\vdash A \vee (B \vee C)\] \[B\vdash A \vee (B \vee C)\]
+
+Then from 4,5,V-:
+
+\[A\vee B \vdash A \vee (B \vee C)\]
+
+Finally:
+
+\[(A \vee B)\vee C \vdash A \vee (B \vee C)\] (3,6)
+
+\hypertarget{t4}{%
+\subsection{3.4. T4}\label{t4}}
+
+Left to Right:
+
+\[A ,\neg A \vdash B\] (conf) \[A \vdash \neg A \rightarrow B\] (conf)
+\[B ,\neg A \vdash B\] (in)
+
+From 3, \(\rightarrow+\):
+
+\[B \vdash \neg A \rightarrow B\]
+
+From 3, 4, V-:
+
+\[(A \vee B) \vdash \neg A \rightarrow B\]
+
+Right to Left:
+
+\[A\vdash A \vee B\] (V+)
+
+From 1, lemma neg imply:
+
+\[\neg (A \vee B) \vdash \neg A\]
+
+\[\neg A \rightarrow B , \neg (A \vee B)\vdash \neg A \] (+)
+\[\neg A \rightarrow B , \neg (A \vee B)\vdash \neg A \rightarrow B \]
+(in)
+
+From \(\rightarrow-\):
+
+\[\neg A \rightarrow B , \neg (A \vee B)\vdash B \]
+
+Using V+:
+
+\[\neg A \rightarrow B , \neg (A \vee B)\vdash (A \vee B) \]
+
+Using in:
+
+\[\neg A \rightarrow B , \neg (A \vee B)\vdash \neg (A \vee B) \] (in)
+
+From \(\neg-\):
+
+\[\neg A \rightarrow B \vdash (A \vee B) \]
+
+To sum up:
+
+\[(A \vee B) \vdash \dashv \neg A \rightarrow B\]
+
+\hypertarget{t5}{%
+\subsection{3.5. T5}\label{t5}}
+
+\[(\neg A \vee B) \vdash \dashv \neg(\neg A) \rightarrow B\] (T4)
+
+\[\neg \neg A \vdash \dashv A\]
+
+From 1, 2, switch:
+
+\[ \neg A \vee B \vdash \dashv A \rightarrow B \]
+
+\hypertarget{t6}{%
+\subsection{3.6. T6}\label{t6}}
+
+Consider that:
+
+\[\neg(\neg A \rightarrow B) , A\vdash \neg(\neg A \rightarrow B)\] (in)
+
+From :
+
+\[A, \neg A \vdash B\]
+
+Using \(\rightarrow+\), we gain:
+
+\[\neg(\neg A \rightarrow B) , A\vdash (\neg A \rightarrow B)\]
+
+Then use \(\neg-\):
+
+\[\neg(\neg A \rightarrow B) \vdash \neg A\]
+
+\[\neg(\neg A \rightarrow B) \vdash \neg B\]
+
+Since:
+
+\[\neg(\neg A \rightarrow B) \vdash \neg A\]
+
+\[\neg(\neg A \rightarrow B) \vdash \neg B\]
+
+Then:
+
+\[\neg(\neg A \rightarrow B) \vdash \neg A \wedge \neg B\]
+
+And:
+
+\[\neg (\neg A \rightarrow B)\vdash \neg(\neg A \rightarrow B)\] (in)
+
+From T4, switch:
+
+\[\neg (A \vee B)\vdash \neg(\neg A \rightarrow B)\]
+
+\[\neg (A \vee B) \vdash \neg A \wedge \neg B\] (Tr)
+
+Another direction:
+
+\[\neg A \wedge \neg B \vdash \neg A, \neg B \] (and)
+\[\neg A ,\neg B , (A \vee B) \vdash \neg B \] (in)
+\[\neg A ,\neg B , (A \vee B) \vdash \neg A \] (in)
+\[\neg A ,\neg B , (A \vee B) \vdash \neg A \rightarrow B\] (T4)
+
+From \(\rightarrow-\):
+
+\[\neg A ,\neg B , (A \vee B) \vdash B\]
+
+Then from \(\neg -\):
+
+\[\neg A ,\neg B \vdash \neg (A \vee B) \]
+
+Using Tr:
+
+\[\neg A \wedge \neg B \vdash \neg (A \vee B) \]
+
+As a result:
+
+\[\neg (A \vee B) \vdash \dashv \neg A \wedge \neg B\]
+
+\hypertarget{t7}{%
+\subsection{3.7. T7}\label{t7}}
+
+\[\neg (A \wedge B) \vdash A \rightarrow \neg B\]
+
+And:
+
+\[ \neg A \vee \neg B \vdash \dashv \neg \neg A \rightarrow \neg B\]
+(T4)
+
+From 2neg, switch:
+
+\[ \neg A \vee \neg B \rightarrow \vdash \dashv A \rightarrow \neg B\]
+
+As a result (Tr):
+
+\[\neg (A \wedge B) \vdash \neg A \vee \neg B\]
+
+Another direction:
+
+We have proved that:
+
+\[ \neg A \vee \neg B \rightarrow \vdash \dashv A \rightarrow \neg B\]
+
+For (we have proved it many times):
+
+\[ A \rightarrow \neg B, A \vdash \neg B\]
+
+Using Tr, and:
+
+\[ \neg A \vee \neg B , (A \wedge B)\vdash \neg B \]
+
+From in, and:
+
+\[ \neg A \vee \neg B , (A \wedge B)\vdash B \]
+
+Using \(\neg-\):
+
+\[ \neg A \vee \neg B \vdash \neg (A \wedge B) \]
+
+Both 2 directions have been proved:
+
+\[\neg (A \wedge B) \vdash \dashv \neg A \vee \neg B\] (T7)
+
+\hypertarget{t8}{%
+\subsection{3.8. T8}\label{t8}}
+
+\[\neg A \vdash \neg A\] (in)
+
+From \(\rightarrow+\):
+
+\[\emptyset \vdash \neg A \rightarrow \neg A\]
+
+From T4:
+
+\[\neg A \rightarrow \neg A \vdash A \vee \neg A\]
+
+As a result:
+
+\[\emptyset \vdash A \vee \neg A\] (1,3,Tr)
+
+\end{document}
