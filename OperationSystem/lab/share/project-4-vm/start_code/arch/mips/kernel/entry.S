@@ -118,6 +118,104 @@ LEAF(set_CP0_COUNT)
     jr  ra
 END(set_CP0_COUNT)
 
+LEAF(set_SP)
+    move sp, v0
+    jr  ra
+    nop
+END(set_SP)
+
+//get_CP0_ENTRYHI
+LEAF(get_CP0_ENTRYHI)
+    mfc0 v0, CP0_ENTRYHI
+    nop
+    jr ra
+    nop
+END(get_CP0_ENTRYHI)
+
+//set_CP0_ENTRYHI
+LEAF(set_CP0_ENTRYHI)
+    mtc0 a0, CP0_ENTRYHI
+    nop
+    jr ra
+    nop
+END(set_CP0_ENTRYHI)
+
+//get_CP0_EntryHI
+LEAF(get_CP0_RANDOM)
+    mfc0 v0, CP0_RANDOM
+    nop
+    jr ra
+    nop
+END(get_CP0_RANDOM)
+
+// get_CP0_BADVADDR()
+LEAF(get_CP0_BADVADDR)
+    mfc0 v0, CP0_BADVADDR
+    nop
+    jr ra
+    nop
+END(get_CP0_BADVADDR)
+
+// get_CP0_INDEX()
+LEAF(get_CP0_INDEX)
+    mfc0 v0, CP0_INDEX
+    nop
+    jr ra
+    nop
+END(get_CP0_INDEX)
+
+// set_CP0_INDEX()
+LEAF(set_CP0_INDEX)
+    mtc0 a0, CP0_INDEX
+    nop
+    jr ra
+    nop
+END(set_CP0_INDEX)
+
+//get_CP0_EPC()
+LEAF(get_CP0_EPC)
+    mfc0 v0, CP0_EPC
+    nop
+    jr ra
+    nop
+END(get_CP0_EPC)
+
+//set_CP0_EPC()
+LEAF(set_CP0_EPC)
+    mtc0 a0, CP0_EPC
+    nop
+    jr ra
+    nop
+END(set_CP0_EPC)
+
+
+//do_tlbp()
+LEAF(do_tlbp)
+    tlbp
+    nop
+    jr ra
+    nop
+END(do_tlbp)
+
+//update_tlb()
+LEAF(update_tlb)
+    mtc0 a0, CP0_ENTRYHI
+    nop
+    mtc0 a1, CP0_ENTRYLO0
+    nop
+    mtc0 a2, CP0_ENTRYLO1
+    nop
+    mtc0 a3, CP0_INDEX
+    nop
+    li k1, 0
+    mtc0 k1,CP0_PAGEMASK
+    nop
+    tlbwi
+    jr ra
+    nop
+END(update_tlb)
+
+
 LEAF(interrupt_enable_init)
 #TODO: FIXIT
     mfc0    k0, CP0_STATUS
@@ -150,6 +248,15 @@ LEAF(reset_count_compare)
     nop
     jr  ra
 END(reset_count_compare)
+
+LEAF(switch_to_kstack)
+    lw k0, current_running
+    addi k0, KERNEL
+    lw $29, OFFSET_REG29(k0)
+    jr ra
+    nop
+END(switch_to_kstack)
+
 
 .macro SAVE_CONTEXT offset
     // TODO save context
@@ -377,6 +484,7 @@ exception_handler_begin:
     // DONE close interrupt
     INTERRUPT_DISABLE
     SAVE_CONTEXT(USER)
+#    jal switch_to_kstack
     // jmp exception_handler[i] which decided by CP0_CAUSE //TODO FIXIT
     mfc0 k0, CP0_CAUSE
     andi k0, 0x0000007C
@@ -395,15 +503,17 @@ NESTED(TLBexception_handler_entry, 0, sp)
 TLBexception_handler_begin:
 	//TLB exception entry
 	//jmp exception_handler[i] which decided by CP0_CAUSE
-
+    li k0, 0x80000180
+    j k0
+    nop
     //SAVE_CONTEXT(USER)
-    jal     tlb_info
-    nop
-    jal     do_TLB_Refill
-    nop
+    //jal     tlb_info
+    //nop
+    //jal     do_TLB_Refill
+    //nop
     //RESTORE_CONTEXT(USER)
 
-    eret
+    //eret
 TLBexception_handler_end:
 END(TLBexception_handler_entry)
 
@@ -426,6 +536,7 @@ NESTED(handle_int, 0, sp)
     RESET_CLOCK_INT
     #INTERRUPT_ENABLE_AND_ERET
     eret
+    nop
     #jr  ra
 END(handle_int)
 
@@ -444,6 +555,7 @@ NESTED(handle_syscall, 0, sp)
     #TODO
     INTERRUPT_ENABLE_AND_ERET
     eret
+    nop
 END(handle_syscall)
 
 NESTED(handle_tlb, 0, sp)
@@ -454,9 +566,10 @@ NESTED(handle_tlb, 0, sp)
     #or a1, v0, v0
     jal tlb_helper
     nop
-    SYSCALL_RESTORE_CONTEXT(USER)
+    RESTORE_CONTEXT(USER)
     INTERRUPT_ENABLE_AND_ERET
-    eret
+    #eret
+    nop
 END(handle_tlb)
 
 NESTED(handle_mod, 0, sp)
@@ -467,7 +580,7 @@ NESTED(handle_mod, 0, sp)
     #or a1, v0, v0
     jal mod_helper
     nop
-    SYSCALL_RESTORE_CONTEXT(USER)
+    RESTORE_CONTEXT(USER)
     INTERRUPT_ENABLE_AND_ERET
     eret
 END(handle_mod)
@@ -488,67 +601,8 @@ NESTED(fake_scene, 0, sp)
     GET_STATUS
     GET_EPC
     RESET_CLOCK_INT
+    #jal set_CP0_ENTRYHI_with_cpid
+    nop
     INTERRUPT_ENABLE_AND_ERET
 END(fake_scene)
 
-//get_CP0_ENTRYHI
-NESTED(get_CP0_ENTRYHI, 0, sp)
-    mfc0 v0, CP0_ENTRYHI
-    nop
-    jr ra
-END(get_CP0_ENTRYHI)
-
-//get_CP0_EntryHI
-NESTED(get_CP0_RANDOM, 0, sp)
-    mfc0 v0, CP0_RANDOM
-    nop
-    jr ra
-END(get_CP0_RANDOM)
-
-// get_CP0_BADVADDR()
-NESTED(get_CP0_BADVADDR, 0, sp)
-    mfc0 v0, CP0_BADVADDR
-    nop
-    jr ra
-END(get_CP0_BADVADDR)
-
-// get_CP0_INDEX()
-NESTED(get_CP0_INDEX, 0, sp)
-    mfc0 v0, CP0_INDEX
-    nop
-    jr ra
-END(get_CP0_INDEX)
-
-// set_CP0_INDEX()
-NESTED(set_CP0_INDEX, 0, sp)
-    mtc0 a0, CP0_INDEX
-    nop
-    jr ra
-END(set_CP0_INDEX)
-
-
-//do_tlbp()
-NESTED(do_tlbp, 0, sp)
-    tlbp
-    nop
-    jr ra
-    nop
-END(do_tlbp)
-
-//update_tlb()
-NESTED(update_tlb, 0, sp)
-    mtc0 a0, CP0_ENTRYHI
-    nop
-    mtc0 a1, CP0_ENTRYLO0
-    nop
-    mtc0 a2, CP0_ENTRYLO1
-    nop
-    mtc0 a3, CP0_INDEX
-    nop
-    li k1, 0
-    mtc0 k1,CP0_PAGEMASK
-    nop
-    tlbwi
-    jr ra
-    nop
-END(update_tlb)

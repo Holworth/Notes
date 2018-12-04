@@ -44,9 +44,15 @@ symbol-file main
 #b test_shell
 b deamon_vm
 #b handle_int
-b do_TLB_Refill
-b *0x80000000
-b mutex_lock_init
+#b do_TLB_Refill
+#b *0x80000000
+#b cmd_set
+#b cmd_dump
+#b *0xa080a59c
+#b fake_scene
+#b set_CP0_ENTRYHI_with_cpid
+b scheduler
+#b mutex_lock_init
 #b enable_interrupt
 c
 

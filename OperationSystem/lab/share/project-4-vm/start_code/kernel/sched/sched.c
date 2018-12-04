@@ -71,6 +71,7 @@ void prepare_proc(pcb_t* pcbp, struct task_info * task)
 
     pcbp->kernel_stack_top=alloc_stack();
     pcbp->user_stack_top=alloc_stack();
+    // pcbp->user_stack_top=0x70000000; //FIXIT
     pcbp->priority_level=pcbp->priority_level_set;
     pcbp->timeslice=pcbp->timeslice_set;
     pcbp->timeslice_left=pcbp->timeslice_set;
@@ -191,6 +192,7 @@ void scheduler(void)
         #endif
     }
     current_running->user_context.cp0_cause=0x0;
+    set_CP0_ENTRYHI_with_cpid();
     check(current_running->kernel_context.regs[31]);
     check(current_running->kernel_context.regs[29]);
     check(current_running->user_context.regs[31]);
@@ -578,3 +580,9 @@ int do_getpid()
 {
     return current_running->pid;
 }
+
+void set_CP0_ENTRYHI_with_cpid()
+{
+    set_CP0_ENTRYHI(current_running->pid&0xff);
+}
+

@@ -22,7 +22,6 @@ static void enable_interrupt()
     set_cp0_status(cp0_status);
 }
 
-
 // TLB related functions //-----------------------------------------
 
 void tlb_info()
@@ -30,73 +29,77 @@ void tlb_info()
 /// @return void
 {
     int ehi = get_CP0_ENTRYHI();
-    printk("VPN2: %x, ASID: %x\n", (ehi & 0xffffe000) >> 13, ehi & 0xff);
+    int baddr = get_CP0_BADVADDR();
+    printk("VPN2: %x, ASID: %x BADADDR:%x\n", (ehi & 0xffffe000) >> 13, ehi & 0xff, baddr);
     return;
 }
 
 void do_L2_swap(pte_L1 *pte_L1p)
 {
-    current_running->pte_L2_clock%4;
-
+    current_running->pte_L2_clock % 4;
 }
 
 void do_swap(int vaddr, pte_L2 *pte_L2p)
 {
     // TODO
     // Choose a page to write to disk.
-    int minfind=0;
+    int minfind = -1;
     {
         // pick the swap_cnt min one in l2 page table.
         // It is better to use a heap to imp it.
         // But I am lazy...
         int i;
-        int min=256;
-        for(i=0;i<256;i++)
+        int min = 256;
+        for (i = 0; i < 256; i++)
         {
-            if(pte_L2p[i].swap_cnt<min)
+            if (pte_L2p[i].inmem)
             {
-                min=pte_L2p[i].swap_cnt;
-                minfind=i;
+                if (pte_L2p[i].swap_cnt < min)
+                {
+                    min = pte_L2p[i].swap_cnt;
+                    minfind = i;
+                }
             }
         }
-        //then swap minfind 
+        //then swap minfind
     }
 
     // Set inmem to 0.
-    pte_L2p[minfind].inmem=0;
+    pte_L2p[minfind].inmem = 0;
 
     // Set inmem in tlb to 0. (if have)
     // set_tlb_valid_0(vaddr, current_running->pid);
     {
-        uint32_t ehi=vaddr>>13;
-        ehi=ehi<<13;
-        ehi|=(current_running->pid&0xff);
+        uint32_t ehi = vaddr >> 13;
+        ehi = ehi << 13;
+        ehi |= (current_running->pid & 0xff);
         do_tlbp();
-        uint32_t index=get_CP0_INDEX();
-        if(index>=64)//index[31]=1;
+        uint32_t index = get_CP0_INDEX();
+        if (index >= 64) //index[31]=1;
         {
             //do nothing
-        }else
+        }
+        else
         {
-            uint32_t elo0,elo1;
-            elo0=pte_L2p[minfind].raddr;
-            elo1=(int)pte_L2p[minfind].raddr+PAGE_SIZE;
-            elo0|=(2<<3)|(1<<2)|(0<<1)|(0);
-            elo1|=(2<<3)|(1<<2)|(0<<1)|(0);
-            update_tlb(ehi,elo0,elo1,index); //TODO
+            uint32_t elo0, elo1;
+            elo0 = ((int)pte_L2p[minfind].raddr) >> 6;
+            elo1 = ((int)pte_L2p[minfind].raddr + PAGE_SIZE) >> 6;
+            elo0 |= (2 << 3) | (1 << 2) | (0 << 1) | (0);
+            elo1 |= (2 << 3) | (1 << 2) | (0 << 1) | (0);
+            update_tlb(ehi, elo0, elo1, index); //
         }
     }
     // Add this page to write list, and get disk_addr. (use lock to protect)
-    current_running->swap_request.valid=1;
-    current_running->swap_request.size=16;
-    current_running->swap_request.mem_addr=pte_L2p[minfind].raddr;
-    if(pte_L2p[minfind].disk_addr!=0)
+    current_running->swap_request.valid = 1;
+    current_running->swap_request.size = 16;
+    current_running->swap_request.mem_addr = pte_L2p[minfind].raddr;
+    if (pte_L2p[minfind].disk_addr != 0)
     {
-        current_running->swap_request.disk_addr=pte_L2p[minfind].disk_addr;
+        current_running->swap_request.disk_addr = pte_L2p[minfind].disk_addr;
     }
     else
     {
-        current_running->swap_request.disk_addr=alloc_disk(16);
+        current_running->swap_request.disk_addr = alloc_disk(16);
     }
     // block and wait for another proc. (use wait signal)
     sys_semaphore_down(&swap_sleep_sem);
@@ -105,17 +108,19 @@ void do_swap(int vaddr, pte_L2 *pte_L2p)
 void do_TLB_Refill()
 {
     //TODO choose index
-    printk("TLB refill\n");
-    int vaddr=get_CP0_BADVADDR();
-    int ehi = get_CP0_ENTRYHI();
-    ehi=ehi<<13;
-    ehi=ehi>>13;
-    ehi|=(current_running->pid&0xff);
+    // printk("TLB refill\n");
+    int vaddr = get_CP0_BADVADDR();
+    int ehi = get_CP0_BADVADDR();
+    ehi = ehi >> 13;
+    ehi = ehi << 13;
+    ehi |= (current_running->pid & 0xff);
     do_tlbp();
     unsigned int tlb_index = get_CP0_INDEX();
     int l1_index = (vaddr & 0xffe00000) >> 21;
     int l2_index = (vaddr & 0x001fe000) >> 13;
-    if (tlb_index >=64 )//INDEX 31 = 1
+    // vt100_move_cursor(1,9);
+    // printk("l1_index:%d l2_index:%d tlb_index:%x\n", l1_index, l2_index, tlb_index);
+    if (tlb_index >= 64) //INDEX 31 = 1
     {
         //Now use FIFO
         tlb_index = (tlb_clock++) % 32; //It seems that the last 32 terms in tlb works differently on borad and on qemu.
@@ -190,12 +195,15 @@ void do_TLB_Refill()
         (l2[l2_index]).raddr = (void *)raddr;
         (l2[l2_index]).disk_addr = 0;
     }
-    uint32_t elo0,elo1;
-    elo0=l2[l2_index].raddr;
-    elo1=(int)l2[l2_index].raddr+PAGE_SIZE;
-    elo0|=(2<<3)|(1<<2)|(1<<1)|(0);
-    elo1|=(2<<3)|(1<<2)|(1<<1)|(0);
-    update_tlb(ehi,elo0,elo1,tlb_index); //TODO
+    uint32_t elo0, elo1;
+    elo0 = ((int)l2[l2_index].raddr) >> 6;
+    elo1 = ((int)l2[l2_index].raddr + PAGE_SIZE) >> 6;
+    elo0 |= (2 << 3) | (1 << 2) | (1 << 1) | (0);
+    elo1 |= (2 << 3) | (1 << 2) | (1 << 1) | (0);
+    vt100_move_cursor(1, 10);
+    printk("write_tlb: ehi:%x, elo0:%x, elo1:%x, index:%x\n", ehi, elo0, elo1, tlb_index);
+    update_tlb(ehi, elo0, elo1, tlb_index); //TODO
+    printk("update tlb finished\n");
     return;
 }
 
@@ -206,8 +214,8 @@ void mod_helper(void)
 
 void tlb_helper(void)
 {
-    printk("In tlb_helper.\n");
-    tlb_info();
+    // printk("\nIn tlb_helper.\n");
+    // tlb_info();
 
     do_TLB_Refill();
 }
@@ -215,11 +223,11 @@ void tlb_helper(void)
 // Page Alloc Operations //--------------------------------
 void *init_page_stack()
 {
-    int addr_now = MEM_BASE;
-    while (addr_now < MEM_UPPER_BOUND)
+    int addr_now = MEM_UPPER_BOUND;
+    while (addr_now > MEM_BASE)
     {
+        addr_now -= PAGE_SIZE << 1;
         free_page((void *)addr_now);
-        addr_now += PAGE_SIZE << 1;
     }
 }
 
@@ -250,9 +258,9 @@ void deamon_vm(void)
     while (1)
     {
         int h;
-        sys_move_cursor(1,14);
-        printf("Deamon vm running. (%d)",h++);
-        if (swap_sleep_sem.queue.head)//not empty
+        sys_move_cursor(1, 14);
+        printf("Deamon vm running. (%d)", h++);
+        if (swap_sleep_sem.queue.head) //not empty
         {
             //do swap
             swap_request_t *request = &((pcb_t *)swap_sleep_sem.queue.head)->swap_request; //todo
@@ -264,10 +272,10 @@ void deamon_vm(void)
             for (i = 0; i < request->size; i++)
             {
                 sdread(swap_buffer, request->disk_addr + 512 * i, 1);
-                sdwrite(request->disk_addr, 1, (int)request->mem_addr + 512 * i);
-                memcpy((void*)((int)request->mem_addr + 512 * i), (void*)swap_buffer, 512);
+                sdwrite((int)request->mem_addr + 512 * i, request->disk_addr, 1);
+                memcpy((void *)((int)request->mem_addr + 512 * i), (void *)swap_buffer, 512);
             }
-            request->valid=0;
+            request->valid = 0;
             sys_semaphore_up(&swap_sleep_sem);
         }
     }
@@ -277,16 +285,31 @@ void deamon_vm(void)
 
 int alloc_disk(int sectors)
 {
-    int tmp=disk_addr;
-    disk_addr+=sectors*512;
+    int tmp = disk_addr;
+    disk_addr += sectors * 512;
     return tmp;
 }
 
 void do_TLB_init()
 {
     int i;
-    for(i=0;i<32;i++)
+    for (i = 0; i < 32; i++)
     {
-        update_tlb(0xa0000000,0x00000000,0x00000000,i);
+        // update_tlb(0x00000001+2*i*0x1000,0x40000+2*i*0x1000+0x16,0x40000+2*i*0x1000+0x1000+0x16,i);
     }
+}
+
+// For Debug //-------------------------------
+void wrong_addr()
+{
+    int baddr = get_CP0_BADVADDR();
+    int epc = get_CP0_EPC();
+    vt100_move_cursor(1, 3);
+    printk("[WRONG ADDR]: BADADDR:%x\n", (baddr));
+    printk("[WRONG ADDR]: EPC:%x\n", (epc));
+    // current_running->user_context.cp0_epc+=4;
+    while (1)
+        ;
+    panic("WRONG ADDR");
+    return;
 }

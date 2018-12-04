@@ -67,6 +67,10 @@ void gethex(int *mem)
     int inline_position=0;
 
     disable_interrupt();
+    vt100_move_cursor(1,1);
+    printk("                                            ");
+    vt100_move_cursor(1,1);
+    printk("gethex:");
     while (1)
     {
         char ch = mread_uart_ch();
@@ -78,7 +82,7 @@ void gethex(int *mem)
             if (inline_position > 0)
             {
                 inline_position--;
-                screen_write_ch('\b');
+                printk("\b");
             }
         }
         else if (ch == 8) //on board
@@ -86,13 +90,13 @@ void gethex(int *mem)
             if (inline_position > 0)
             {
                 inline_position--;
-                screen_write_ch('\b');
+                printk("\b");
             }
         }
         else if (ch != 13) //
         {
             buffer[inline_position++]=ch;
-            screen_write_ch(ch);
+            printk("%c",ch);
         }
         else //ch==13
         {

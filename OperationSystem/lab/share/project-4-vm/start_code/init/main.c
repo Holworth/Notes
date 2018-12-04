@@ -93,11 +93,36 @@ uint32_t alloc_stack()
 //     return stack_base_now;
 // }
 
+static void init_global_space()
+{
+    uint32_t size=(*(uint32_t*)0xa08001fc);
+    size*=512;
+    printk("%x\n",size);
+    size+=0x80000000;
+    printk("%x\n",size);
+    uint32_t i=0x8000f000;
+    for(i=0x8000f000;i!=size;i+=4)
+    {
+        *(uint32_t *)i=0;
+        // printk("%x\n",i);
+    }
+    return;
+}
+
 static void init_memory()
 {
     init_page_stack();
     memcpy(0x80000000,TLBexception_handler_entry,(TLBexception_handler_end-TLBexception_handler_begin));
     do_TLB_init();
+    
+    {
+        //FIXIT
+        int i=0xa0f00000;
+        for(i=0xa0f00000;i<0xa1f00000;i+=4)
+        {
+            *(int*)i=i;
+        }
+    }
 
     //TODO: for test
     // TLB_set_global(0x00000000,0,0xa0f00000);
@@ -208,6 +233,8 @@ static void init_pcb()
 #define CAUSE_MOD 1
 #define CAUSE_TLBL 2
 #define CAUSE_TLBS 3
+#define CAUSE_ADEL 4
+#define CAUSE_ADES 5
 #define CAUSE_SYS 8
 
 static void init_exception_handler()
@@ -220,6 +247,9 @@ static void init_exception_handler()
     exception_handler[CAUSE_INT]=&handle_int;
     exception_handler[CAUSE_MOD]=&handle_mod;
     exception_handler[CAUSE_TLBL]=&handle_tlb;
+    exception_handler[CAUSE_TLBS]=&handle_tlb;
+    exception_handler[CAUSE_ADEL]=&wrong_addr;
+    exception_handler[CAUSE_ADES]=&wrong_addr;
     exception_handler[CAUSE_SYS]=&handle_syscall;
     memcpy(0x80000180,exception_handler_entry,(exception_handler_end-exception_handler_begin));
 }
@@ -304,6 +334,9 @@ void __attribute__((section(".entry_function"))) _start(void)
     // interrupt_disable();
     printk("> [INIT] asm_start() succeeded.\n");
     // printk("> [INIT] printk() working nornally.\n");
+
+    // init_global_space();
+    // printk("> [INIT] init_global_space() succeeded.\n");
 
     // init interrupt (^_^)
     init_exception();

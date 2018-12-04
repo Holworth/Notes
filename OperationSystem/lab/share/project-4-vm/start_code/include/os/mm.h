@@ -11,7 +11,7 @@
 int tlb_clock;
 
 // TLB related asm //---------------------------
-void update_tlb(int ehi, int elo0, int elo1, int index);
+void update_tlb(unsigned int ehi, unsigned int elo0, unsigned int elo1, unsigned int index);
 void do_TLB_init();
 void do_TLB_Refill();
 void do_page_fault();
@@ -98,4 +98,6 @@ char* swap_buffer[512];
 int disk_addr;
 int alloc_disk(int);
 
+// For Debug //-------------------------------
+void wrong_addr();
 #endif

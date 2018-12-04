@@ -81,6 +81,7 @@ extern void TLBexception_handler_end(void);
 extern void handle_int(void);
 extern void handle_mod(void);
 extern void handle_tlb(void);
+extern void wrong_addr(void);
 extern void handle_syscall(void);
 extern void handle_other(void);
 

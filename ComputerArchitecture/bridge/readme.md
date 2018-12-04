@@ -92,7 +92,8 @@ READ端的数据来源由仲裁逻辑决定.
 graph LR;
 idle--接收到类SRAM端口的读请求-->addr
 addr--完成地址握手-->data
-data--数据传输完成-->idle
+data--数据传输完成-->bend
+bend--B握手完成-->idle
 idle--没有请求-->idle
 
 ```

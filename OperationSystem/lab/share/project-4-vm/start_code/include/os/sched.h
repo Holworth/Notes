@@ -259,4 +259,6 @@ pid_t new_pid();
 
 void prepare_proc(pcb_t* pcbp, struct task_info * task);
 
+void set_CP0_ENTRYHI_with_cpid();
+
 #endif

@@ -95,9 +95,12 @@ static char read_uart_ch(void)
 struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
 struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
 struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, USER_PROCESS,1,1};
+struct task_info pressure_test_task = {"pressure_test1", (uint32_t)&pressure_test, USER_PROCESS,1,1};
+struct task_info pressure_test_task2 = {"pressure_test2", (uint32_t)&pressure_test2, USER_PROCESS,1,1};
+struct task_info mem_swap_test_task = {"mem_swap_test", (uint32_t)&mem_swap_test, USER_PROCESS,1,1};
 
-static struct task_info *test_tasks[16] = {&task1, &task2, &vm_deamon};
-static int num_test_tasks = 3;
+static struct task_info *test_tasks[16] = {&task1, &task2, &vm_deamon, &pressure_test_task,&pressure_test_task2, &mem_swap_test_task};
+static int num_test_tasks = 6;
 
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
@@ -383,6 +386,21 @@ inline void cmd_set()
     return;
 }
 
+inline void cmd_test()
+{
+    unsigned int i=0;
+    for(i=0xa0000000;i<0xa1f00000;i+=4)
+    {
+        if(*(int*)i==0x4321)
+        {
+            printf("%x\n",i);
+        }
+    }
+    return ;
+}
+
+
+
 inline void shell_interpret_cmd()
 {
     argc = 0;
@@ -483,6 +501,11 @@ inline void shell_interpret_cmd()
         cmd_set();
         return;
     }
+    if (!strcmp(argv[0], "test"))
+    {
+        cmd_test();
+        return;
+    }
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
@@ -502,6 +525,16 @@ inline void show_ascii(char ch)
     FLOAT_PRINT_START(SCREEN_WIDTH - 15, 1);
     printf("|ascii: %d|", ch);
     FLOAT_PRINT_END(SCREEN_WIDTH - 15, 1);
+    return;
+}
+
+inline void show_ehi()
+{
+
+    FLOAT_PRINT_START(SCREEN_WIDTH - 15, 14);
+    int t=get_CP0_ENTRYHI();
+    printf("|ehi: %x|", t);
+    FLOAT_PRINT_END(SCREEN_WIDTH - 15, 14);
     return;
 }
 
@@ -531,6 +564,7 @@ void test_shell()
     // start_deamon("vm_deamon");
     shell_newline();
 
+    // printf("%x\n",(int)TLBexception_handler_end-(int)TLBexception_handler_begin);
 
     while (1)
     {
@@ -540,6 +574,7 @@ void test_shell()
         enable_interrupt();
         if (!ch)
             continue;
+        show_ehi();
 
         // TODO solve command
         if(ch==65)//up arrow

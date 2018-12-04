@@ -21,8 +21,8 @@ main:
 	sll	$a2, 9
 
 #   or
-#   for small kernel:
-#	li  $a2, 0x000b0000
+#   for small kernel or self-set-global kernel:
+#	li  $a2, 0x0000f000
 
 #normal way
 

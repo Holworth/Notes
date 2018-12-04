@@ -8,9 +8,16 @@
 #define RW_TIMES 2
 
 int rand()
-{	
-	int current_time = get_timer();
+{
+	int current_time = time_elapsed;
 	return current_time % 100000;
+}
+
+static void enable_interrupt()
+{
+	uint32_t cp0_status = get_cp0_status();
+	cp0_status |= 0x01;
+	set_cp0_status(cp0_status);
 }
 
 /*static void disable_interrupt()
@@ -20,12 +27,6 @@ int rand()
     set_cp0_status(cp0_status);
 }
 
-static void enable_interrupt()
-{
-    uint32_t cp0_status = get_cp0_status();
-    cp0_status |= 0x01;
-    set_cp0_status(cp0_status);
-}
 
 static char read_uart_ch(void)
 {
@@ -41,35 +42,118 @@ static char read_uart_ch(void)
 }
 */
 
-
 void rw_task1(void)
 {
 	int mem1, mem2 = 0;
 	int curs = 0;
 	int memory[RW_TIMES];
 	int i = 0;
-	for(i = 0; i < RW_TIMES; i++)
+	int m;
+	for (i = 0; i < RW_TIMES; i++)
 	{
-		sys_move_cursor(1, curs+i);
+		sys_move_cursor(1, curs + i);
 		gethex(&mem1);
-		sys_move_cursor(1, curs+i);
+		// mem1=0;
+		sys_move_cursor(1, curs + i);
 		memory[i] = mem2 = rand();
 		*(int *)mem1 = mem2;
 		printk("Write: 0x%x, %d", mem1, mem2);
 	}
 	curs = RW_TIMES;
-	for(i = 0; i < RW_TIMES; i++)
+	for (i = 0; i < RW_TIMES; i++)
 	{
-		sys_move_cursor(1, curs+i);
+		sys_move_cursor(1, curs + i);
 		gethex(&mem1);
-		sys_move_cursor(1, curs+i);
-		memory[i+RW_TIMES] = *(int *)mem1;
-		if(memory[i+RW_TIMES] == memory[i])
-			printk("Read succeed: %d", memory[i+RW_TIMES]);
+		// mem1=0;
+		sys_move_cursor(1, curs + i);
+		memory[i + RW_TIMES] = *(int *)mem1;
+		if (memory[i + RW_TIMES] == memory[i])
+			printf("Read succeed: %d", memory[i + RW_TIMES]);
 		else
-			printk("Read error: %d", memory[i+RW_TIMES]);
+			printf("Read error: %d", memory[i + RW_TIMES]);
 	}
-	while(1);
+	// sys_exit();
+	m = get_cp0_status();
+	printf("0x%x\n", m);
+	// sys_exit();
+	// enable_interrupt();
+	while (1)
+		;
 	//Only input address.
 	//Achieving input r/w command is recommended but not required.
+}
+
+void pressure_test(void)
+{
+	uint32_t i = 0x0;
+	uint32_t j = 0x0;
+	int clk = 0;
+	for (i = 0; i < 0x70000000; i += 4)
+	{
+		(*(int *)i) = i;
+		sys_move_cursor(1, 1);
+		printf("Pressure_test1: now write 0x%x\n", i);
+		if (clk == 0)
+		{
+			clk = 1;
+		}
+		else
+		{
+			clk = 0;
+			sys_move_cursor(1, 2);
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			j += 4;
+		}
+	}
+	while(1);
+}
+
+void pressure_test2(void)
+{
+	uint32_t i = 0x0;
+	uint32_t j = 0x0;
+	int clk = 0;
+	for (i = 0; i < 0x70000000; i += 4)
+	{
+		(*(int *)i) = i;
+		sys_move_cursor(1, 3);
+		printf("Pressure_test2: now write 0x%x\n", i);
+		if (clk == 0)
+		{
+			clk = 1;
+		}
+		else
+		{
+			clk = 0;
+			sys_move_cursor(1, 4);
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			j += 4;
+		}
+	}
+	while(1);
+}
+
+void mem_swap_test(void)
+{
+	uint32_t i = 0x0;
+	uint32_t j = 0x0;
+	int clk = 0;
+	for (i = 0; i < 0x70000000; i += 0x1000)
+	{
+		(*(int *)i) = i;
+		sys_move_cursor(1, 5);
+		printf("Mem_swap_test: now write 0x%x\n", i);
+		if (clk == 0)
+		{
+			clk = 1;
+		}
+		else
+		{
+			clk = 0;
+			sys_move_cursor(1, 6);
+			printf("Mem_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			j += 0x1000;
+		}
+	}
+	while(1);
 }
