@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>readme.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/*
+
+School Book style from goldblog.com.ua (c) Zaripov Yura <yur4ik7@ukr.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 15px 0.5em 0.5em 30px;
+  font-size: 11px;
+  line-height:16px;
+}
+
+pre{
+  background:#f6f6ae url(./school-book.png);
+  border-top: solid 2px #d2e8b9;
+  border-bottom: solid 1px #d2e8b9;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color:#005599;
+  font-weight:bold;
+}
+
+.hljs,
+.hljs-subst {
+  color: #3e5915;
+}
+
+.hljs-string,
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-attribute,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-link {
+  color: #2c009f;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion,
+.hljs-meta {
+  color: #e60415;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-doctag,
+.hljs-title,
+.hljs-section,
+.hljs-type,
+.hljs-name,
+.hljs-selector-id,
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+</head>
+<body>
+<h1 id="sram-like-to-axi-bridge">Sram-like to Axi Bridge</h1>
+<!-- TOC -->
+<ul>
+<li><a href="#1-%E6%A8%A1%E5%9D%97%E7%BB%BC%E8%BF%B0">1. 模块综述</a></li>
+<li><a href="#2-%E5%AE%9E%E7%8E%B0%E8%AF%B4%E6%98%8E">2. 实现说明</a></li>
+<li><a href="#3-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82">3. 实现细节</a>
+<ul>
+<li><a href="#31-%E7%B1%BBsram%E7%AB%AF%E5%8F%A3%E7%9A%84inst%E7%AB%AF%E6%8E%A7%E5%88%B6">3.1. 类SRAM端口的INST端控制</a></li>
+<li><a href="#32-%E7%B1%BBsram%E7%AB%AF%E5%8F%A3%E7%9A%84data%E7%AB%AF%E6%8E%A7%E5%88%B6">3.2. 类SRAM端口的DATA端控制</a></li>
+<li><a href="#33-axi%E6%80%BB%E7%BA%BF%E7%9A%84read%E7%AB%AF%E6%8E%A7%E5%88%B6">3.3. AXI总线的READ端控制</a></li>
+<li><a href="#34-axi%E6%80%BB%E7%BA%BF%E7%9A%84write%E7%AB%AF%E6%8E%A7%E5%88%B6">3.4. AXI总线的WRITE端控制</a></li>
+<li><a href="#35-%E4%BB%B2%E8%A3%81%E9%80%BB%E8%BE%91">3.5. 仲裁逻辑</a>
+<ul>
+<li><a href="#351-%E4%BB%B2%E8%A3%81%E9%80%BB%E8%BE%91%E7%9A%84%E7%BB%84%E6%88%90">3.5.1. 仲裁逻辑的组成</a></li>
+<li><a href="#352-%E4%BB%B2%E8%A3%81%E4%BE%9D%E6%8D%AE">3.5.2. 仲裁依据</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#4-bug%E5%88%86%E6%9E%90">4. BUG分析</a></li>
+<li><a href="#5-%E5%AE%9E%E9%AA%8C%E6%97%A5%E7%A8%8B">5. 实验日程</a></li>
+<li><a href="#5-%E8%A1%A5%E5%85%85">5. 补充</a>
+<ul>
+<li><a href="#%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92">进一步开发计划</a></li>
+<li><a href="#%E6%94%AF%E6%8C%81%E9%AB%98%E6%95%88%E8%AF%BB%E5%8F%96%E7%9A%84%E6%A1%A5%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF">支持高效读取的桥的设计思路</a></li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+<h1 id="1-%E6%A8%A1%E5%9D%97%E7%BB%BC%E8%BF%B0">1. 模块综述</h1>
+<p><code>cpu_axi_interface</code>模块是一个实现保守的, 不支持多条读指令同时在AXI总线上执行的类sram-axi总线转接桥.</p>
+<h1 id="2-%E5%AE%9E%E7%8E%B0%E8%AF%B4%E6%98%8E">2. 实现说明</h1>
+<p>在总线实验第一阶段中, 实现了基本的转接桥设计. 为了确保在第一阶段中的设计正确, 在本次实验中采取了最为保守的设计. 对于数据写操作, 只要数据写操作到达即可执行. 对于两种数据读操作, 每次AXI总线只执行其中的一种, 并且在一条读操作完成之前不进行其他的操作.</p>
+<p>同样, 对于类sram接口数据端的读与写操作, 在本设计中严格按顺序执行, 在一条指令完成操作之前不会进行下一个读写操作.</p>
+<h1 id="3-%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82">3. 实现细节</h1>
+<p>在转接桥的内部实现了四个状态机, 当然, 状态机的控制高度耦合. 其中四个状态机分别对应:</p>
+<ul>
+<li>类SRAM端口的INST端控制</li>
+<li>类SRAM端口的DATA端控制</li>
+<li>AXI总线的READ端控制</li>
+<li>AXI总线的WRITE端控制</li>
+</ul>
+<p>各个状态机采用标准的三段式状态机写法.</p>
+<p>状态机的状态转移图如下:</p>
+<h2 id="31-%E7%B1%BBsram%E7%AB%AF%E5%8F%A3%E7%9A%84inst%E7%AB%AF%E6%8E%A7%E5%88%B6">3.1. 类SRAM端口的INST端控制</h2>
+<pre class="hljs"><code><div>graph LR;
+idle--地址发送完成,AXI总线正在处理此请求--&gt;busy
+busy--AXI总线返回这条请求的结果--&gt;idle
+idle--没有请求,有其他请求,当前请求未被AXI总线响应--&gt;idle
+</div></code></pre>
+<h2 id="32-%E7%B1%BBsram%E7%AB%AF%E5%8F%A3%E7%9A%84data%E7%AB%AF%E6%8E%A7%E5%88%B6">3.2. 类SRAM端口的DATA端控制</h2>
+<pre class="hljs"><code><div>graph LR;
+idle--地址发送完成,AXI总线正在处理此写请求--&gt;write_busy
+idle--地址发送完成,AXI总线正在处理此读请求--&gt;read_busy
+write_busy--AXI总线返回这条写请求的结果--&gt;idle
+read_busy--AXI总线返回这条写请求的结果--&gt;idle
+idle--没有请求,有其他请求,当前请求未被AXI总线响应--&gt;idle
+</div></code></pre>
+<h2 id="33-axi%E6%80%BB%E7%BA%BF%E7%9A%84read%E7%AB%AF%E6%8E%A7%E5%88%B6">3.3. AXI总线的READ端控制</h2>
+<p>下图中addr对应地址握手状态, data对应数据握手状态.</p>
+<pre class="hljs"><code><div>graph LR;
+idle--接收到类SRAM端口的读请求--&gt;addr
+addr--完成地址握手--&gt;data
+data--数据传输完成--&gt;idle
+idle--没有请求--&gt;idle
+</div></code></pre>
+<p>READ端的数据来源由仲裁逻辑决定.</p>
+<h2 id="34-axi%E6%80%BB%E7%BA%BF%E7%9A%84write%E7%AB%AF%E6%8E%A7%E5%88%B6">3.4. AXI总线的WRITE端控制</h2>
+<p>下图中addr对应地址握手状态, data对应数据握手状态, bend对应传输结束处理bxx信号状态.</p>
+<pre class="hljs"><code><div>graph LR;
+idle--接收到类SRAM端口的读请求--&gt;addr
+addr--完成地址握手--&gt;data
+data--数据传输完成--&gt;idle
+idle--没有请求--&gt;idle
+
+</div></code></pre>
+<h2 id="35-%E4%BB%B2%E8%A3%81%E9%80%BB%E8%BE%91">3.5. 仲裁逻辑</h2>
+<p>仲裁逻辑负责处理多个数据事务同时请求读端口的情况.</p>
+<p>在本设计中, 因为DATA端口的数据处理严格有序, 所以不涉及处理读写相关的情况.</p>
+<h3 id="351-%E4%BB%B2%E8%A3%81%E9%80%BB%E8%BE%91%E7%9A%84%E7%BB%84%E6%88%90">3.5.1. 仲裁逻辑的组成</h3>
+<p>仲裁逻辑主要依赖于<code>current_affair</code>寄存器. 其维护了当前AXI总线读端口上正在执行的传输的信息. 关键控制代码如下:</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">reg</span> [<span class="hljs-number">1</span>:<span class="hljs-number">0</span>]current_affair;
+
+<span class="hljs-meta">`<span class="hljs-meta-keyword">define</span> affair_none 2'b00</span>
+<span class="hljs-meta">`<span class="hljs-meta-keyword">define</span> affair_inst 2'b01</span>
+<span class="hljs-meta">`<span class="hljs-meta-keyword">define</span> affair_data 2'b10</span>
+
+<span class="hljs-comment">//judge</span>
+<span class="hljs-keyword">always</span>@(<span class="hljs-keyword">posedge</span> clk)<span class="hljs-keyword">begin</span>
+    <span class="hljs-keyword">if</span>(!resetn)<span class="hljs-keyword">begin</span>
+        current_affair&lt;=<span class="hljs-number">2'b0</span>;
+    <span class="hljs-keyword">end</span>
+    <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">begin</span>
+    <span class="hljs-keyword">if</span>(current_affair==<span class="hljs-meta">`affair_none)</span>
+    <span class="hljs-keyword">begin</span>
+        current_affair&lt;=
+        (data_req&amp;(!data_wr))?
+            <span class="hljs-meta">`affair_data:</span>
+            (inst_req)?
+                <span class="hljs-meta">`affair_inst:</span>
+                <span class="hljs-meta">`affair_none;</span>
+    <span class="hljs-keyword">end</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">begin</span>
+        current_affair&lt;=rvalid?<span class="hljs-meta">`affair_none:current_affair;</span>
+        <span class="hljs-comment">//在完成一次读传输之后清除仲裁寄存器中保存的值</span>
+    <span class="hljs-keyword">end</span>
+    <span class="hljs-keyword">end</span>
+<span class="hljs-keyword">end</span>
+</div></code></pre>
+<p>之后, 各状态机就可以根据自身状态和 current_affair 的值来给出控制信号.</p>
+<h3 id="352-%E4%BB%B2%E8%A3%81%E4%BE%9D%E6%8D%AE">3.5.2. 仲裁依据</h3>
+<p>由于CPU实现中, 如果指令读优先于数据读的话, 可能因为数据读等待而引起流水线阻塞. 此时先完成指令的取址是没有必要的. 因此选择将数据读的优先级提高, 在数据读和指令读同时发生时, 先完成数据读处理.</p>
+<!-- 附注: 在CPU实现中, 写数据指令和读数据指令都在访存(MEM)级向内存端口发出信息. -->
+<h1 id="4-bug%E5%88%86%E6%9E%90">4. BUG分析</h1>
+<p>简单的语法错误, 连线错误略去不谈(从写完大概花了30分钟就在tb上跑对了).</p>
+<p>在上板过程中暂时没有测试到使桥失效的种子.</p>
+<h1 id="5-%E5%AE%9E%E9%AA%8C%E6%97%A5%E7%A8%8B">5. 实验日程</h1>
+<ul>
+<li>2018.12.2 下午 总线相关知识学习.</li>
+<li>2018.12.3 15:20-17:00 框架设计.状态机设计,初步代码编写.</li>
+<li>2018.12.3 19:00-23:00 完成代码编写,仿真及测试,完成说明文件编写.</li>
+</ul>
+<h1 id="5-%E8%A1%A5%E5%85%85">5. 补充</h1>
+<p>(因为暂时没什么BUG好写的就多写点补充吧)</p>
+<h2 id="%E8%BF%9B%E4%B8%80%E6%AD%A5%E5%BC%80%E5%8F%91%E8%AE%A1%E5%88%92">进一步开发计划</h2>
+<p>如果在CPU上这个桥工作正常的话(不太可能): 考虑修改桥的设计, 使之支持同时处理两条读指令, 这样应该可以大幅提高CPU的访存速度.</p>
+<p>否则的话: 依照CPU的设计修改桥或者CPU.</p>
+<h2 id="%E6%94%AF%E6%8C%81%E9%AB%98%E6%95%88%E8%AF%BB%E5%8F%96%E7%9A%84%E6%A1%A5%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF">支持高效读取的桥的设计思路</h2>
+<p>如果要支持同时处理两条读指令的话, 控制AXI总线的状态机需要进行比较大幅度的修改.</p>
+<p>引入新结构 data_history 寄存器来保证读写操作的顺序正确. 在一个新的数据内存读写操作到达时, 将其信息加入历史寄存器. 因为数据内存读写相关只发生在两条指令之间, 因此历史寄存器只需要设置至多两项.</p>
+<!-- 
+```v
+`define hst_none 2'b00;
+`define hst_read 2'b01;
+`define hst_write 2'b10;
+reg [1:0]data_history[2];//init to 0
+reg hist_point;//init to 0
+always@(posedge clk)begin
+    case({data_req,data_wr})
+    2'b10://read
+    begin
+        if(data_history[hist_point]==hst_none)
+    end
+    2'b11://write
+    begin
+
+    end
+    default://no transfer
+    begin
+
+    end
+
+    endcase
+end
+``` -->
+<p>首先是要根据返回的结果的id来确定结果的类型, 并将结果返回回对应的sram端口. 比如说一条取址读的结果和访存读的结果需要借此来进行区分. 同时状态机的&quot;结束传输&quot;逻辑也要进行变动. 再其次, 对于连续的读写和写读同一个地址的指令, 应该在第一条传输操作完成之前禁止第二条传输操作的执行.</p>
+<p>我们来分析这样的操作对于CPU实际效率的影响. 支持两个读操作并行执行可以提高&quot;取址和读内存&quot;同时发生时的执行效率. 在实际情况中, 这样的事件是很常见的, 因此有很大的意义.</p>
+<p>但是对于连续的读写同一个内存地址的操作, 在之前的CPU实现中, 写数据指令和读数据指令都在访存(MEM)级向内存端口发出信息. 因此支持这种操作只对于&quot;阻塞在第四级等待返回的读内存指令和阻塞在第三级等待返回的写内存指令&quot;有效. 相比之前的改动来说对于性能的影响并不会特别大, 反而可能会引起很多较难调试的BUG;</p>
+<p>之后的实验中将尽可能先满足&quot;两个读操作并行&quot;, 数据读写同时进入AXI总线的设计优先级不高.</p>
+
+</body>
+</html>

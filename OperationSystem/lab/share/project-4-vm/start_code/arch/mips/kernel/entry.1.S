@@ -388,6 +388,85 @@ exception_handler_begin:
 exception_handler_end:
 END(exception_handler_entry)
 
+//void TLB_set_global(int vaddr, int index, int raddr);
+NESTED(TLB_set_global, 0, sp)
+    /// @param a0: vaddr
+    /// @param a1: TLB index
+    /// @param a2: addr1
+    /// @param a3: reserved(pid)
+    //li	k1,	(vaddr<<13)|(pid&0xff)
+    //li	k1,	(a0<<13)|(0&0xff)
+    li s3, 0xffffe000
+    and s0,a0,s3
+    andi s1,a3,0xff
+    or	 k1, s0, s1
+    mtc0	k1,	CP0_ENTRYHI # 设置虚拟页面
+    //li	k1,	(epfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //li	k1,	(a2<<6)|(2<<3)|(1<<2)|1<<1|1)
+    li s3, 0xffffffc0
+    and s0,a2,s3
+    li s1,0x17
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO0 #	 设置偶数物理页面
+    addiu   a2, 0x01000 # 计算另外一个物理页面的地址
+    //li	k1,	(opfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //li	k1,	(a3<<6)|(2<<3)|(1<<2)|1<<1|1)
+    li s3, 0xffffffc0
+    and s0,a2,s3
+    li s1,0x17
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO1 #	 设置奇数物理页面
+    li k1,0x0 #	 设置页面大小为 4KB
+    mtc0	k1,CP0_PAGEMASK
+    //li	k1,	index_of_some_entry #	 设置 TLB 表项的索引值
+    andi    k1, a1,0x3f
+    mtc0	k1,	CP0_INDEX
+    nop
+    tlbwi
+    jr ra
+    nop
+END(TLB_set_global)
+
+//void TLB_set_proc(int tlb_index, int vaddr, int raddr, int pid);
+NESTED(TLB_set_proc, 0, sp)
+    /// @param a0: tlb_index
+    /// @param a1: vaddr
+    /// @param a2: raddr
+    /// @param a3: pid
+    //li	k1,	(vaddr<<13)|(pid&0xff)
+    //li	k1,	(a0<<13)|(0&0xff)
+    li s3, 0xffffe000
+    and s0,a1,s3
+    andi s1,a3,0xff
+    or	 k1, s0, s1
+    mtc0	k1,	CP0_ENTRYHI # 设置虚拟页面
+    //li	k1,	(epfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //li	k1,	(a2<<6)|(2<<3)|(1<<2)|1<<1|1)
+    li s3, 0xffffffc0
+    and s0,a2,s3
+    li s1,0x16 //G=0
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO0 #	 设置偶数物理页面
+    addiu   a2, 0x01000 # 计算另外一个物理页面的地址
+    //li	k1,	(opfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //li	k1,	(a3<<6)|(2<<3)|(1<<2)|1<<1|1)
+    li s3, 0xffffffc0
+    and s0,a2,s3
+    li s1,0x16 //G=0
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO1 #	 设置奇数物理页面
+    li k1,0x0 #	 设置页面大小为 4KB
+    mtc0	k1,CP0_PAGEMASK
+    //li	k1,	index_of_some_entry #	 设置 TLB 表项的索引值
+    andi    k1, a0,0x3f
+    mtc0	k1,	CP0_INDEX
+    nop
+    tlbwi
+    jr ra
+    nop
+END(TLB_set_proc)
+
+
 .global TLBexception_handler_begin
 .global TLBexception_handler_end
 
@@ -512,43 +591,60 @@ NESTED(get_CP0_BADVADDR, 0, sp)
     jr ra
 END(get_CP0_BADVADDR)
 
-// get_CP0_INDEX()
-NESTED(get_CP0_INDEX, 0, sp)
-    mfc0 v0, CP0_INDEX
-    nop
-    jr ra
-END(get_CP0_INDEX)
-
-// set_CP0_INDEX()
-NESTED(set_CP0_INDEX, 0, sp)
-    mtc0 a0, CP0_INDEX
-    nop
-    jr ra
-END(set_CP0_INDEX)
-
 
 //do_tlbp()
 NESTED(do_tlbp, 0, sp)
+    mfc0 k0, CP0_BADVADDR
+    nop
+    li k1, 0xffffff00
+    and k0, k0, k1
+    li k1, 0xff
+    and a0, a0, k1
+    or k0,a0,k0
+    mtc0 k0, CP0_ENTRYHI
     tlbp
+    nop
+    mfc0 v0, CP0_INDEX
     nop
     jr ra
     nop
 END(do_tlbp)
 
-//update_tlb()
-NESTED(update_tlb, 0, sp)
-    mtc0 a0, CP0_ENTRYHI
+//set_tlb_valid_0()
+NESTED(set_tlb_valid_0, 0, sp)
+/// @param a0 vaddr
+/// @param a1 pid
+    li k1, 0xffffff00
+    and k0, k1, a0
+    li k1, 0xff
+    and a1, a1, k1
+    or k0,k0,k1
+    mtc0 k0, CP0_ENTRYHI
+    tlbp
     nop
-    mtc0 a1, CP0_ENTRYLO0
+    mfc0 k0, CP0_INDEX
+    blez k0, set_tlb_valid_0_end
     nop
-    mtc0 a2, CP0_ENTRYLO1
-    nop
-    mtc0 a3, CP0_INDEX
-    nop
-    li k1, 0
-    mtc0 k1,CP0_PAGEMASK
+
+    li s3, 0xffffffc0
+    and s0,a0,s3
+    li s1,0x14 //G=0, Valid=0
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO0 #	 设置偶数物理页面
+    addiu   a0, 0x01000 # 计算另外一个物理页面的地址
+    //li	k1,	(opfn<<6)|(coherency<<3)|(Dirty<<2)|Valid<<1|Global)
+    //li	k1,	(a3<<6)|(2<<3)|(1<<2)|1<<1|1)
+    li s3, 0xffffffc0
+    and s0,a0,s3
+    li s1,0x16 //G=0, Valid=0
+    or k1, s0, s1
+    mtc0	k1,	CP0_ENTRYLO1 #	 设置奇数物理页面
+    li k1,0x0 #	 设置页面大小为 4KB
+    mtc0	k1,CP0_PAGEMASK
     nop
     tlbwi
+
+set_tlb_valid_0_end:
     jr ra
     nop
-END(update_tlb)
+END(set_tlb_valid_0)

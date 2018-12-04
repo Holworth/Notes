@@ -46,7 +46,7 @@ mailbox_t *mbox_open(char *name)
     mboxs[find_empty].valid=1;
     mboxs[find_empty].size=MAILBOX_SIZE;
     mboxs[find_empty].size_used=0;
-    strcpy(&mboxs[find_empty].name, name);
+    strcpy((char*)&mboxs[find_empty].name, (char*)name);
     do_condition_init(&mboxs[find_empty].not_full);
     do_condition_init(&mboxs[find_empty].not_empty);
     // printk("Created mbox %s\n",name);

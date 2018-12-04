@@ -6,6 +6,7 @@
 #include "screen.h"
 #include "lock.h"
 #include "test.h"
+#include "mm.h"
 
 // #define PRIORITY_SCH
 
@@ -115,6 +116,7 @@ void scheduler(void)
     check(current_running->status==TASK_RUNNING);
     check(current_running->kernel_context.cp0_epc);
     check(current_running->user_context.cp0_epc);
+    check(current_running->user_context.cp0_status);
     if(current_running->status==TASK_RUNNING)
     {
         current_running->status=TASK_READY;
@@ -420,12 +422,56 @@ int panic(char* error_name)
     other_check(current_running->user_context.cp0_epc);
     other_check(current_running->user_context.cp0_status);
     other_check(current_running->user_context.cp0_cause);
+    other_check(current_running->user_context.cp0_badvaddr);
     error_ps();
-    // other_check(current_running->block_time);
-    // other_check(current_running->run_cnt);
-    // other_check(current_running->reserved);
-    // other_check(current_running->sys_int_cnt);
-    // other_check(current_running->time_int_cnt);
+    printk("ze:%x at:%x v0:%x v1:%x\n",
+        current_running->kernel_context.regs[0],
+        current_running->kernel_context.regs[1],
+        current_running->kernel_context.regs[2],
+        current_running->kernel_context.regs[3]
+        );
+    printk("a0:%x a1:%x a2:%x a3:%x\n",
+        current_running->kernel_context.regs[4],
+        current_running->kernel_context.regs[5],
+        current_running->kernel_context.regs[6],
+        current_running->kernel_context.regs[7]
+        );
+    printk("t0:%x t1:%x t2:%x t3:%x\n",
+        current_running->kernel_context.regs[8],
+        current_running->kernel_context.regs[9],
+        current_running->kernel_context.regs[10],
+        current_running->kernel_context.regs[11]
+        );
+    printk("t4:%x t5:%x t6:%x t7:%x\n",
+        current_running->kernel_context.regs[12],
+        current_running->kernel_context.regs[13],
+        current_running->kernel_context.regs[14],
+        current_running->kernel_context.regs[15]
+        );
+    printk("s0:%x s1:%x s2:%x s3:%x\n",
+        current_running->kernel_context.regs[16],
+        current_running->kernel_context.regs[17],
+        current_running->kernel_context.regs[18],
+        current_running->kernel_context.regs[19]
+        );
+    printk("s4:%x s5:%x s6:%x s7:%x\n",
+        current_running->kernel_context.regs[20],
+        current_running->kernel_context.regs[21],
+        current_running->kernel_context.regs[22],
+        current_running->kernel_context.regs[23]
+        );
+    printk("t8:%x t9:%x k0:%x k1:%x\n",
+        current_running->kernel_context.regs[24],
+        current_running->kernel_context.regs[25],
+        current_running->kernel_context.regs[26],
+        current_running->kernel_context.regs[27]
+        );
+    printk("gp:%x sp:%x fp:%x ra:%x\n",
+        current_running->kernel_context.regs[28],
+        current_running->kernel_context.regs[29],
+        current_running->kernel_context.regs[30],
+        current_running->kernel_context.regs[31]
+        );
     while(1);
     return;
 }
@@ -433,6 +479,15 @@ int panic(char* error_name)
 
 void other_helper()
 {
+    tlb_info();
+    // other_check(current_running->pid);
+    // other_check(current_running->status);
+    // other_check(current_running->kernel_context.cp0_epc);
+    // other_check(current_running->kernel_context.cp0_status);
+    // other_check(current_running->user_context.cp0_epc);
+    // other_check(current_running->user_context.cp0_status);
+    // other_check(current_running->user_context.cp0_cause);
+    // error_ps();
     panic("OTHER_HELPER");
 }
 

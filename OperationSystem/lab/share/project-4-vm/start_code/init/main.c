@@ -52,6 +52,7 @@
 #include "common.h"
 #include "syscall.h"
 #include "sync.h"
+#include "mm.h"
 
 #define PORT 0xbfe48000
 #define bios_printstr 0x8007b980
@@ -94,6 +95,14 @@ uint32_t alloc_stack()
 
 static void init_memory()
 {
+    init_page_stack();
+    memcpy(0x80000000,TLBexception_handler_entry,(TLBexception_handler_end-TLBexception_handler_begin));
+    do_TLB_init();
+
+    //TODO: for test
+    // TLB_set_global(0x00000000,0,0xa0f00000);
+    // TLB_set_global(0x00020000,1,0xa0f00000);
+
 	// init_page_table(); 
 	//In task1&2, page table is initialized completely with address mapping, but only virtual pages in task3.
 	// init_TLB();		//only used in P4 task1
@@ -169,6 +178,15 @@ static void init_pcb()
         prepare_proc(&pcb[i],tasks_used[i]);
     }
 
+    //pcb for vmem
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        //TODO : may have problem
+        pcb[i].pte_L1p=(void*)&PTE_L1[i];
+        pcb[i].pte_L2p=(void*)&PTE_L2[i];
+        // remark: this projection will not change when process switches and proc exits;
+    }
+
     //init empty_pcb_for_init
     current_running=&empty_pcb_for_init;
     current_running->pid=0;
@@ -186,6 +204,12 @@ static void init_pcb()
     pcb_idle.first_run=1;
 }
 
+#define CAUSE_INT 0
+#define CAUSE_MOD 1
+#define CAUSE_TLBL 2
+#define CAUSE_TLBS 3
+#define CAUSE_SYS 8
+
 static void init_exception_handler()
 {
     int i=0;
@@ -193,8 +217,10 @@ static void init_exception_handler()
     {
     exception_handler[i]=&handle_other;
     }
-    exception_handler[0]=&handle_int;
-    exception_handler[8]=&handle_syscall;
+    exception_handler[CAUSE_INT]=&handle_int;
+    exception_handler[CAUSE_MOD]=&handle_mod;
+    exception_handler[CAUSE_TLBL]=&handle_tlb;
+    exception_handler[CAUSE_SYS]=&handle_syscall;
     memcpy(0x80000180,exception_handler_entry,(exception_handler_end-exception_handler_begin));
 }
 
@@ -286,7 +312,7 @@ void __attribute__((section(".entry_function"))) _start(void)
 	// init virtual memory
 	init_memory();
 	printk("> [INIT] Virtual memory initialization succeeded.\n");
-    
+
     // init system call table (0_0)
     init_syscall();
     printk("> [INIT] System call initialized successfully.\n");

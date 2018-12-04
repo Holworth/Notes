@@ -39,10 +39,15 @@ symbol-file main
 #b sleep_task
 #b *0x80000180
 #b scheduler
-b *0x80000200
+#b *0xa0800200
+#b TLB_set_global
+#b test_shell
+b deamon_vm
+#b handle_int
+b do_TLB_Refill
 b *0x80000000
-b *0x8007b1cc
-
+b mutex_lock_init
+#b enable_interrupt
 c
 
 # 附注

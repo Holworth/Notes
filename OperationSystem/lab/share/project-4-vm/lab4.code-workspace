@@ -4,5 +4,9 @@
 			"path": "start_code"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"sync.h": "c"
+		}
+	}
 }

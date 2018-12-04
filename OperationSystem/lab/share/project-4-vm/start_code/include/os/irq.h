@@ -74,7 +74,13 @@ extern void exception_handler_entry(void);
 extern void exception_handler_begin(void);
 extern void exception_handler_end(void);
 
+extern void TLBexception_handler_entry(void);
+extern void TLBexception_handler_begin(void);
+extern void TLBexception_handler_end(void);
+
 extern void handle_int(void);
+extern void handle_mod(void);
+extern void handle_tlb(void);
 extern void handle_syscall(void);
 extern void handle_other(void);
 

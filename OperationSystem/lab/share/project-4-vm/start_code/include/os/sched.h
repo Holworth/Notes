@@ -33,6 +33,7 @@
 #include "queue.h"
 #include "vector.h"
 #include "stack.h"
+#include "mm.h"
 
 #define NUM_MAX_TASK 16
 #define ASM_USER 156
@@ -166,6 +167,22 @@ typedef struct pcb
 
     /* Process Name */
     char* name;
+
+    // Virtual Memory Part //
+
+    /* pte_L1p */
+    pte_L1* pte_L1p;
+
+    /* pte_L2p */
+    pte_L2 (* pte_L2p)[256];
+
+    /* pte_L2 used */
+    int pte_L2_count;
+    // char pte_L2_used[4];
+    int pte_L2_clock;
+
+    /* info used to do swap */
+    swap_request_t swap_request;
 } pcb_t;
 
 /* task information, used to init PCB */
@@ -226,16 +243,6 @@ int do_wait(pid_t pid);
 int do_ps();
 int do_getpid();
 
-// TODO
-// void do_semaphore_init();
-// void do_semaphore_up();
-// void do_semaphore_down();
-// void do_condition_init();
-// void do_condition_wait();
-// void do_condition_signal();
-// void do_condition_broadcast();
-// void do_barrier_init();
-// void do_barrier_wait();
 #include "sync.h"
 
 extern void other_helper();

@@ -12,7 +12,7 @@ char buffer[BUF_SIZE];
 
 void write_bootblock(FILE *image, FILE *bbfile, Elf32_Phdr *Phdr);
 Elf32_Phdr *read_exec_file(FILE *opfile);
-uint8_t count_kernel_sectors(Elf32_Phdr *Phdr);
+uint32_t count_kernel_sectors(Elf32_Phdr *Phdr);
 void extent_opt(Elf32_Phdr *Phdr_bb, Elf32_Phdr *Phdr_k, int kernelsz);
 
 //使用的文件读写函数原型
@@ -35,10 +35,10 @@ Elf32_Phdr *read_exec_file(FILE *opfile)
     //警告: 会产生未释放的内存空间, 需要在外面自行释放
 }
 
-uint8_t count_kernel_sectors(Elf32_Phdr *Phdr)
+uint32_t count_kernel_sectors(Elf32_Phdr *Phdr)
 {
     printf("count_kernel_sectors() get Phdr->p_memsz %d\nmake", Phdr->p_memsz);
-    return (uint8_t)((Phdr->p_memsz + SECTOR_SIZE - 1) / SECTOR_SIZE);
+    return (uint32_t)((Phdr->p_memsz + SECTOR_SIZE - 1) / SECTOR_SIZE);
 }
 
 void write_bootblock(FILE *image, FILE *file, Elf32_Phdr *phdr)
@@ -73,10 +73,10 @@ void write_kernel(FILE *image, FILE *knfile, Elf32_Phdr *Phdr, int kernelsz)
     puts("Kernel write finished.");
 }
 
-void record_kernel_sectors(FILE *image, uint8_t kernelsz)
+void record_kernel_sectors(FILE *image, uint32_t kernelsz)
 {
-    fseek(image, SECTOR_SIZE - 1, SEEK_SET);
-    fwrite(&kernelsz, 1, 1, image);
+    fseek(image, SECTOR_SIZE - 4, SEEK_SET);
+    fwrite(&kernelsz, 4, 1, image);
     puts("Kernel size recorded.");
 }
 
@@ -107,7 +107,7 @@ int main(int argc, char* argv[], char* env[])
     Elf32_Phdr *segment_head_kernel = read_exec_file(kernel_file);
 
     //计算kernel占用的sector数
-    uint8_t kernel_sectors = count_kernel_sectors(segment_head_kernel);
+    uint32_t kernel_sectors = count_kernel_sectors(segment_head_kernel);
 
     //写镜像
     write_bootblock(image_file, bootblock_file, segment_head_bootblock);

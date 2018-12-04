@@ -12,7 +12,7 @@ static char plane4[] = {"|  o'o             "};
 
 void lab4_drawing_task1(void)
 {
-    int i = 22, j = 10;
+    int i = 22, j = 9;
 
     while (1)
     {
@@ -20,28 +20,28 @@ void lab4_drawing_task1(void)
         {
             /* move */
             sys_move_cursor(i, j + 0);
-            printk("%s", plane1);
+            printf("%s", plane1);
 
             sys_move_cursor(i, j + 1);
-            printk("%s", plane2);
+            printf("%s", plane2);
 
             sys_move_cursor(i, j + 2);
-            printk("%s", plane3);
+            printf("%s", plane3);
 
             sys_move_cursor(i, j + 3);
-            printk("%s", plane4);
+            printf("%s", plane4);
         }
 
         sys_move_cursor(1, j + 0);
-        printk("%s", blank);
+        printf("%s", blank);
 
         sys_move_cursor(1, j + 1);
-        printk("%s", blank);
+        printf("%s", blank);
 
         sys_move_cursor(1, j + 2);
-        printk("%s", blank);
+        printf("%s", blank);
 
         sys_move_cursor(1, j + 3);
-        printk("%s", blank);
+        printf("%s", blank);
     }
 }

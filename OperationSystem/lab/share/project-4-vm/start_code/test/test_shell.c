@@ -94,8 +94,10 @@ static char read_uart_ch(void)
 
 struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
 struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
-static struct task_info *test_tasks[16] = {&task1, &task2};
-static int num_test_tasks = 2;
+struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, USER_PROCESS,1,1};
+
+static struct task_info *test_tasks[16] = {&task1, &task2, &vm_deamon};
+static int num_test_tasks = 3;
 
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
@@ -206,7 +208,7 @@ inline void add_to_history()
 inline void get_history()
 {
     shell_clear_input();
-    shell_fake_input(&shell_history[shell_history_now]);
+    shell_fake_input((char*)&shell_history[shell_history_now]);
     shell_history_now=loop_sub(shell_history_now);
 }
 
@@ -503,17 +505,32 @@ inline void show_ascii(char ch)
     return;
 }
 
+void start_deamon(char* name)
+{
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if((test_tasks[i])&&(!strcmp(test_tasks[i]->name,name)))
+        {
+            sys_spawn(test_tasks[i]);
+            return;
+        }
+    }
+    printf("[DEAMON] %s failed to start.\n");
+}
+
 // Shell itself
 void test_shell()
 {
-    // while(1);
     disable_interrupt();
     // init_other_tasks(num_task5_tasks,task5_tasks);
     enable_interrupt();
     cmd_clear();
     shell_drawline();
     sys_move_cursor(1, SHELL_LINE_POSITION + 1);
+    // start_deamon("vm_deamon");
     shell_newline();
+
 
     while (1)
     {

@@ -66,11 +66,10 @@ void gethex(int *mem)
     char buffer[100];
     int inline_position=0;
 
+    disable_interrupt();
     while (1)
     {
-        disable_interrupt();
         char ch = mread_uart_ch();
-        enable_interrupt();
         if (!ch)
             continue;
 
@@ -103,5 +102,6 @@ void gethex(int *mem)
     }
 
     *mem=htoi(buffer);
+    enable_interrupt();
     return;
 }
