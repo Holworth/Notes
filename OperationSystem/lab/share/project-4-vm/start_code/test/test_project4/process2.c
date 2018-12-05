@@ -78,7 +78,10 @@ void rw_task1(void)
 	// sys_exit();
 	// enable_interrupt();
 	while (1)
-		;
+	{
+		sys_move_cursor(1, 13);
+		printf("Process2: Test fin.\n");
+	}
 	//Only input address.
 	//Achieving input r/w command is recommended but not required.
 }
@@ -90,9 +93,9 @@ void pressure_test(void)
 	int clk = 0;
 	for (i = 0; i < 0x70000000; i += 4)
 	{
-		(*(int *)i) = i;
+		(*(int *)i) = i+1;
 		sys_move_cursor(1, 1);
-		printf("Pressure_test1: now write 0x%x\n", i);
+		printf("Pressure_test1: now write 0x%x\n", i+1);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -101,7 +104,8 @@ void pressure_test(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 2);
-			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+1);
+			if(((*(int *)(j)))!=((j)+1)){while(1);}
 			j += 4;
 		}
 	}
@@ -115,9 +119,9 @@ void pressure_test2(void)
 	int clk = 0;
 	for (i = 0; i < 0x70000000; i += 4)
 	{
-		(*(int *)i) = i;
+		(*(int *)i) = i+2;
 		sys_move_cursor(1, 3);
-		printf("Pressure_test2: now write 0x%x\n", i);
+		printf("Pressure_test2: now write 0x%x\n", i+2);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -126,7 +130,8 @@ void pressure_test2(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 4);
-			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+2);
+			if(((*(int *)(j)))!=((j)+2)){while(1);}
 			j += 4;
 		}
 	}
@@ -140,9 +145,9 @@ void mem_swap_test(void)
 	int clk = 0;
 	for (i = 0; i < 0x70000000; i += 0x1000)
 	{
-		(*(int *)i) = i;
+		(*(int *)i) = i+3;
 		sys_move_cursor(1, 5);
-		printf("Mem_swap_test: now write 0x%x\n", i);
+		printf("Mem_swap_test: now write 0x%x\n", i+3);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -151,7 +156,8 @@ void mem_swap_test(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 6);
-			printf("Mem_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j));
+			printf("Mem_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+3);
+			if(((*(int *)(j)))!=((j)+3)){while(1);}
 			j += 0x1000;
 		}
 	}

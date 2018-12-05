@@ -1,3 +1,24 @@
+// ----------------------------------------------------------------
+//                   Lagenaria Siceraria OS
+//                            mm.h
+// ----------------------------------------------------------------
+//              Copyright (C) 2018 Wang Huaqiang 
+//             email : wanghuaqiang16@mails.ucas.ac.cn
+// ----------------------------------------------------------------
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------
+
 #ifndef INCLUDE_MM_H_
 #define INCLUDE_MM_H_
 
@@ -30,24 +51,25 @@ void tlb_helper(void);
 //pte_L2: 2^8 * 16Byte -> 4KB
 typedef struct page_table_entry_L2
 {
-    char setuped;
-    char inmem;
-    char valid;
-    char swap_cnt;//4
-    void* raddr;//8
-    int disk_addr;//12
-    int reserved;//for align 16
+    char setuped;       //vaddr-raddr project has already been setuped
+    char inmem;         //this l2's page(s) is in memory, "valid" in tlb
+    char valid;         //reserved
+    char swap_cnt;      //4: count how many times this page has been swaped
+    void* raddr;        //8: this page(s)' addr in physic memory
+    int disk_addr;      //12: this page(s)' addr in disk. 0 if it has not been swaped out.
+    int reserved;       //16: for align 16, now is used as R in clock algorithm.
+    //for each tlb miss, reserved (i.e. R) ++
 }pte_L2;
 
 //pte_L1 always in memory
 typedef struct page_table_entry_L1
 {
-    char setuped;
-    char inmem;//ie: pte_L2 valid, pte_L2 is in memory
-    char resv1;
-    char resv2;
-    pte_L2* addr;
-    int disk_addr;
+    char setuped;       //L2 page table has already been setuped
+    char inmem;         //pte_L2 is in memory, ie: pte_L2 valid
+    char swap_cnt;      //L2 page table swap cnt
+    char resv2;         //reserved for align
+    pte_L2* addr;       //L2 page table's addr in disk.
+    int disk_addr;      //L2 page table's addr in physic memory
 }pte_L1;
 
 // 16 L1 pte array is always in memory
@@ -91,11 +113,13 @@ typedef struct swap_request_struct
 }swap_request_t;
 
 char* swap_buffer[512];
+char* L2_pt_swap_buffer[512];
 
 // Disk Regulation //-------------------------------
 
 #define SWAP_BASE 0x000f0000
 int disk_addr;
+// int disk_addr=SWAP_BASE;
 int alloc_disk(int);
 
 // For Debug //-------------------------------

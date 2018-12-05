@@ -34,9 +34,74 @@ void tlb_info()
     return;
 }
 
-void do_L2_swap(pte_L1 *pte_L1p)
+uint32_t do_L2_swap(pte_L1 *pte_L1p)
+//return empty/swap_in addr for new L2 page table 
 {
-    current_running->pte_L2_clock % 4;
+    vt100_move_cursor(1,7);
+    printk("do_L2_swap\n");
+    // int L2_pick = current_running->pte_L2_clock % 4;
+
+    //find a L1 term, its L2 is in mem;
+    //use Least Switched Fst
+
+    int L2_to_swap_out=-1;
+    int min_swap_find=1000;
+    int l;
+    for(l=0;l<2048;l++)
+    {
+        if(current_running->pte_L1p[l].inmem)
+        {
+            int swap_cnt=current_running->pte_L1p[l].swap_cnt;
+            if(swap_cnt<min_swap_find)
+            {
+                min_swap_find=swap_cnt;
+                L2_to_swap_out=l;
+            }
+        }
+    }
+
+    //check
+    if(l==-1)panic("L2_to_swap_out==-1");
+    
+    //alloc disk
+    uint32_t disk_addr;
+    if(current_running->pte_L1p[min_swap_find].disk_addr==0)
+    {
+        disk_addr=alloc_disk(8);
+        current_running->pte_L1p[min_swap_find].disk_addr=disk_addr;
+    }else
+    {
+        disk_addr=current_running->pte_L1p[min_swap_find].disk_addr=disk_addr;
+    }
+    //write 
+
+    //8*512=4K
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        // sdread(L2_pt_swap_buffer, disk_addr + 512 * i, 1);
+        sdwrite(((int)current_running->pte_L1p[min_swap_find].addr + 512 * i), disk_addr + 512 * i, 1);
+        // memcpy((void *)(&(current_running->pte_L2p[L2_pick])), (void *)L2_pt_swap_buffer, 512);
+    }
+    current_running->pte_L1p[min_swap_find].inmem=0;
+    current_running->pte_L1p[min_swap_find].swap_cnt++;
+
+    //swap new L2 in
+    if(pte_L1p==0)
+    {
+        return (uint32_t)(current_running->pte_L1p[min_swap_find].addr);
+    }else
+    {
+        int k;
+        for (k = 0; k < 8; k++)
+        {
+            sdread((int)(&(current_running->pte_L1p[min_swap_find].addr)), pte_L1p->disk_addr + 512 * i, 1);
+            // sdwrite((int)current_running->pte_L1p[min_swap_find] + 512 * i, disk_addr + 512 * i, 1);
+            // memcpy((void *)(&(current_running->pte_L2p[L2_pick])), (void *)L2_pt_swap_buffer, 512);
+        }
+        pte_L1p->inmem=1;
+        return (uint32_t)current_running->pte_L1p[min_swap_find].addr;
+    }
 }
 
 void do_swap(int vaddr, pte_L2 *pte_L2p)
@@ -64,6 +129,12 @@ void do_swap(int vaddr, pte_L2 *pte_L2p)
         //then swap minfind
     }
 
+    if(minfind==-1)
+    {
+        //no page of this L2 is in mem
+        panic("Need alloc other proc's mem.");
+    }
+
     // Set inmem to 0.
     pte_L2p[minfind].inmem = 0;
 
@@ -89,7 +160,7 @@ void do_swap(int vaddr, pte_L2 *pte_L2p)
             update_tlb(ehi, elo0, elo1, index); //
         }
     }
-    // Add this page to write list, and get disk_addr. (use lock to protect)
+    // Add this page to write list, and get disk_addr.
     current_running->swap_request.valid = 1;
     current_running->swap_request.size = 16;
     current_running->swap_request.mem_addr = pte_L2p[minfind].raddr;
@@ -130,11 +201,12 @@ void do_TLB_Refill()
     if (!current_running->pte_L1p[l1_index].setuped)
     //l2 page table has not been setuped.
     {
+        pte_L2* L2_addr=0;
         if (!(current_running->pte_L2_count < MAX_L2_PER_PROC))
         // L2 page table switch
         {
-            do_L2_swap(0);
-            panic("L2 page table need switch (not setuped)");
+            L2_addr=(pte_L2*)do_L2_swap(0);
+            // panic("L2 page table need switch (not setuped)");
             //TODO
         }
 
@@ -143,18 +215,24 @@ void do_TLB_Refill()
             int L2_inmem_num = current_running->pte_L2_clock % 4;
             current_running->pte_L2_clock++;
             current_running->pte_L2_count++;
+            if(L2_addr==0)
+            {
+                L2_addr=(pte_L2*)&((current_running->pte_L2p)[L2_inmem_num]);
+            }
+
             int i = 0;
             for (i = 0; i++; i < 256)
             {
-                (current_running->pte_L2p)[L2_inmem_num][i].setuped = 0;
-                (current_running->pte_L2p)[L2_inmem_num][i].inmem = 0;
-                (current_running->pte_L2p)[L2_inmem_num][i].disk_addr = 0;
+                L2_addr[i].setuped = 0;
+                L2_addr[i].inmem = 0;
+                L2_addr[i].disk_addr = 0;
+                L2_addr[i].swap_cnt = 0;
             }
 
             // link new L2 page table to L1
             current_running->pte_L1p[l1_index].setuped = 1;
             current_running->pte_L1p[l1_index].inmem = 1;
-            current_running->pte_L1p[l1_index].addr = (pte_L2 *)&(current_running->pte_L2p)[L2_inmem_num];
+            current_running->pte_L1p[l1_index].addr =L2_addr;
             current_running->pte_L1p[l1_index].disk_addr = 0;
         }
     }
@@ -162,8 +240,8 @@ void do_TLB_Refill()
     if (!current_running->pte_L1p[l1_index].inmem)
     //l2 page table not in memory.
     {
-        do_L2_swap(&current_running->pte_L1p[l1_index]);
-        panic("L2 page table need switch (not in mem)");
+        current_running->pte_L1p[l1_index].addr= (pte_L2*)do_L2_swap(&current_running->pte_L1p[l1_index]);
+        // panic("L2 page table need switch (not in mem)");
     }
 
     pte_L2 *l2 = current_running->pte_L1p[l1_index].addr;
@@ -177,7 +255,7 @@ void do_TLB_Refill()
         {
             //TODO PAGE SWITCH
             panic("Page not in mem.");
-            do_swap(vaddr, &l2[l2_index]);
+            do_swap(vaddr, &l2[l2_index]); //TODO: swap in
             l2[l2_index].inmem = 1;
         }
     }
@@ -188,7 +266,7 @@ void do_TLB_Refill()
         while (!(raddr = alloc_page())) //alloc_page failed
         {
             panic("do_swap (L2 fst use)");
-            do_swap(vaddr, &l2[l2_index]); //TODO
+            do_swap(vaddr, &l2[l2_index]); //TODO: swap out
         }
         (l2[l2_index]).setuped = 1;
         (l2[l2_index]).inmem = 1;
@@ -272,7 +350,7 @@ void deamon_vm(void)
             for (i = 0; i < request->size; i++)
             {
                 sdread(swap_buffer, request->disk_addr + 512 * i, 1);
-                sdwrite((int)request->mem_addr + 512 * i, request->disk_addr, 1);
+                sdwrite((int)request->mem_addr + 512 * i,  request->disk_addr + 512 * i, 1);
                 memcpy((void *)((int)request->mem_addr + 512 * i), (void *)swap_buffer, 512);
             }
             request->valid = 0;

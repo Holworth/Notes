@@ -94,7 +94,7 @@ static char read_uart_ch(void)
 
 struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
 struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
-struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, USER_PROCESS,1,1};
+struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, KERNEL_PROCESS,1,1};
 struct task_info pressure_test_task = {"pressure_test1", (uint32_t)&pressure_test, USER_PROCESS,1,1};
 struct task_info pressure_test_task2 = {"pressure_test2", (uint32_t)&pressure_test2, USER_PROCESS,1,1};
 struct task_info mem_swap_test_task = {"mem_swap_test", (uint32_t)&mem_swap_test, USER_PROCESS,1,1};
@@ -506,6 +506,11 @@ inline void shell_interpret_cmd()
         cmd_test();
         return;
     }
+    if (!strcmp(argv[0], "start"))
+    {
+        cmd_start();
+        return;
+    }
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
@@ -552,6 +557,25 @@ void start_deamon(char* name)
     printf("[DEAMON] %s failed to start.\n");
 }
 
+inline void cmd_start()
+{
+    if(argc!=2)
+    {
+        printf("Usage: start [proc name]\n");
+        return;
+    }
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if((test_tasks[i])&&(!strcmp(test_tasks[i]->name,argv[1])))
+        {
+            sys_spawn(test_tasks[i]);
+            return;
+        }
+    }
+    printf("Failed to start %s.\n");
+}
+
 // Shell itself
 void test_shell()
 {
@@ -561,7 +585,7 @@ void test_shell()
     cmd_clear();
     shell_drawline();
     sys_move_cursor(1, SHELL_LINE_POSITION + 1);
-    // start_deamon("vm_deamon");
+    start_deamon("vm_deamon");
     shell_newline();
 
     // printf("%x\n",(int)TLBexception_handler_end-(int)TLBexception_handler_begin);

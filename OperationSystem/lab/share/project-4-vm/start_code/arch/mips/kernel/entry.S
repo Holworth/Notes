@@ -251,8 +251,7 @@ END(reset_count_compare)
 
 LEAF(switch_to_kstack)
     lw k0, current_running
-    addi k0, KERNEL
-    lw $29, OFFSET_REG29(k0)
+    lw $29, OFFSET_KBASE(k0)
     jr ra
     nop
 END(switch_to_kstack)
@@ -484,7 +483,7 @@ exception_handler_begin:
     // DONE close interrupt
     INTERRUPT_DISABLE
     SAVE_CONTEXT(USER)
-#    jal switch_to_kstack
+    jal switch_to_kstack
     // jmp exception_handler[i] which decided by CP0_CAUSE //TODO FIXIT
     mfc0 k0, CP0_CAUSE
     andi k0, 0x0000007C

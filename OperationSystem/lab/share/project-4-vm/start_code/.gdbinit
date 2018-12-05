@@ -42,8 +42,8 @@ symbol-file main
 #b *0xa0800200
 #b TLB_set_global
 #b test_shell
-b deamon_vm
-#b handle_int
+#b deamon_vm
+b handle_int
 #b do_TLB_Refill
 #b *0x80000000
 #b cmd_set

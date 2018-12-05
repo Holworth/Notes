@@ -70,8 +70,14 @@ void prepare_proc(pcb_t* pcbp, struct task_info * task)
     pcbp->timeslice_set=task->timeslice;
 
     pcbp->kernel_stack_top=alloc_stack();
-    pcbp->user_stack_top=alloc_stack();
-    // pcbp->user_stack_top=0x70000000; //FIXIT
+    if((pcbp->type==KERNEL_PROCESS)|(pcbp->type==KERNEL_THREAD))
+    {
+        pcbp->user_stack_top=alloc_stack();
+    }else
+    {
+        // pcbp->user_stack_top=alloc_stack();
+        pcbp->user_stack_top=0x70000000; 
+    }
     pcbp->priority_level=pcbp->priority_level_set;
     pcbp->timeslice=pcbp->timeslice_set;
     pcbp->timeslice_left=pcbp->timeslice_set;
