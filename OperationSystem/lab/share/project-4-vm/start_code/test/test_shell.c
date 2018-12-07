@@ -399,6 +399,24 @@ inline void cmd_test()
     return ;
 }
 
+inline void cmd_start()
+{
+    if(argc!=2)
+    {
+        printf("Usage: start [proc name]\n");
+        return;
+    }
+    int i;
+    for(i=0;i<NUM_MAX_TASK;i++)
+    {
+        if((test_tasks[i])&&(!strcmp(test_tasks[i]->name,argv[1])))
+        {
+            sys_spawn(test_tasks[i]);
+            return;
+        }
+    }
+    printf("Failed to start %s.\n");
+}
 
 
 inline void shell_interpret_cmd()
@@ -555,25 +573,6 @@ void start_deamon(char* name)
         }
     }
     printf("[DEAMON] %s failed to start.\n");
-}
-
-inline void cmd_start()
-{
-    if(argc!=2)
-    {
-        printf("Usage: start [proc name]\n");
-        return;
-    }
-    int i;
-    for(i=0;i<NUM_MAX_TASK;i++)
-    {
-        if((test_tasks[i])&&(!strcmp(test_tasks[i]->name,argv[1])))
-        {
-            sys_spawn(test_tasks[i]);
-            return;
-        }
-    }
-    printf("Failed to start %s.\n");
 }
 
 // Shell itself

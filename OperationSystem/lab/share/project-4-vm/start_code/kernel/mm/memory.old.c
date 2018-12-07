@@ -34,8 +34,16 @@ void tlb_info()
     return;
 }
 
-static int get_L2_to_swap_out()
+uint32_t do_L2_swap(pte_L1 *pte_L1p)
+//return empty/swap_in addr for new L2 page table
 {
+    vt100_move_cursor(1, 7);
+    printk("do_L2_swap\n");
+    // int L2_pick = current_running->pte_L2_clock % 4;
+
+    //find a L1 term, its L2 is in mem;
+    //use Least Switched Fst
+
     int L2_to_swap_out = -1;
     int min_swap_find = 1000;
     int l;
@@ -51,97 +59,90 @@ static int get_L2_to_swap_out()
             }
         }
     }
-}
 
-uint32_t do_L2_swap(pte_L1 *pte_L1p)
-//return empty/swap_in addr for new L2 page table
-{
-    vt100_move_cursor(1, 7);
-    printk("do_L2_swap\n");
-    // int L2_pick = current_running->pte_L2_clock % 4;
-
-    //find a L1 term, its L2 is in mem;
-    //use Least Switched Fst
-
-    int L2_to_swap_out=get_L2_to_swap_out();
-    
     //check
-    if (L2_to_swap_out == -1)
+    if (l == -1)
         panic("L2_to_swap_out==-1");
 
     //alloc disk
     uint32_t disk_addr;
-    if (current_running->pte_L1p[L2_to_swap_out].disk_addr == 0)
+    if (current_running->pte_L1p[min_swap_find].disk_addr == 0)
     {
         disk_addr = alloc_disk(8);
-        current_running->pte_L1p[L2_to_swap_out].disk_addr = disk_addr;
+        current_running->pte_L1p[min_swap_find].disk_addr = disk_addr;
     }
     else
     {
-        disk_addr = current_running->pte_L1p[L2_to_swap_out].disk_addr;
+        disk_addr = current_running->pte_L1p[min_swap_find].disk_addr = disk_addr;
     }
     //write
-
-    vt100_move_cursor(1,1);
-    other_check(disk_addr);
 
     //8*512=4K
     int i;
     for (i = 0; i < 8; i++)
     {
         // sdread(L2_pt_swap_buffer, disk_addr + 512 * i, 1);
-        printk("sdwrite:%x, %x, %x\n",((uint32_t)current_running->pte_L1p[L2_to_swap_out].addr + 512 * i), disk_addr + 512 * i, 512);
-        sdwrite(((uint32_t)current_running->pte_L1p[L2_to_swap_out].addr + 512 * i), disk_addr + 512 * i, 512);
+        sdwrite(((int)current_running->pte_L1p[min_swap_find].addr + 512 * i), disk_addr + 512 * i, 1);
         // memcpy((void *)(&(current_running->pte_L2p[L2_pick])), (void *)L2_pt_swap_buffer, 512);
     }
-
-    set_breakpoint();
-
-    current_running->pte_L1p[L2_to_swap_out].inmem = 0;
-    current_running->pte_L1p[L2_to_swap_out].swap_cnt++;
+    current_running->pte_L1p[min_swap_find].inmem = 0;
+    current_running->pte_L1p[min_swap_find].swap_cnt++;
 
     //swap new L2 in
     if (pte_L1p == 0)
     {
-        return (uint32_t)(current_running->pte_L1p[L2_to_swap_out].addr);
+        return (uint32_t)(current_running->pte_L1p[min_swap_find].addr);
     }
     else
     {
         int k;
         for (k = 0; k < 8; k++)
         {
-            sdread((uint32_t)((current_running->pte_L1p[L2_to_swap_out].addr)), pte_L1p->disk_addr + 512 * i, 512);
+            sdread((int)(&(current_running->pte_L1p[min_swap_find].addr)), pte_L1p->disk_addr + 512 * i, 1);
             // sdwrite((int)current_running->pte_L1p[min_swap_find] + 512 * i, disk_addr + 512 * i, 1);
             // memcpy((void *)(&(current_running->pte_L2p[L2_pick])), (void *)L2_pt_swap_buffer, 512);
         }
         pte_L1p->inmem = 1;
-        pte_L1p->addr = (current_running->pte_L1p[L2_to_swap_out].addr);
-        return (uint32_t)current_running->pte_L1p[L2_to_swap_out].addr;
+        return (uint32_t)current_running->pte_L1p[min_swap_find].addr;
     }
 }
 
-void* do_swap(pte_L2* swapin)
+void do_swap(int vaddr, pte_L2 *pte_L2p)
 {
     // TODO
     // Choose a page to write to disk.
-    other_check(current_running->pid);
-    other_check(get_CP0_BADVADDR());
+    int minfind = -1;
+    {
+        // pick the swap_cnt min one in l2 page table.
+        // It is better to use a heap to imp it.
+        // But I am lazy...
+        int i;
+        int min = 256;
+        for (i = 0; i < 256; i++)
+        {
+            if (pte_L2p[i].inmem)
+            {
+                if (pte_L2p[i].swap_cnt < min)
+                {
+                    min = pte_L2p[i].swap_cnt;
+                    minfind = i;
+                }
+            }
+        }
+        //then swap minfind
+    }
 
-    int swap_target = clock_findnext();
-    pte_L2* pte_L2p= (pte_L2*)(current_running->pte_L2p);
-    if (!(pte_L2p)[swap_target].inmem)
+    if (minfind == -1)
     {
         //no page of this L2 is in mem
         panic("Need alloc other proc's mem.");
     }
 
-    // Then swap it
     // Set inmem to 0.
-    pte_L2p[swap_target].inmem = 0;
+    pte_L2p[minfind].inmem = 0;
 
     // Set inmem in tlb to 0. (if have)
     // set_tlb_valid_0(vaddr, current_running->pid);
-    uint32_t vaddr=get_CP0_BADVADDR();
     {
         uint32_t ehi = vaddr >> 13;
         ehi = ehi << 13;
@@ -155,8 +156,8 @@ void* do_swap(pte_L2* swapin)
         else
         {
             uint32_t elo0, elo1;
-            elo0 = ((int)pte_L2p[swap_target].raddr) >> 6;//in fact this is useless
-            elo1 = ((int)pte_L2p[swap_target].raddr + PAGE_SIZE) >> 6;//in fact this is useless
+            elo0 = ((int)pte_L2p[minfind].raddr) >> 6;
+            elo1 = ((int)pte_L2p[minfind].raddr + PAGE_SIZE) >> 6;
             elo0 |= (2 << 3) | (1 << 2) | (0 << 1) | (0);
             elo1 |= (2 << 3) | (1 << 2) | (0 << 1) | (0);
             update_tlb(ehi, elo0, elo1, index); //
@@ -165,36 +166,17 @@ void* do_swap(pte_L2* swapin)
     // Add this page to write list, and get disk_addr.
     current_running->swap_request.valid = 1;
     current_running->swap_request.size = 16;
-    current_running->swap_request.mem_addr = pte_L2p[swap_target].raddr;
-
-    //
-
-    if(!swapin)//just alloc new page
+    current_running->swap_request.mem_addr = pte_L2p[minfind].raddr;
+    if (pte_L2p[minfind].disk_addr != 0)
     {
-        // panic("invalid swap in");
-        current_running->swap_request.disk_addr = alloc_disk(16);
-        pte_L2p[swap_target].disk_addr=current_running->swap_request.disk_addr;
-        sys_semaphore_down(&swap_sleep_sem);
-        return pte_L2p[swap_target].raddr;
-    }
-    else//swap in and swap out
-    {
-    if (swapin->disk_addr != 0)
-    {
-        current_running->swap_request.disk_addr = swapin->disk_addr;
+        current_running->swap_request.disk_addr = pte_L2p[minfind].disk_addr;
     }
     else
     {
         current_running->swap_request.disk_addr = alloc_disk(16);
     }
-    swapin->raddr=pte_L2p[swap_target].raddr;
-    swapin->inmem=1;
-    pte_L2p[swap_target].disk_addr=current_running->swap_request.disk_addr;
     // block and wait for another proc. (use wait signal)
     sys_semaphore_down(&swap_sleep_sem);
-    return swapin->raddr;
-
-    }
 }
 
 void do_TLB_Refill()
@@ -276,7 +258,7 @@ void do_TLB_Refill()
         {
             //TODO PAGE SWITCH
             panic("Page not in mem.");
-            l2[l2_index].raddr=do_swap(&l2[l2_index]); //TODO: swap in
+            do_swap(vaddr, &l2[l2_index]); //TODO: swap in
             l2[l2_index].inmem = 1;
         }
     }
@@ -284,10 +266,10 @@ void do_TLB_Refill()
     {
         void *raddr;
         //alloc_page() return 0 if failed
-        if(!(raddr = alloc_page())) //alloc_page failed
+        while (!(raddr = alloc_page())) //alloc_page failed
         {
-            raddr = do_swap(0); //TODO: swap out
-            // panic("do_swap (L2 fst use)");
+            panic("do_swap (L2 fst use)");
+            do_swap(vaddr, &l2[l2_index]); //TODO: swap out
         }
         (l2[l2_index]).setuped = 1;
         (l2[l2_index]).inmem = 1;
@@ -362,7 +344,6 @@ void deamon_vm(void)
         if (swap_sleep_sem.queue.head) //not empty
         {
             //do swap
-            set_breakpoint();
             swap_request_t *request = &((pcb_t *)swap_sleep_sem.queue.head)->swap_request; //todo
             // void	sdread(unsigned	char	*buf,	unsigned	int	base,	int	n)
             // void sdwrite(unsigned	int	base,	int	n,	unsigned	char	*buf)
@@ -371,15 +352,9 @@ void deamon_vm(void)
             int i;
             for (i = 0; i < request->size; i++)
             {
-                printk("sdread:%x, %x, %x\n",&swap_buffer, request->disk_addr + 512 * i, 512);
-                //sdread
-                // disable_interrupt();
-                // Have problem
-                sdread(&swap_buffer, request->disk_addr + 512 * i, 512);
-                // ((void (*) (void*,int,int))(0x8007b1cc))(&swap_buffer, request->disk_addr + 512 * i, 512);
-                // enable_interrupt();
-                sdwrite((uint32_t)request->mem_addr + 512 * i, request->disk_addr + 512 * i, 512);
-                memcpy((void *)((uint32_t)request->mem_addr + 512 * i), (void *)&swap_buffer, 512);
+                sdread(swap_buffer, request->disk_addr + 512 * i, 1);
+                sdwrite((int)request->mem_addr + 512 * i, request->disk_addr + 512 * i, 1);
+                memcpy((void *)((int)request->mem_addr + 512 * i), (void *)swap_buffer, 512);
             }
             request->valid = 0;
             sys_semaphore_up(&swap_sleep_sem);
@@ -388,11 +363,6 @@ void deamon_vm(void)
 }
 
 // Disk Regulation //-------------------------------
-
-int disk_init()
-{
-    disk_addr=SWAP_BASE;
-}
 
 int alloc_disk(int sectors)
 {
@@ -416,20 +386,13 @@ void do_TLB_init()
 // int clock_point[16];
 // #define next_clock(clock) ((clock==CLOCK_SIZE)?0:clock++)
 
-int next_clock(int clock)
-{
-    clock++;
-    if(clock==CLOCK_SIZE)return 0;
-    return clock;
-}
-
-int clock_findnext()
+static int clock_findnext()
 {
     // @notused param L2start The base addr of L2 page table for current proc
-    pte_L2 *L2start = (pte_L2 *)current_running->pte_L2p;
+    pte_L2 *L2start = current_running->pte_L2p;
     current_running->clock_point;
     int dbg_cnt = 0;
-    while (dbg_cnt++ < (3*CLOCK_SIZE))
+    while (dbg_cnt++ < (CLOCK_SIZE))
     {
         pte_L2 *p = &L2start[current_running->clock_point];
         if (p->setuped)
@@ -443,7 +406,6 @@ int clock_findnext()
                 else //!p->R
                 {
                     //find result
-                    p->R = 1;
                     return current_running->clock_point;
                 }
             }

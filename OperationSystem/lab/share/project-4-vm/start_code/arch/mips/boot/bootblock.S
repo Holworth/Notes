@@ -17,12 +17,12 @@ main:
 # 	data size
 #	calculate data size (byte)
 #	imagecreater saved kernel size in sector number here:
-	lw	$a2,  0xa08001fc
-	sll	$a2, 9
+#	lw	$a2,  0xa08001fc
+#	sll	$a2, 9
 
 #   or
 #   for small kernel or self-set-global kernel:
-#	li  $a2, 0x0000f000
+	li  $a2, 0x0000f000
 
 #normal way
 

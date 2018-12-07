@@ -53,7 +53,7 @@ typedef struct page_table_entry_L2
 {
     char setuped;       //vaddr-raddr project has already been setuped
     char inmem;         //this l2's page(s) is in memory, "valid" in tlb
-    char valid;         //reserved
+    char R;         //reserved
     char swap_cnt;      //4: count how many times this page has been swaped
     void* raddr;        //8: this page(s)' addr in physic memory
     int disk_addr;      //12: this page(s)' addr in disk. 0 if it has not been swaped out.
@@ -84,11 +84,17 @@ pte_L2 PTE_L2[16][4][256];
 // pte_L1*
 // pte_L2_count; //initial:=0
 
+// Clock Algorithm //--------------------------------
+
+#define CLOCK_SIZE 256*4
+int next_clock(int);
+int next_clock(int);
+int clock_findnext();
 
 // Page Alloc Operations //--------------------------------
 
 #define MEM_BASE 0x00f00000
-#define MEM_UPPER_BOUND 0x01f00000
+#define MEM_UPPER_BOUND 0x01200000
 #define PAGE_SIZE 0x00001000
 
 void* free_mem_page[0x2000];
@@ -117,9 +123,10 @@ char* L2_pt_swap_buffer[512];
 
 // Disk Regulation //-------------------------------
 
-#define SWAP_BASE 0x000f0000
+#define SWAP_BASE 0x00100000
 int disk_addr;
 // int disk_addr=SWAP_BASE;
+int disk_init();
 int alloc_disk(int);
 
 // For Debug //-------------------------------

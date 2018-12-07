@@ -181,6 +181,10 @@ typedef struct pcb
     // char pte_L2_used[4];
     int pte_L2_clock;
 
+    /* info used for clock algorithm */
+
+    int clock_point;
+
     /* info used to do swap */
     swap_request_t swap_request;
 } pcb_t;
@@ -260,5 +264,7 @@ pid_t new_pid();
 void prepare_proc(pcb_t* pcbp, struct task_info * task);
 
 void set_CP0_ENTRYHI_with_cpid();
+
+void set_breakpoint();
 
 #endif

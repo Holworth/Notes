@@ -97,11 +97,11 @@ static void init_global_space()
 {
     uint32_t size=(*(uint32_t*)0xa08001fc);
     size*=512;
+    // printk("%x\n",size);
+    size+=0xa0800000;
     printk("%x\n",size);
-    size+=0x80000000;
-    printk("%x\n",size);
-    uint32_t i=0x8000f000;
-    for(i=0x8000f000;i!=size;i+=4)
+    uint32_t i=0xa080f000;
+    for(i=0xa080f000;i!=size;i+=4)
     {
         *(uint32_t *)i=0;
         // printk("%x\n",i);
@@ -111,14 +111,16 @@ static void init_global_space()
 
 static void init_memory()
 {
+    disk_init();
     init_page_stack();
     memcpy(0x80000000,TLBexception_handler_entry,(TLBexception_handler_end-TLBexception_handler_begin));
     do_TLB_init();
     
+    //for debug
     {
         //FIXIT
         int i=0xa0f00000;
-        for(i=0xa0f00000;i<0xa1f00000;i+=4)
+        for(i=0xa0f00000;i<0xa1200000;i+=4)
         {
             *(int*)i=i;
         }
@@ -335,8 +337,8 @@ void __attribute__((section(".entry_function"))) _start(void)
     printk("> [INIT] asm_start() succeeded.\n");
     // printk("> [INIT] printk() working nornally.\n");
 
-    // init_global_space();
-    // printk("> [INIT] init_global_space() succeeded.\n");
+    init_global_space();
+    printk("> [INIT] init_global_space() succeeded.\n");
 
     // init interrupt (^_^)
     init_exception();

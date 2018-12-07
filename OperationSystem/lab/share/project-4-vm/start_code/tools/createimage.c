@@ -84,12 +84,12 @@ void extent_opt(Elf32_Phdr *Phdr_bb, Elf32_Phdr *Phdr_k, int kernelsz)
 {
     puts("----------------------------------");
     
-    puts("--------KERNEL--------");
+    puts("\n--------KERNEL--------");
     printf("number of kernel sectors: 0x%x(%d)\n", kernelsz, (int)kernelsz);
     printf("kernel image file size: 0x%x(%d)\n", Phdr_k->p_filesz,Phdr_k->p_filesz);
     printf("kernel image memory size: 0x%x(%d)\n", Phdr_k->p_memsz,Phdr_k->p_memsz);
     printf("kernel image memory offset: 0x%x\n", Phdr_k->p_offset);
-    puts("--------BOOTBLOCK--------");
+    puts("\n--------BOOTBLOCK--------");
     printf("bootblock image file size: 0x%x(%d)\n", Phdr_bb->p_filesz,Phdr_bb->p_filesz);
     printf("bootblock image memory size: 0x%x\n", Phdr_bb->p_memsz);
     printf("bootblock image memory offset: 0x%x\n", Phdr_bb->p_offset);

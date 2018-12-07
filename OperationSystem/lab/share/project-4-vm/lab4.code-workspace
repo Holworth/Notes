@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"files.associations": {
-			"sync.h": "c"
+			"sync.h": "c",
+			"stdio.h": "c"
 		}
 	}
 }

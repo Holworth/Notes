@@ -43,7 +43,7 @@ symbol-file main
 #b TLB_set_global
 #b test_shell
 #b deamon_vm
-b handle_int
+#b handle_int
 #b do_TLB_Refill
 #b *0x80000000
 #b cmd_set
@@ -51,9 +51,18 @@ b handle_int
 #b *0xa080a59c
 #b fake_scene
 #b set_CP0_ENTRYHI_with_cpid
-b scheduler
+#b scheduler
 #b mutex_lock_init
 #b enable_interrupt
+#b do_L2_swap
+b set_breakpoint
+#b sdwrite
+#b *0x80085690
+#b clock_findnext
+b do_swap
+#b *0x80079cd8
+#b read_asm  
+#b *0x800856a8
 c
 
 # 附注

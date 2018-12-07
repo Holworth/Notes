@@ -188,6 +188,13 @@ LEAF(set_CP0_EPC)
     nop
 END(set_CP0_EPC)
 
+//get_CP0_CAUSE()
+LEAF(get_CP0_CAUSE)
+    mfc0 v0, CP0_CAUSE
+    nop
+    jr ra
+    nop
+END(get_CP0_CAUSE)
 
 //do_tlbp()
 LEAF(do_tlbp)
@@ -605,3 +612,15 @@ NESTED(fake_scene, 0, sp)
     INTERRUPT_ENABLE_AND_ERET
 END(fake_scene)
 
+NESTED(read_asm, 0, sp)
+#	target position
+#	li  $a0, 0xa0800200
+#	data source
+#	li  $a1, 0x00000200
+# 	data size
+#	li  $a2, 0x0000f000
+	jal 0x8007b1cc
+    nop
+    jr ra
+    nop
+END(read_asm)

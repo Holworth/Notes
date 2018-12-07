@@ -424,13 +424,17 @@ int panic(char* error_name)
 {
     printk("# [ERROR] %s\n",error_name);
     other_check(current_running->pid);
-    other_check(current_running->status);
-    other_check(current_running->kernel_context.cp0_epc);
-    other_check(current_running->kernel_context.cp0_status);
-    other_check(current_running->user_context.cp0_epc);
+    // other_check(current_running->status);
+    // other_check(current_running->kernel_context.cp0_epc);
+    // other_check(current_running->kernel_context.cp0_status);
+    // other_check(current_running->user_context.cp0_epc);
     other_check(current_running->user_context.cp0_status);
-    other_check(current_running->user_context.cp0_cause);
-    other_check(current_running->user_context.cp0_badvaddr);
+    // other_check(current_running->user_context.cp0_cause);
+    // other_check(current_running->user_context.cp0_badvaddr);
+    other_check(get_CP0_EPC());
+    other_check(get_CP0_BADVADDR());
+    other_check(get_CP0_CAUSE());
+    other_check(get_cp0_status());
     error_ps();
     printk("ze:%x at:%x v0:%x v1:%x\n",
         current_running->kernel_context.regs[0],
@@ -592,3 +596,8 @@ void set_CP0_ENTRYHI_with_cpid()
     set_CP0_ENTRYHI(current_running->pid&0xff);
 }
 
+void set_breakpoint()
+{
+    printk("BP");
+    return;
+}
