@@ -1,23 +1,63 @@
-//A 5-level pipelined MIPs32 CPU 
-//Huaqiang Wang (c) 2018
-//top.v
+// ----------------------------------------------------------------
+//                A 5-level pipelined MIPs32 CPU 
+//                  Sram-like cpu top module
+// ----------------------------------------------------------------
+//              Copyright (C) 2018 Wang Huaqiang 
+//             email : wanghuaqiang16@mails.ucas.ac.cn
+// ----------------------------------------------------------------
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// -----------------------------------------------------------------
+
 `include "define.v"
 
-module mycpu_top(
+module cpu_sram_like(
     input            clk,
     input            resetn,            //low active
 
-    output           inst_sram_en,
-    output  [ 3:0]   inst_sram_wen,
-    output  [31:0]   inst_sram_addr,
-    output  [31:0]   inst_sram_wdata,
-    input   [31:0]   inst_sram_rdata,
+    //sram alike socket
+    //inst sram-like 
+    output inst_req,      
+    output inst_wr,       
+    output [1:0]inst_size,     
+    output [31:0]inst_addr,     
+    output [31:0]inst_wdata,    
+    input [31:0]inst_rdata,    
+    input inst_addr_ok,
+    input inst_data_ok,
     
-    output           data_sram_en,
-    output  [ 3:0]   data_sram_wen,
-    output  [31:0]   data_sram_addr,
-    output  [31:0]   data_sram_wdata,
-    input   [31:0]   data_sram_rdata,
+    //data sram-like 
+    output data_req,      
+    output data_wr,       
+    output [1:0]data_size,     
+    output [31:0]data_addr,     
+    output [31:0]data_wdata,    
+    input [31:0]data_rdata,    
+    input data_addr_ok,  
+    input data_data_ok,  
+
+    //sram socket
+    // output           inst_sram_en,
+    // output  [ 3:0]   inst_sram_wen,
+    // output  [31:0]   inst_sram_addr,
+    // output  [31:0]   inst_sram_wdata,
+    // input   [31:0]   inst_sram_rdata,
+    
+    // output           data_sram_en,
+    // output  [ 3:0]   data_sram_wen,
+    // output  [31:0]   data_sram_addr,
+    // output  [31:0]   data_sram_wdata,
+    // input   [31:0]   data_sram_rdata,
 
     //debug interface
     output  [31:0]   debug_wb_pc,
@@ -34,12 +74,12 @@ module mycpu_top(
 wire [31:0]wire_to_IF_PC_reg;
 wire [31:0]IF_PC_in;
 
-assign inst_sram_en=1'b1;
-assign inst_sram_wen=4'b0000;
-assign inst_sram_addr=IF_PC_in;
-assign inst_sram_wdata=32'b0;
+// assign inst_sram_en=1'b1;
+// assign inst_sram_wen=4'b0000;
+// wire inst_sram_addr=IF_PC_in;
+// assign inst_sram_wdata=32'b0;
 
-assign data_sram_en=1'b1;
+// assign data_sram_en=1'b1;
 
 wire clear_pipeline;
 wire [31:0]clear_pipeline_PC;
@@ -141,7 +181,7 @@ wire IF_ID_readygo;//data can get out of this stage
 wire IF_ID_valid_out;//output wire: data from this stage is valid
 wire IF_ID_allowout;//data is getting out of this stage
 
-assign IF_ID_valid_in=resetn;
+assign IF_ID_valid_in=resetn&inst_data_ok;
 
 assign IF_ID_readygo=1;//data can flow out of this stage
 assign IF_ID_allowin=IF_ID_readygo&&ID_EX_allowin||!IF_ID_valid;
@@ -1033,8 +1073,9 @@ assign bubble=jump_with_reg?
     corelation_B3&(~bypass_B3)
 );
 
+//-------------------------------------------
 //EXCEPTION
-
+//-------------------------------------------
 
 wire [31:0]CP0_rdata;
 
@@ -1051,6 +1092,91 @@ exception_pass exception(
     CP0_rdata,
     EX_MEM_valid
 );
+
+//-------------------------------------------
+//AXI control
+//-------------------------------------------
+
+//pre-IF
+
+reg  [2:0]sram_inst_addr_state_now;
+wire [2:0]sram_inst_addr_state_next;
+
+`define sram_inst_addr_reset 3'b000
+`define sram_inst_addr_addr0 3'b001
+`define sram_inst_addr_addrdecode 3'b010
+`define sram_inst_addr_reserved 3'b100
+
+always@(posedge clk)
+begin
+    if(!resetn)begin
+        sram_inst_addr_state_now<=3'b0;
+    end else begin
+        sram_inst_addr_state_now<=sram_inst_addr_state_next;
+    end
+end
+
+assign sram_inst_addr_state_next=
+    {3{sram_inst_addr_state_now==`sram_inst_addr_reset}}&
+    (
+        `sram_inst_addr_addr0
+    )|
+    {3{sram_inst_addr_state_now==`sram_inst_addr_addr0}}&
+    (
+        (inst_addr_ok?sram_inst_addr_addrdecode:sram_inst_addr_addr0)
+    )|
+    {3{sram_inst_addr_state_now==`sram_inst_addr_addrdecode}}&
+    (
+        `sram_inst_addr_addrdecode
+    );
+
+assign inst_req=sram_inst_addr_state_now!=`sram_inst_addr_reset;
+assign inst_wr=1'b0;
+assign inst_size=2'b10;
+assign inst_addr=inst_sram_addr;
+assign inst_wdata=32'b0;
+
+
+// assign sram_inst_addr_state_next=
+//     {3{sram_inst_addr_state_now==`sram_inst_addr_reset}}&
+//     (
+//         {3{inst_addr_ok}}&
+//     )|
+
+//IF
+reg  [2:0]sram_inst_data_state_now;
+wire [2:0]sram_inst_data_state_next;//wire in fact
+
+`define sram_inst_data_reset 3'b000
+`define sram_inst_data_idle 3'b001
+`define sram_inst_data_waitinst 3'b010
+`define sram_inst_data_reserved 3'b100
+
+always@(posedge clk)
+begin
+    if(!resetn)begin
+        sram_inst_data_state_now<=3'b0;
+    end else begin
+        sram_inst_data_state_now<=sram_inst_data_state_next;
+    end
+end
+
+assign sram_inst_data_state_next=
+    {3{sram_inst_data_state_now==`sram_inst_data_reset}}&
+    (
+        sram_inst_data_idle
+    )|
+    {3{sram_inst_data_state_now==`sram_inst_data_idle}}&
+    (
+        inst_addr_ok?sram_inst_data_waitinst:sram_inst_data_idle
+    )|
+    {3{sram_inst_data_state_now==`sram_inst_data_waitinst}}&
+    (
+        inst_data_ok?sram_inst_data_idle:inst_data_ok
+        //may need change if accrelate axi_ifc
+    );
+
+assign inst_sram_rdata=inst_rdata;
 
 //Reserved
 //---------------------------------

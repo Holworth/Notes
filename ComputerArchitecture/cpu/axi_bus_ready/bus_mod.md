@@ -100,3 +100,46 @@ data端口支持连续的两个操作.
 ## 同一个请求源分配相同ID来约束数据返回的顺序
 
 
+## 非对齐访存指令的处理
+
+需要将三位读写转化成一次一位读写, 一次两位读写.
+
+wire[3:0] strb_swl=
+    {4{ea==2'b00}}&4'b0001|
+    {4{ea==2'b01}}&4'b0011|
+    {4{ea==2'b10}}&4'b0111|
+    {4{ea==2'b11}}&4'b1111;
+wire[3:0] strb_swr=
+    {4{ea==2'b00}}&4'b1111|
+    {4{ea==2'b01}}&4'b1110|
+    {4{ea==2'b10}}&4'b1100|
+    {4{ea==2'b11}}&4'b1000;
+
+涉及的问题在EX级处理, EX级的状态机需要引入额外的状态来处理三位非对齐访存指令.
+
+### EXsram状态机改
+
+```mermaid
+graph LR;
+reset-->idle
+idle-->wait_store
+wait_store--store_not_aligned-->wait_store2
+idle-->wait_load
+idle-->next
+wait_store2--store_finished-->next
+wait_store--store_aligned_finished-->next
+wait_load--load_addr_finished-->next
+```
+
+-->next: cango
+
+cango条件:
+
+1. idle状态(没有存取指令)
+1. wait_store--store_finished(store完成)且store_aligned
+1. wait_store2--store_finished
+1. wait_load--load_addr_finished
+
+其他影响: divider在mem级写回数据, 似乎没有很大的影响(TODO)
+
+## 顶层模块修改

@@ -1,0 +1,97 @@
+\documentclass{article} % For LaTeX2e
+% \usepackage{nips13submit_e,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{ulem}
+\usepackage{textcomp}  % \textcelsius
+
+
+\providecommand{\tightlist}{%
+	\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% \graphicspath{{./fig/}}
+% \usepackage{tikz}
+
+\title{Homework 9}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+\author{Wang Huaqiang}
+
+\begin{document}
+
+	\maketitle
+
+
+  \hypertarget{section}{%
+  \section{8.15}\label{section}}
+  
+  \paragraph{}
+  
+  The two sentences can not imply the fact that \(x \notin s\).
+  
+  \paragraph{}
+  
+  For example, prove that 1 is not in \(\emptyset\). We know from the
+  defination that 1 is in all the sets with a 1 in it, yet we will never
+  know if 1 is in \(\emptyset\) for nothing can be drived from the 2
+  rules.
+  
+  \hypertarget{section-1}{%
+  \section{8.20}\label{section-1}}
+  
+  Lemma:
+  
+  ~\\
+  
+  We first define prediction ``is Nature Number'' N(x).
+  
+  \[N(x):=  (x=0)\vee((x=y+1)\wedge(N(y))) \]
+  
+  Also, we can generate nature number z by using function ``+'' for
+  multiple times:
+  
+  \[z := +(1,+(1,...)) \ ((z-1)functions \ in \ total)\]
+  
+  For example:
+  
+  \[3:=  +(1,+(1,1)) \]
+  
+  Based on these lemmas:
+  
+  \hypertarget{a}{%
+  \subsection{8.20.a}\label{a}}
+  
+  \[iseven(x) := \exists y \ x = +(y,y)\]
+  
+  or
+  
+  \[ iseven(x) := \exists y (\ N(y)\wedge (<(X(2,y),x)\wedge (<(x,X(2,+(y,1))))\vee (x=0)\]
+  
+  \hypertarget{b}{%
+  \subsection{8.20.b}\label{b}}
+  
+  \[ isprime(x) := \neg \exists a,b \ x=X(a,b)\wedge(<(1,a))\wedge(<(1,b))\wedge N(a) \wedge N(b)\]
+  
+  or
+  
+  \[ isprime(x) := \forall a,b \ x=X(a,b)\rightarrow (a=1)\vee (b=1)\]
+  
+  \hypertarget{c}{%
+  \subsection{8.20.c}\label{c}}
+  
+  \[Goldbach := \forall x \ \exists a,b \ \ iseven(x) \wedge isprime(x) \wedge isprime(b) \wedge (x=X(a,b))\]
+  
+  \sout{So in fact we do not need these lemmas. 23333}
+  
+  \begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+  
+  \begin{center}
+  Copyright (C) 2018 Wang Huaqiang 
+  \end{center}
+
+\end{document}

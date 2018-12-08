@@ -1,0 +1,65 @@
+\hypertarget{ai-hw9}{%
+\section{AI HW9}\label{ai-hw9}}
+
+Wang Huaqiang
+
+2016K8009929035
+
+\hypertarget{section}{%
+\section{8.15}\label{section}}
+
+The two sentences can not imply the fact that \(x \notin s\).
+
+For example, prove that 1 is not in \(\emptyset\). We know from the
+defination that 1 is in all the sets with a 1 in it, yet we will never
+know if 1 is in \(\emptyset\) for nothing can be drived from the 2
+rules.
+
+\hypertarget{section-1}{%
+\section{8.20}\label{section-1}}
+
+Lemma:
+
+We first define prediction ``is Nature Number'' N(x).
+
+\[N(x):=  (x=0)\vee((x=y+1)\wedge(N(y))) \]
+
+Also, we can generate nature number z by using function ``+'' for
+multiple times:
+
+\[z := +(1,+(1,...)) \ ((z-1)functions \ in \ total)\]
+
+For example:
+
+\[3:=  +(1,+(1,1)) \]
+
+Based on these lemmas:
+
+\hypertarget{a}{%
+\subsection{8.20.a}\label{a}}
+
+\[ iseven(x) := \exist y \ x = +(y,y)\]
+
+or
+
+\[ iseven(x) := \exist y (\ N(y)\wedge (<(X(2,y),x)\wedge (<(x,X(2,+(y,1))))\vee (x=0)\]
+
+\hypertarget{b}{%
+\subsection{8.20.b}\label{b}}
+
+\[ isprime(x) := \neg \exist a,b \ x=X(a,b)\wedge(<(1,a))\wedge(<(1,b))\wedge N(a) \wedge N(b)\]
+
+or
+
+\[ isprime(x) := \forall a,b \ x=X(a,b)\rightarrow (a=1)\vee (b=1)\]
+
+\hypertarget{c}{%
+\subsection{8.20.c}\label{c}}
+
+\[Goldbach := \forall x \ \exist a,b \ \ iseven(x) \wedge isprime(x) \wedge isprime(b) \wedge (x=X(a,b))\]
+
+\sout{So in fact we do not need these lemmas. 23333}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+Copyright (C) 2018 Wang Huaqiang
