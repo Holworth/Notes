@@ -146,7 +146,8 @@ always@(*)begin
     end
     `sram_inst_busy: 
     begin
-        sram_inst_state_next=axi_judge_inst?`sram_inst_idle:`sram_inst_busy;
+    //ERROR
+        sram_inst_state_next=axi_data_received?`sram_inst_idle:`sram_inst_busy;
     end
     default: 
     begin

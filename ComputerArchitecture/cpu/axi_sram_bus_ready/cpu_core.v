@@ -1234,11 +1234,30 @@ wire IF_togo=(sram_inst_data_state_now==`sram_inst_data_waitinst)&inst_data_ok;
 //EX sram
 
 //FIXIT
+
+reg[1:0] addr_sent;
+always@(posedge clk)begin
+    if(ID_EX_valid_in&&ID_EX_allowin)begin
+        addr_sent<=2'b0;
+    end else begin
+        if((ID_EX_reg.mem_wen_pick!=0)&data_addr_ok)begin
+            addr_sent<=2'b1;
+        end
+        if((ID_EX_reg.mem_wen_pick!=0)&data_data_ok&(addr_sent==2'b1))begin
+            addr_sent<=2'b10;
+        end
+    end
+end
+
 wire ex_sram_finished=
     (ID_EX_reg.mem_wen_pick==0)&(!ID_EX_reg.mem_read)|
-    data_addr_ok;
+    (ID_EX_reg.mem_read)&data_addr_ok|
+    (ID_EX_reg.mem_wen_pick!=0)&data_data_ok|
+    (addr_sent==2'b10)
+    ;
 assign data_req=
-    (ID_EX_reg.mem_wen_pick!=0)|(ID_EX_reg.mem_read);
+    (ID_EX_reg.mem_wen_pick!=0)&(addr_sent==2'b0)|
+    (ID_EX_reg.mem_read);
 assign data_wr=
     data_sram_wen!=0;
     // (ID_EX_reg.mem_wen_pick!=0);
