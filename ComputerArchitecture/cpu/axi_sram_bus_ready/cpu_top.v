@@ -106,7 +106,8 @@ module mycpu_top(
     //data sram-like 
     wire data_req;      
     wire data_wr;       
-    wire [1:0]data_size;     
+    // wire [1:0]data_size;     
+    wire [3:0]strb;
     wire [31:0]data_addr;     
     wire [31:0]data_wdata;    
     wire [31:0]data_rdata;    
@@ -130,7 +131,8 @@ cpu_sram_like cpu(
     //data sram-like 
     data_req,      
     data_wr,       
-    data_size,     
+    // data_size,     
+    strb,     
     data_addr,     
     data_wdata,    
     data_rdata,    
@@ -146,7 +148,7 @@ cpu_sram_like cpu(
     {int,2'b0} //used to=8'b00000000;
 );
 
-cpu_axi_interface bridge(
+cpu_axi_sram_interface bridge(
     aclk,
     aresetn,
 
@@ -163,7 +165,8 @@ cpu_axi_interface bridge(
     //data sram-like 
     data_req,      
     data_wr,       
-    data_size,     
+    // data_size,     
+    strb,
     data_addr,     
     data_wdata,    
     data_rdata,    

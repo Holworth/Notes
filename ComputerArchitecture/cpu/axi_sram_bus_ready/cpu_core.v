@@ -39,7 +39,8 @@ module cpu_sram_like(
     //data sram-like 
     output data_req,      
     output data_wr,       
-    output [1:0]data_size,     
+    // output [1:0]data_size,     
+    output [3:0]strb,     
     output [31:0]data_addr,     
     output [31:0]data_wdata,    
     input [31:0]data_rdata,    
@@ -73,16 +74,22 @@ module cpu_sram_like(
 
 wire [31:0]wire_to_IF_PC_reg;
 wire [31:0]IF_PC_in;
+wire [31:0]inst_sram_addr=IF_PC_in;
 
 // assign inst_sram_en=1'b1;
 // assign inst_sram_wen=4'b0000;
-// wire inst_sram_addr=IF_PC_in;
 // assign inst_sram_wdata=32'b0;
 
 // assign data_sram_en=1'b1;
 
+//clear pipeline
 wire clear_pipeline;
 wire [31:0]clear_pipeline_PC;
+
+//basic sram wires
+wire [3:0]data_sram_wen;
+wire [31:0] inst_sram_rdata=inst_rdata;
+wire [31:0]data_sram_rdata=data_rdata;
 
 //----------------------------------------------
 //Import modules
@@ -181,9 +188,9 @@ wire IF_ID_readygo;//data can get out of this stage
 wire IF_ID_valid_out;//output wire: data from this stage is valid
 wire IF_ID_allowout;//data is getting out of this stage
 
-assign IF_ID_valid_in=resetn&inst_data_ok;
+assign IF_ID_valid_in=resetn&IF_togo;
 
-assign IF_ID_readygo=1;//data can flow out of this stage
+assign IF_ID_readygo=IF_ID_valid&(!bubble)&(!div_stall);//data can flow out of this stage
 assign IF_ID_allowin=IF_ID_readygo&&ID_EX_allowin||!IF_ID_valid;
 assign IF_ID_valid_out=IF_ID_valid&&IF_ID_readygo;
 assign IF_ID_allowout=IF_ID_readygo&&ID_EX_allowin;
@@ -214,32 +221,43 @@ wire [31:0]PC_jump_alu;
 
 assign jump_nop=~(jump_short|jump_long|jump_alu);
 
-assign IF_PC_in=
-    (resetn)?
-    (clear_pipeline?
-        clear_pipeline_PC:
-        (bubble|div_stall)?
-            IF_delayslot:
-            (
-                ({32{jump_short}}&PC_jump_short)|
-                ({32{jump_long}}&PC_jump_long)|
-                ({32{jump_alu}}&PC_jump_alu)|
-                ({32{~(jump_short|jump_long|jump_alu)}}&PC_4)
-            )
-    )
-    :32'hbfc00000;
+// assign IF_PC_in=
+//     (resetn)?
+//     (clear_pipeline?
+//         clear_pipeline_PC:
+//         (
+//             ({32{jump_short}}&PC_jump_short)|
+//             ({32{jump_long}}&PC_jump_long)|
+//             ({32{jump_alu}}&PC_jump_alu)|
+//             ({32{~(jump_short|jump_long|jump_alu)}}&PC_4)
+//         )
+//     )
+//     :32'hbfc00000;
 
-//d flipflop of IF_delayslot
+assign IF_PC_in=
+        (
+            ({32{jump_short}}&PC_jump_short)|
+            ({32{jump_long}}&PC_jump_long)|
+            ({32{jump_alu}}&PC_jump_alu)|
+            ({32{~(jump_short|jump_long|jump_alu)}}&PC_4)
+        );
+    
+
+//d flipflop of IF_delayslot (now IF_addrtmp)
+reg [31:0]IF_addrtmp;
 always@(posedge clk)begin
     if(!resetn)begin
-        IF_delayslot<=32'hbfc00000;
+        IF_addrtmp<=32'hbfc00000;
     end
     // else 
     // if(clear_pipeline)begin
     //     IF_delayslot<=32'b0;
     // end
     else begin
-        IF_delayslot<=((IF_ID_allowout|clear_pipeline)?IF_PC_in:IF_delayslot);
+        // IF_delayslot<=((IF_ID_allowout|clear_pipeline)?
+        //     (inst_addr_ok?inst_addr:IF_delayslot):
+        //     IF_delayslot);
+        IF_addrtmp<=inst_addr_ok?inst_addr:IF_addrtmp;
     end
 end
 
@@ -250,6 +268,7 @@ always@(posedge clk)begin
         IF_ID_valid<=1'b0;
         IF_ID_PC_reg<=32'b0;
         IF_inst_reg<=32'b0;
+        IF_delayslot<=32'hbfc00000;
     end
     else begin
         IF_ID_valid<=
@@ -261,10 +280,14 @@ always@(posedge clk)begin
         // IF_ID_valid<=1'b0;
         IF_ID_PC_reg<=32'b0;
         IF_inst_reg<=32'b0;
+        ID_inst_reg<=32'b0;
+        IF_delayslot<=32'b0;
     end else
     if(IF_ID_valid_in&&IF_ID_allowin)begin
         IF_ID_PC_reg<=IF_delayslot;
         IF_inst_reg<=inst_sram_rdata;
+        ID_inst_reg<=IF_inst_reg;
+        IF_delayslot<=IF_addrtmp;
     end
 end
 
@@ -281,7 +304,7 @@ wire ID_EX_valid_out;//output wire: data from this stage is valid
 wire ID_EX_allowout;//data is getting out of this stage
 
 assign ID_EX_valid_in=IF_ID_valid_out;
-assign ID_EX_readygo=inst_sent;//data can flow out of this stage
+assign ID_EX_readygo=inst_sent&ex_sram_finished;//data can flow out of this stage
 //decode need only 1 clock cycle, yet 
 assign ID_EX_allowin=ID_EX_readygo&&EX_MEM_allowin||!ID_EX_valid;
 
@@ -298,7 +321,8 @@ assign inst_sent=~bubble;
 //ID data
 
 wire [31:0] ID_inst_in;
-assign ID_inst_in=IF_inst_reg;
+reg [31:0] ID_inst_reg;
+assign ID_inst_in=ID_inst_reg;
 
 
 
@@ -517,7 +541,7 @@ wire ID_exception_data=
     control.lw_op&(ID_MEM_addr[1:0]!=2'b0)|
     control.sh_op&(ID_MEM_addr[0]!=1'b0)|
     control.sw_op&(ID_MEM_addr[1:0]!=2'b0);
-wire ID_exception_reserved=control.RI;//1
+wire ID_exception_reserved=(control.RI)&(!ID_exception_fetch);//1
 wire ID_exception_instruction=control.Sys|control.Bp;//1
 wire ID_exception_int=exception.int_detect;//1
 wire ID_set_CP0=control.set_CP0;//1
@@ -528,7 +552,7 @@ wire [31:0]ID_badaddr=
     (ID_exception_data?ID_MEM_addr:32'b0);
 wire ID_Sys=control.Sys;
 wire ID_Bp=control.Bp;
-wire ID_RI=control.RI;
+wire ID_RI=control.RI&(!ID_exception_fetch);
 wire ID_OV=0;
 wire ID_BD=IF_ID_BD_r;//1
 wire ID_eret=control.eret;//1
@@ -597,7 +621,7 @@ always@(posedge clk)begin
     end
     else 
     begin
-        if(!div_stall)begin
+        if((!div_stall)&(ID_EX_allowin|ex_sram_finished))begin
             ID_EX_data<=`bubble;
             ID_EX_MEM_addr_reg<=32'b0;
             exception.ID_EX_exception_pipe_reg.data<=64'b0;
@@ -617,7 +641,7 @@ wire EX_MEM_valid_out;//output wire: data from this stage is valid
 wire EX_MEM_allowout;//data is getting out of this stage
 
 assign EX_MEM_valid_in=ID_EX_valid_out;
-assign EX_MEM_readygo=1;//data can flow out of this stage
+assign EX_MEM_readygo=mem_sram_finished;//data can flow out of this stage
 //TODO: mul and div
 assign EX_MEM_allowin=(EX_MEM_readygo&&MEM_WB_allowin||!EX_MEM_valid)&(!div_stall);//Added control logic in 10.7
 // assign EX_MEM_allowin=(EX_MEM_readygo&&MEM_WB_allowin||!EX_MEM_valid);
@@ -636,10 +660,9 @@ assign EX_MEM_allowout=EX_MEM_readygo&&EX_MEM_allowin;
 reg [31:0] EX_result;
 
 //EX memory interaction
-assign data_sram_addr=ID_EX_MEM_addr_reg;
+wire[31:0] data_sram_addr=ID_EX_MEM_addr_reg;
 
 wire [31:0]exmux_output;
-wire [3:0]strb;
 
 //Used for generating data really used for sxx insts.
 wbmux exmux(
@@ -657,7 +680,7 @@ wbmux exmux(
     strb
 );
 
-assign data_sram_wdata=exmux_output;
+wire[31:0] data_sram_wdata=exmux_output;
 //11.26 bug fixed
 wire block_data_wen=exception.ID_EX_exception_pipe_reg.exception_data|exception.ID_EX_exception_pipe_reg.exception_fetch;
 assign data_sram_wen=({4{(!clear_pipeline)&(!block_data_wen)}})&strb&{4{ID_EX_reg.mem_wen_pick!=0}};
@@ -770,7 +793,7 @@ wire MEM_WB_valid_out;//output wire: data from this stage is valid
 wire MEM_WB_allowout;//data is getting out of this stage
 
 assign MEM_WB_valid_in=EX_MEM_valid_out;
-assign MEM_WB_readygo=1;//data can flow out of this stage
+assign MEM_WB_readygo=mem_sram_finished;//data can flow out of this stage
 assign MEM_WB_allowin=MEM_WB_readygo&&WB_allowin||!MEM_WB_valid;
 assign MEM_WB_valid_out=MEM_WB_valid&&MEM_WB_readygo;
 assign MEM_WB_allowout=MEM_WB_readygo&&MEM_WB_allowin;
@@ -970,17 +993,17 @@ wire corelation_B3=ID_control_signal.reg_b_valid&(ID_rt!=0)&(ID_rt==MEM_WB_reg.r
 
 wire bypass_A1=corelation_A1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
 wire bypass_A2=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15]);
-wire bypass_A3=corelation_A3;
+wire bypass_A3=corelation_A3&MEM_WB_readygo;
 wire bypass_B1=corelation_B1&(!ID_EX_reg.mem_read)&(ID_EX_reg.reg_write_src[0]);
 wire bypass_B2=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15]);
-wire bypass_B3=corelation_B3;
+wire bypass_B3=corelation_B3&MEM_WB_readygo;
 
 wire bypass_A1_inst=1'b0;
 wire bypass_A2_inst=corelation_A2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15])&(!(EX_MEM_reg.mem_read));//ALU_result
-wire bypass_A3_inst=1'b1;
+wire bypass_A3_inst=1'b1&MEM_WB_readygo;
 wire bypass_B1_inst=1'b0;
 wire bypass_B2_inst=corelation_B2&(!EX_MEM_reg.reg_write_src[3])&(!EX_MEM_reg.reg_write_src[4])&(!EX_MEM_reg.reg_write_src[15])&(!(EX_MEM_reg.mem_read));//ALU_result
-wire bypass_B3_inst=1'b1;
+wire bypass_B3_inst=1'b1&MEM_WB_readygo;
 
 wire [31:0] bypassed_regfile_rdata1=(bypass_A1?Result:
     (bypass_A2?(EX_MEM_reg.mem_read?MEM_result_in:EX_result):
@@ -1054,7 +1077,8 @@ assign B_data=
 
 // assign bubble = 0;
 
-assign bubble=jump_with_reg?
+
+assign bubble=(jump_with_reg?
 (
     corelation_A1&(~bypass_A1_inst)|
     corelation_A2&(~bypass_A2_inst)|
@@ -1071,7 +1095,7 @@ assign bubble=jump_with_reg?
     corelation_B1&(~bypass_B1)|
     corelation_B2&(~bypass_B2)|
     corelation_B3&(~bypass_B3)
-);
+))&IF_ID_valid;
 
 //-------------------------------------------
 //EXCEPTION
@@ -1105,7 +1129,7 @@ wire [2:0]sram_inst_addr_state_next;
 `define sram_inst_addr_reset 3'b000
 `define sram_inst_addr_addr0 3'b001
 `define sram_inst_addr_addrdecode 3'b010
-`define sram_inst_addr_reserved 3'b100
+`define sram_inst_addr_clearpipe 3'b100
 
 always@(posedge clk)
 begin
@@ -1123,19 +1147,38 @@ assign sram_inst_addr_state_next=
     )|
     {3{sram_inst_addr_state_now==`sram_inst_addr_addr0}}&
     (
-        (inst_addr_ok?sram_inst_addr_addrdecode:sram_inst_addr_addr0)
+        (inst_addr_ok?`sram_inst_addr_addrdecode:`sram_inst_addr_addr0)
+    )|
+    {3{sram_inst_addr_state_now==`sram_inst_addr_clearpipe}}&
+    (
+        (inst_addr_ok?`sram_inst_addr_addrdecode:`sram_inst_addr_clearpipe)
     )|
     {3{sram_inst_addr_state_now==`sram_inst_addr_addrdecode}}&
     (
-        `sram_inst_addr_addrdecode
+        clear_pipeline?`sram_inst_addr_clearpipe:`sram_inst_addr_addrdecode
     );
 
-assign inst_req=sram_inst_addr_state_now!=`sram_inst_addr_reset;
+assign inst_req=(sram_inst_addr_state_now!=`sram_inst_addr_reset)&(!bubble)&(!div_stall);
 assign inst_wr=1'b0;
 assign inst_size=2'b10;
-assign inst_addr=inst_sram_addr;
-assign inst_wdata=32'b0;
+wire inst_reset=
+    (
+        (sram_inst_addr_state_now==`sram_inst_addr_addr0)|
+        (sram_inst_addr_state_now==`sram_inst_addr_reset)
+    );
 
+reg [31:0]clear_pipeline_PC_reg;
+always@(posedge clk)begin
+    if(clear_pipeline)clear_pipeline_PC_reg<=clear_pipeline_PC;
+end
+
+wire inst_cpipe=sram_inst_addr_state_now==`sram_inst_addr_clearpipe;
+assign inst_addr=
+{32{inst_reset}}&(32'hbfc00000)|
+{32{inst_cpipe}}&(clear_pipeline_PC_reg)|
+{32{(!inst_cpipe)&(!inst_reset)}}&inst_sram_addr;
+
+assign inst_wdata=32'b0;
 
 // assign sram_inst_addr_state_next=
 //     {3{sram_inst_addr_state_now==`sram_inst_addr_reset}}&
@@ -1150,7 +1193,7 @@ wire [2:0]sram_inst_data_state_next;//wire in fact
 `define sram_inst_data_reset 3'b000
 `define sram_inst_data_idle 3'b001
 `define sram_inst_data_waitinst 3'b010
-`define sram_inst_data_reserved 3'b100
+`define sram_inst_data_clearpipe 3'b100
 
 always@(posedge clk)
 begin
@@ -1164,19 +1207,138 @@ end
 assign sram_inst_data_state_next=
     {3{sram_inst_data_state_now==`sram_inst_data_reset}}&
     (
-        sram_inst_data_idle
+        `sram_inst_data_idle
     )|
     {3{sram_inst_data_state_now==`sram_inst_data_idle}}&
     (
-        inst_addr_ok?sram_inst_data_waitinst:sram_inst_data_idle
+        inst_addr_ok?
+            clear_pipeline?`sram_inst_data_clearpipe:`sram_inst_data_waitinst:
+            `sram_inst_data_idle
     )|
     {3{sram_inst_data_state_now==`sram_inst_data_waitinst}}&
     (
-        inst_data_ok?sram_inst_data_idle:inst_data_ok
+        inst_data_ok?`sram_inst_data_idle:
+            clear_pipeline?
+                `sram_inst_data_clearpipe:
+                `sram_inst_data_waitinst
+        //may need change if accrelate axi_ifc
+    )|
+    {3{sram_inst_data_state_now==`sram_inst_data_clearpipe}}&
+    (
+        inst_data_ok?`sram_inst_data_idle:`sram_inst_data_clearpipe
         //may need change if accrelate axi_ifc
     );
 
-assign inst_sram_rdata=inst_rdata;
+wire IF_togo=(sram_inst_data_state_now==`sram_inst_data_waitinst)&inst_data_ok;
+
+//EX sram
+
+//FIXIT
+wire ex_sram_finished=
+    (ID_EX_reg.mem_wen_pick==0)&(!ID_EX_reg.mem_read)|
+    data_addr_ok;
+assign data_req=
+    (ID_EX_reg.mem_wen_pick!=0)|(ID_EX_reg.mem_read);
+assign data_wr=
+    data_sram_wen!=0;
+    // (ID_EX_reg.mem_wen_pick!=0);
+assign data_addr=data_sram_addr;     
+assign data_wdata=data_sram_wdata;
+// assign strb=;//from mux
+
+// input [31:0]data_rdata,    
+// input data_addr_ok,  
+// input data_data_ok,  
+
+// IF sram like
+// reg  [2:0]sram_ex_state_now;
+// wire [2:0]sram_ex_state_next;//wire in fact
+
+// `define sram_ex_reset 3'b000
+// `define sram_ex_idle 3'b001
+// `define sram_ex_store1 3'b010
+// `define sram_ex_store2 3'b011
+// `define sram_ex_load 3'b100
+
+// always@(posedge clk)
+// begin
+//     if(!resetn)begin
+//         sram_ex_state_now<=3'b0;
+//     end else begin
+//         sram_ex_state_now<=sram_ex_state_next;
+//     end
+// end
+
+// assign sram_ex_state_next=
+//     {3{sram_ex_state_now==`sram_ex_reset}}&
+//     (
+//         sram_ex_idle
+//     )|
+//     {3{sram_ex_state_now==`sram_ex_idle}}&
+//     (
+//         {3{ID_EX_reg.mem_wen_pick!=0}}&`sram_ex_store1|
+//         {3{ID_EX_reg.mem_read}}&`sram_ex_load
+//     )|
+//     {3{sram_ex_state_now==`sram_ex_store1}}&
+//     (
+//         data_addr_ok?
+//         (ID_EX_reg.mem_wen_pick[3]|ID_EX_reg.mem_wen_pick[4])?
+//             `sram_ex_store2:
+//             `sram_ex_idle:
+//         `sram_ex_store1
+//     )|
+//     {3{sram_ex_state_now==`sram_ex_store2}}&
+//     (
+//         data_addr_ok?`sram_ex_idle:`sram_ex_store2
+//     )|
+//     {3{sram_ex_state_now==`sram_ex_load}}&
+//     (
+//         data_addr_ok?`sram_ex_idle:`sram_ex_load
+//     );
+
+// //TODO: MEM allowin!
+// wire ex_sram_finished=
+//     (ID_EX_reg.mem_wen_pick==0)&(!ID_EX_reg.mem_read)|
+//     ex_transfer_finished;
+// wire ex_transfer_finished=
+//    (ID_EX_reg.mem_wen_pick[3]|ID_EX_reg.mem_wen_pick[4])?
+//         ((sram_ex_state_now==`sram_ex_store2)&data_addr_ok):
+//         data_addr_ok;
+// assign data_req=
+//     (sram_ex_state_now==`sram_ex_store1)|
+//     (sram_ex_state_now==`sram_ex_store2)|
+//     (sram_ex_state_now==`sram_ex_load);
+// assign data_wr=
+//     (sram_ex_state_now==`sram_ex_store1)|
+//     (sram_ex_state_now==`sram_ex_store2);
+// wire [1:0]swl_size=
+//     {2{data_addr[1:0]==2'b00}}&2'b0001|//fixit
+//     {2{data_addr[1:0]==2'b01}}&2'b0011|
+//     {2{data_addr[1:0]==2'b10}}&2'b0111|
+//     {2{data_addr[1:0]==2'b11}}&2'b1111;
+// wire [1:0]swr_size=
+//     {2{data_addr[1:0]==2'b00}}&2'b1111|
+//     {2{data_addr[1:0]==2'b01}}&2'b1110|
+//     {2{data_addr[1:0]==2'b10}}&2'b1100|
+//     {2{data_addr[1:0]==2'b11}}&2'b1000;
+// assign data_size=
+//     {2{ID_EX_reg.mem_wen_pick[0]}}&2'b10|//sw_op
+//     {2{ID_EX_reg.mem_wen_pick[1]}}&2'b01|//sh_op
+//     {2{ID_EX_reg.mem_wen_pick[2]}}&2'b00|//sb_op
+//     {2{ID_EX_reg.mem_wen_pick[3]}}&swl_size|//swl_op
+//     {2{ID_EX_reg.mem_wen_pick[4]}}&swr_size|//swr_op
+//     {2{ID_EX_reg.mem_read}}&2'b10;
+// assign data_addr=data_sram_addr;     
+// assign data_wdata=data_sram_wdata;
+// // input [31:0]data_rdata,    
+// // input data_addr_ok,  
+// // input data_data_ok,  
+
+//MEM sram
+
+wire mem_sram_finished=
+    (!EX_MEM_reg.mem_read)|data_data_ok;
+    // input data_data_ok,  
 
 //Reserved
 //---------------------------------

@@ -295,7 +295,7 @@ reg BD;
 assign CP0_Cause[31]=BD;
 assign CP0_Cause[30]=TI&IM7;//TODO: TO PASS THE TEST
 assign CP0_Cause[29:16]=14'b0;
-assign CP0_Cause[15]=IP7|TI;
+assign CP0_Cause[15]=IP7|TI&IM7;
 assign CP0_Cause[14]=IP6;
 assign CP0_Cause[13]=IP5;
 assign CP0_Cause[12]=IP4;
@@ -337,13 +337,13 @@ always@(posedge clk)begin
     if(!resetn)begin
         TI<=1'b0;
     end else 
-    if(CP0_Count==CP0_Compare)
-    begin
-        TI<=1'b1;
-    end else
     if(set_compare)
     begin
         TI<=1'b0;
+    end else
+    if((CP0_Count==CP0_Compare)&&(CP0_Compare!=32'b0))//12.9 added
+    begin
+        TI<=1'b1;
     end
 end
 
