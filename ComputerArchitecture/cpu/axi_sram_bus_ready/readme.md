@@ -1,13 +1,22 @@
-# MIPSO32五级流水CPU
+<!-- # MIPSO32五级流水CPU -->
 
-> 当前版本: axi_bus_ready
-> 对应实验: lab5
-> 最后修改: 2018.12.7
+MIPS O32 5-Pipelined AXI/SRAM CPU 
+=================================
+
+Copyright (C) 2018 Wang Huaqiang 
+
+email : wanghuaqiang16@mails.ucas.ac.cn
+
+***
+
+> 当前版本: axi_sram_bus_passed(basic)
+> 对应实验: lab5-3
+> 最后修改: 2018.12.10
 
 ## 文件架构
 
-* define.v          宏定义
-* top.v             CPU顶层设计
+* cpu_top.v         带AXI总线接口的CPU顶层包装(AXI接口)
+* cpu_core.v        SRAM-CPU顶层设计(SRAM接口)
 * control.v         控制逻辑生成模块
 * reg.v             寄存器堆
 * alu.v             算术逻辑单元
@@ -15,8 +24,10 @@
 * divider.v         迭代除法器
 * pipereg.v         流水线控制信号翻译, 无实质逻辑
 * wbmux.v           STORE/LOAD用多路选择器
-* cp0def.v          CP0寄存器宏定义
 * exception.v       异常处理模块
+* axi_sram_ifc.v    sram-axi转换桥
+* define.v          宏定义
+* cp0def.v          CP0寄存器宏定义
 
 ## 设计简述
 
@@ -32,7 +43,7 @@ pre-fetch级(pre-IF)位于取指令级之前, 在这一级, CPU根据译码级�
 
 中断统一在写回级进行处理.
 
-异常处理的整体布局如下:
+异常处理的的异常信号随流水线一同传递, 其整体布局如下:
 
 1. 在译码级利用指令译码逻辑产生绝大多数异常, 包括保留指令异常, 引起异常(或需要使用异常通路)的指令, 如syscall, break, eret指令在这一阶段完成解析.
 1. 同时在译码级进行当前PC地址和访存PC地址的检查, 发现异常的PC地址直接产生异常.
@@ -40,7 +51,10 @@ pre-fetch级(pre-IF)位于取指令级之前, 在这一级, CPU根据译码级�
 1. 在访存级接收所有外部中断与时钟信号.
 1. 最终所有的异常汇聚到访存级进行处理, 因此将CP0寄存器堆设置在访存级.
 
+接口方面, 当前CPU支持SRAM接口, 以及AXI总线接口, 分别对应`cpu_core.v`和`cpu_top.v`. 注意, 此CPU暂不支持sram-like接口, 因为sram-like接口不支持三位写操作, 因此不能发挥AXI总线的性能, 且会造成设计上的复杂.
 
-***
+当前使用的转接桥效率有限, 不能完整的发挥出SRAM-CPU的性能. AXI-CPU退化为多周期CPU的形式.
 
-Huaqiang Wang (c) 2018
+---
+
+Copyright (C) 2018 Wang Huaqiang 
