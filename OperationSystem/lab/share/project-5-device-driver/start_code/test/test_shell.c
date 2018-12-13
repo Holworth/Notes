@@ -91,17 +91,22 @@ struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, KERNEL_PROCESS,
 struct task_info pressure_test_task = {"pressure_test1", (uint32_t)&pressure_test, USER_PROCESS,1,1};
 struct task_info pressure_test_task2 = {"pressure_test2", (uint32_t)&pressure_test2, USER_PROCESS,1,1};
 struct task_info mem_swap_test_task = {"mem_swap_test", (uint32_t)&mem_swap_test, USER_PROCESS,1,1};
+struct task_info L2_swap_test_task = {"L2_swap_test", (uint32_t)&L2_swap_test, USER_PROCESS,1,1};
 struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, USER_PROCESS,1,1};
 struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, USER_PROCESS,1,1};
 struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, USER_PROCESS,1,1};
 
 static struct task_info *test_tasks[16] = 
     {
-        &task1, &task2, &vm_deamon, &pressure_test_task,
-        &pressure_test_task2, &mem_swap_test_task,
-        &phy_regs_test1_task,
-        &phy_regs_test2_task,
-        &phy_regs_test3_task
+        &task1, &task2, 
+        &vm_deamon,//2 
+        &pressure_test_task,//3
+        &pressure_test_task2,//4 
+        &mem_swap_test_task,//5
+        &L2_swap_test_task,//6
+        &phy_regs_test1_task,//7
+        &phy_regs_test2_task,//8
+        &phy_regs_test3_task//9
     };
 static int num_test_tasks = 9;
 
@@ -299,6 +304,7 @@ inline void cmd_about()
 {
     printf(" Lagenaria Siceraria OS\n");
     printf(" Copyright (C) 2018 Huaqiang Wang\n");
+    printf(" Compiled at: %s,%s\n",__DATE__,__TIME__);
 }
 
 inline void cmd_history()
@@ -365,12 +371,35 @@ inline void cmd_dump()
 {
     if(argc!=2)
     {
-        printf("Dump: Invalid arguments. Usage: dump [vaddr (in hex, no 0x)]\n");
+        printf("Dump: Invalid arguments. Usage: dump [vaddr (in hex, no 0x)] / [l2]\n");
         return;
     }
-    uint32_t* dumpaddr=(uint32_t *)htoi(argv[1]);
-    uint32_t dumpval=*dumpaddr;
-    printf("Dump addr 0x%x, result: 0x%x, %d\n",dumpaddr,dumpval, dumpval);
+    if(strcmp("l2",argv[1]))
+    {
+        uint32_t* dumpaddr=(uint32_t *)htoi(argv[1]);
+        uint32_t dumpval=*dumpaddr;
+        printf("Dump addr 0x%x, result: 0x%x, %d\n",dumpaddr,dumpval, dumpval);
+    }else
+    {
+        L2_dump();
+    }
+    return;
+}
+
+inline void cmd_find()
+{
+    if(argc!=2)
+    {
+        printf("Find: Invalid arguments. Usage: find [val]\n");
+        return;
+    }
+        uint32_t findval=(uint32_t)htoi(argv[1]);
+        uint32_t findaddr=0xa0000000;
+        for(;findaddr<0xa1f00000;findaddr+=4)
+        {
+            if((*(uint32_t*)findaddr)==findval)
+                printf("Find in addr 0x%x\n",findaddr);
+        }
     return;
 }
 
@@ -515,6 +544,11 @@ inline void shell_interpret_cmd()
     if (!strcmp(argv[0], "dump"))
     {
         cmd_dump();
+        return;
+    }
+    if (!strcmp(argv[0], "find"))
+    {
+        cmd_find();
         return;
     }
     if (!strcmp(argv[0], "set"))

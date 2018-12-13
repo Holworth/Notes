@@ -316,6 +316,11 @@ void *alloc_page()
 {
     if (free_mem_page_stack_point)
     {
+        if(current_running->memused>MAX_PAGE_PER_PROC)
+        {
+            return 0;
+        }
+        current_running->memused++;
         return free_mem_page[--free_mem_page_stack_point];
     }
     else //no free mem_page remains
@@ -326,6 +331,7 @@ void *alloc_page()
 
 void *free_page(void *paddr)
 {
+    current_running->memused--;
     free_mem_page[free_mem_page_stack_point++] = paddr;
 }
 

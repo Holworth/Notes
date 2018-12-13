@@ -78,6 +78,7 @@ void prepare_proc(pcb_t* pcbp, struct task_info * task)
         // pcbp->user_stack_top=alloc_stack();
         pcbp->user_stack_top=0x70000000; 
     }
+
     pcbp->priority_level=pcbp->priority_level_set;
     pcbp->timeslice=pcbp->timeslice_set;
     pcbp->timeslice_left=pcbp->timeslice_set;
@@ -314,8 +315,16 @@ do_unblock_all(queue_t *queue)
 inline void free_proc_resource(pcb_t* pcbp)
 {
     //free stack
-    stack_push(&freed_stack, pcbp->kernel_stack_top);
-    stack_push(&freed_stack, pcbp->user_stack_top);
+    if((pcbp->kernel_stack_top&0x80000000))
+    {
+        // printk("boom1, %x, %x \n", pcbp->kernel_stack_top, pcbp->kernel_stack_top&0x80000000);
+        stack_push(&freed_stack, pcbp->kernel_stack_top);
+    }
+    if((pcbp->user_stack_top&0x80000000))
+    {
+        // printk("boom2, %x, %x \n", pcbp->user_stack_top, pcbp->user_stack_top&0x80000000);
+        stack_push(&freed_stack, pcbp->user_stack_top);
+    }
 
     //free current queues
     queue_t* queuei = pcbp->current_queue;

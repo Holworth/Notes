@@ -13,5 +13,6 @@ void rw_task1(void);
 void pressure_test(void);
 void pressure_test2(void);
 void mem_swap_test(void);
+void L2_swap_test(void);
 
 #endif

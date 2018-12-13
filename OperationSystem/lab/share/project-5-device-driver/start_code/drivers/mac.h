@@ -3,9 +3,9 @@
 
 #include "type.h"
 #include "queue.h"
-#define TEST_REGS1
-//#define TEST_REGS2
-//#define TEST_REGS3
+#include "syscall.h"
+#include "vdisk.h"
+
 #define GMAC_BASE_ADDR (0xbfe10000)
 #define DMA_BASE_ADDR  (0xbfe11000)
 #define PSIZE (256)
@@ -13,15 +13,14 @@
 
 //---------------------------------------
 #define LS1C_MAC_IRQ 0
-int sys_init_mac();
-int sys_net_send(uint32_t, uint32_t);
-int sys_net_recv(uint32_t, uint32_t, uint32_t);
-int register_irq_handler(uint32_t, uint32_t);
-int sys_wait_recv_package();
+// int sys_init_mac();
+// int sys_net_send(uint32_t, uint32_t);
+// int sys_net_recv(uint32_t, uint32_t, uint32_t);
+// int sys_wait_recv_package();
 
+int register_irq_handler(uint32_t, uint32_t);
 
 //---------------------------------------
-
 extern queue_t recv_block_queue;
 extern uint32_t recv_flag[PNUM];
 extern uint32_t ch_flag;
@@ -762,8 +761,6 @@ enum InitialRegisters
     DmaIntDisable = 0,
 };
 
-
-
 typedef struct desc
 {
     uint32_t tdes0;
@@ -771,6 +768,7 @@ typedef struct desc
     uint32_t tdes2;
     uint32_t tdes3;
 } desc_t;
+
 typedef struct mac
 {
     uint32_t psize;     // backpack size
@@ -790,6 +788,9 @@ typedef struct mac
     uint32_t td_phy;
     uint32_t rd_phy;    
 
+    //Anyone can tell me the difference between 
+    // saddr_phy, saddr, td_phy????
+
 } mac_t;
 
 uint32_t read_register(uint32_t base, uint32_t offset);
@@ -807,4 +808,22 @@ void do_init_mac(void);
 void do_wait_recv_package(void);
 void irq_mac(void);
 void check_recv(mac_t *test_mac);
+
+#define DESC_NUM 0x80 //128
+#define DESC_SIZE 16 //128
+// #define DESC_BASE VDISK_UPPER_BOUND //0xa1d00000
+#define BIG_RECEIVE_BUFFER VDISK_UPPER_BOUND //0xa1d00000
+
+
+// void init_tx_desc();
+// void init_rx_desc();
+// uint32_t init_desc();
+
+// uint32_t receive_buffer[PNUM][PSIZE];
+uint32_t receive_buffer;
+desc_t send_desc_table[DESC_NUM];
+desc_t receive_desc_table[DESC_NUM];
+
+uint32_t desc_addr_now;
+
 #endif

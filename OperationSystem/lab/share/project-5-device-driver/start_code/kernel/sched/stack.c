@@ -21,6 +21,6 @@ int stack_push(struct int_stack* stack,uint32_t data)
 
 uint32_t stack_pop(struct int_stack* stack)
 {
-    return stack->data[stack->point--];
+    return stack->data[--stack->point];
 }
 

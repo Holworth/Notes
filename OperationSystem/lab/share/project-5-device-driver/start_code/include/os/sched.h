@@ -187,6 +187,10 @@ typedef struct pcb
 
     /* info used to do swap */
     swap_request_t swap_request;
+
+    /* info used to limit mem use */
+    int memused;
+    
 } pcb_t;
 
 /* task information, used to init PCB */

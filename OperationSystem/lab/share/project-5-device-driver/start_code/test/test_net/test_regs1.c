@@ -4,7 +4,7 @@
 #include "screen.h"
 #include "syscall.h"
 #include "sched.h"
-#include "test4.h"
+#include "test_net.h"
 
 #ifdef TEST_REGS1
 
@@ -30,12 +30,71 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
-    
+    int lcnt=0;
+    // Fst Tx desc
+    uint32_t start_addr=(uint32_t)&send_desc_table;
+    // uint32_t last_addr=desc_addr_now;
+
+    //Not the last one
+    while(++lcnt<(PNUM))
+    {
+        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
+        ((desc_t *)desc_addr_now)->tdes1=0+1<<24;
+        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer;
+        ((desc_t *)desc_addr_now)->tdes3=desc_addr_now+DESC_SIZE;
+        desc_addr_now+=DESC_SIZE;
+    }
+
+    //The last one
+        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
+        ((desc_t *)desc_addr_now)->tdes1=0+1<<25;//TODO 31
+        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer;
+        ((desc_t *)desc_addr_now)->tdes3=start_addr;
+        desc_addr_now+=DESC_SIZE;
+    //buffer size not set
+
+    //Set up mac: TODO
+    mac->td=(uint32_t)send_desc_table;//?
+    mac->td_phy=(uint32_t)send_desc_table;//?
+    mac->saddr_phy=(uint32_t)buffer;
+    mac->saddr=(uint32_t)buffer;
+
+    return;
 }
 
 static void recv_desc_init(mac_t *mac)
 {
-    
+    int lcnt=0;
+    // Fst Tx desc
+    uint32_t start_addr=(uint32_t)&receive_desc_table;
+    uint32_t buffer_addr=receive_buffer;
+    // uint32_t last_addr=desc_addr_now;
+
+    //Not the last one
+    while(++lcnt<(PNUM))
+    {
+        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
+        ((desc_t *)desc_addr_now)->tdes1=0+1<<24;//TODO 31
+        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer_addr;
+        ((desc_t *)desc_addr_now)->tdes3=desc_addr_now+DESC_SIZE;
+        desc_addr_now+=DESC_SIZE;
+        buffer_addr+=PSIZE*4;
+    }
+
+    //The last one
+        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
+        ((desc_t *)desc_addr_now)->tdes1=0+1<<25;
+        ((desc_t *)desc_addr_now)->tdes2=buffer_addr;
+        ((desc_t *)desc_addr_now)->tdes3=start_addr;
+        desc_addr_now+=DESC_SIZE;
+    //buffer size not set
+
+    //Set up mac: TODO
+    mac->rd=(uint32_t)receive_desc_table;//?
+    mac->rd_phy=(uint32_t)receive_desc_table;//?
+    mac->saddr_phy=(uint32_t)buffer_addr;
+    mac->saddr=(uint32_t)buffer_addr;
+    return;
 }
 
 
@@ -122,17 +181,17 @@ void phy_regs_task2()
 
     queue_init(&recv_block_queue);
     sys_move_cursor(1, print_location);
-    printf("[RECV TASK] start recv:                    ");
+    printf("> [RECV TASK] start recv:                    ");
     ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
     if (ret == 0)
     {
         sys_move_cursor(1, print_location);
-        printf("[RECV TASK]     net recv is ok!                          ");
+        printf("> [RECV TASK]     net recv is ok!                          ");
     }
     else
     {
         sys_move_cursor(1, print_location);
-        printf("[RECV TASK]     net recv is fault!                       ");
+        printf("> [RECV TASK]     net recv is fault!                       ");
     }
 
     sys_exit();
@@ -140,6 +199,11 @@ void phy_regs_task2()
 
 void phy_regs_task3()
 {
+    //init desc addr
+    send_desc=(desc_t*)&send_desc_table;
+    receive_desc=(desc_t*)&receive_desc_table;
+    receive_buffer=BIG_RECEIVE_BUFFER;
+
     uint32_t print_location = 1;
     sys_move_cursor(1, print_location);
     printf("> [INIT] Waiting for MAC initialization .\n");

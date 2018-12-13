@@ -4,7 +4,7 @@
 #include "screen.h"
 #include "syscall.h"
 #include "sched.h"
-#include "test4.h"
+#include "test_net.h"
 
 #ifdef TEST_REGS3
 
@@ -149,6 +149,9 @@ void phy_regs_task2()
 
 void phy_regs_task3()
 {
+    send_desc=&send_desc_table;
+    receive_desc=&receive_desc_table;
+    
     uint32_t print_location = 1;
     sys_move_cursor(1, print_location);
     printf("> [INIT] Waiting for MAC initialization .\n");

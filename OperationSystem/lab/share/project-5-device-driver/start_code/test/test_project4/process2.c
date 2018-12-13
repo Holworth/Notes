@@ -93,9 +93,9 @@ void pressure_test(void)
 	int clk = 0;
 	for (i = 0; i < 0x70000000; i += 4)
 	{
-		(*(int *)i) = i+1;
+		(*(int *)i) = i + 1;
 		sys_move_cursor(1, 1);
-		printf("Pressure_test1: now write 0x%x\n", i+1);
+		printf("Pressure_test1: now write 0x%x\n", i + 1);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -104,12 +104,17 @@ void pressure_test(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 2);
-			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+1);
-			if(((*(int *)(j)))!=((j)+1)){while(1);}
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)), (j) + 1);
+			if (((*(int *)(j))) != ((j) + 1))
+			{
+				while (1)
+					;
+			}
 			j += 4;
 		}
 	}
-	while(1);
+	while (1)
+		;
 }
 
 void pressure_test2(void)
@@ -119,9 +124,9 @@ void pressure_test2(void)
 	int clk = 0;
 	for (i = 0; i < 0x70000000; i += 4)
 	{
-		(*(int *)i) = i+2;
+		(*(int *)i) = i + 2;
 		sys_move_cursor(1, 3);
-		printf("Pressure_test2: now write 0x%x\n", i+2);
+		printf("Pressure_test2: now write 0x%x\n", i + 2);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -130,12 +135,17 @@ void pressure_test2(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 4);
-			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+2);
-			if(((*(int *)(j)))!=((j)+2)){while(1);}
+			printf("Pressure_test2: now read 0x%x, should be 0x%x\n", (*(int *)(j)), (j) + 2);
+			if (((*(int *)(j))) != ((j) + 2))
+			{
+				while (1)
+					;
+			}
 			j += 4;
 		}
 	}
-	while(1);
+	while (1)
+		;
 }
 
 void mem_swap_test(void)
@@ -143,11 +153,12 @@ void mem_swap_test(void)
 	uint32_t i = 0x0;
 	uint32_t j = 0x0;
 	int clk = 0;
+
 	for (i = 0; i < 0x70000000; i += 0x1000)
 	{
-		(*(int *)i) = i+3;
+		(*(int *)i) = i + 3;
 		sys_move_cursor(1, 5);
-		printf("Mem_swap_test: now write 0x%x\n", i+3);
+		printf("Mem_swap_test: now write 0x%x\n", i + 3);
 		if (clk == 0)
 		{
 			clk = 1;
@@ -156,10 +167,54 @@ void mem_swap_test(void)
 		{
 			clk = 0;
 			sys_move_cursor(1, 6);
-			printf("Mem_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)),(j)+3);
-			if(((*(int *)(j)))!=((j)+3)){while(1);}
+			printf("Mem_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)), (j) + 3);
+			if (((*(int *)(j))) != ((j) + 3))
+			{
+				sys_move_cursor(1, 7);
+				printf("Error!\n");
+				// while (1)
+				sys_exit();
+					// ;
+			}
 			j += 0x1000;
 		}
 	}
-	while(1);
+	while (1)
+		;
+}
+
+void L2_swap_test(void)
+{
+	uint32_t i = 0x0;
+	uint32_t j = 0x0;
+	int clk = 0;
+
+	for (i = 0; i < 0x70000000; i += 0x100000)
+	{
+		(*(int *)i) = i + 3;
+		sys_move_cursor(1, 5);
+		printf("L2_swap_test: now write 0x%x\n", i + 3);
+		if (clk == 0)
+		{
+			clk = 1;
+		}
+		else
+		{
+			clk = 0;
+			sys_move_cursor(1, 6);
+			printf("L2_swap_test: now read 0x%x, should be 0x%x\n", (*(int *)(j)), (j) + 3);
+			if (((*(int *)(j))) != ((j) + 3))
+			{
+				sys_move_cursor(1, 7);
+				printf("Error!\n");
+				L2_dump();
+				while(1)
+				;
+				sys_exit();
+
+			}
+			j += 0x100000;
+		}
+	}
+	sys_exit();
 }

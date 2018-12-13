@@ -53,11 +53,11 @@
 #include "syscall.h"
 #include "sync.h"
 #include "mm.h"
+#include "mac.h"
 
 #define PORT 0xbfe48000
 #define bios_printstr 0x8007b980
-#define STACK_BASE 0xa0e00000
-#define STACK_SIZE 0x10000 
+
 // current_running
 // ready_queue
 
@@ -67,13 +67,15 @@ uint32_t stack_base_now = STACK_BASE;
 
 uint32_t free_stack(uint32_t addr)
 {
-    stack_push(&freed_stack,addr);
+    //only real mem addr can be reused.
+    if((addr&0x80000000))
+        stack_push(&freed_stack,addr);
 }
 
 uint32_t alloc_stack()
 {
     // uint32_t t=stack_base_now;
-
+    // printk("freed_stack.point:%d\n", freed_stack.point);
     if(stack_empty(&freed_stack))
     {
     stack_base_now-=STACK_SIZE;
@@ -119,14 +121,27 @@ static void init_memory()
     //for debug
     {
         //FIXIT
-        int i=0xa0f00000;
-        for(i=0xa0f00000;i<0xa1200000;i+=4)
+        int i=STACK_BASE;
+        for(i=STACK_BASE;i<0xa1f00000;i+=4)
         {
             *(int*)i=i;
         }
     }
 
-    //TODO: for test
+    // Init space for mac
+    {
+        //FIXIT
+        int i=BIG_RECEIVE_BUFFER;
+        for(i=BIG_RECEIVE_BUFFER;i<0xa1f00000;i+=4)
+        {
+            *(int*)i=0;
+        }
+    }
+    
+    // Init some global vars
+    // desc_addr_now=DESC_BASE;
+
+    // for lab4 test
     // TLB_set_global(0x00000000,0,0xa0f00000);
     // TLB_set_global(0x00020000,1,0xa0f00000);
 
@@ -313,6 +328,11 @@ static void init_syscall(void)
 
     syscall[SYSCALL_PS]=&do_ps;
     syscall[SYSCALL_GETPID]=&do_getpid;
+    
+    syscall[SYSCALL_INIT_MAC]=&do_init_mac;
+    syscall[SYSCALL_NET_SEND]=&do_net_send;
+    syscall[SYSCALL_NET_RECV]=&do_net_recv;
+    syscall[SYSCALL_WAIT_RECV_PACKAGE]=&do_wait_recv_package;
 
     return;
 }
@@ -356,6 +376,10 @@ void __attribute__((section(".entry_function"))) _start(void)
     init_pcb();
     printk("> [INIT] PCB initialization succeeded.\n");
 
+    // alloc_basic_page();
+    // current_running=&empty_pcb_for_init;//do not touch this
+    // printk("> [INIT] Basic Page alloced for each PCB.\n");
+
     // init screen (QAQ)
     #ifdef DEBUG
     printk("> [INIT] init_screen() closed for debugging.\n");
@@ -364,9 +388,10 @@ void __attribute__((section(".entry_function"))) _start(void)
     // printk("> [INIT] SCREEN initialization succeeded.\n");
     #endif
 
-    vt100_move_cursor(1, 10);
+    vt100_move_cursor(1, 1);
     printk("> Lagenaria Siceraria OS\n");
     printk("> Copyright (C) 2018 Huaqiang Wang\n");
+    printk("> Compiled at: %s,%s\n",__DATE__,__TIME__);
 
     // Enable interrupt
     // interrupt_enable_init();
@@ -379,7 +404,7 @@ void __attribute__((section(".entry_function"))) _start(void)
     
     while (1)
     {
-    error_ps();
+    // error_ps();
     do_scheduler();
     info("init_scheduler() called more than 1");
     // do_scheduler();

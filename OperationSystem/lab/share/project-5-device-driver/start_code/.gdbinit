@@ -35,31 +35,12 @@ symbol-file main
 
 # 等待连接
 #b *0xa0800200
-# TODO: 在这里设置断点:
-#b sleep_task
-#b *0x80000180
-#b scheduler
-#b *0xa0800200
-#b TLB_set_global
-#b test_shell
-#b deamon_vm
-#b handle_int
-#b do_TLB_Refill
-#b *0x80000000
-#b cmd_set
-#b cmd_dump
-#b *0xa080a59c
-#b fake_scene
-#b set_CP0_ENTRYHI_with_cpid
-#b scheduler
-#b mutex_lock_init
-#b enable_interrupt
-#b do_L2_swap
-b set_breakpoint
-#b sdwrite
-#b *0x80085690
 #b clock_findnext
+b set_breakpoint
 b do_swap
+b do_L2_swap
+b do_TLB_Refill
+#b do_semaphore_up
 #b *0x80079cd8
 #b read_asm  
 #b *0x800856a8

@@ -24,7 +24,7 @@
 
 #include "type.h"
 #include "sync.h"
-
+#include "vdisk.h"
 
 #define TLB_ENTRY_NUMBER 64
 #define MAX_L2_PER_PROC  4
@@ -53,11 +53,12 @@ typedef struct page_table_entry_L2
 {
     char setuped;       //vaddr-raddr project has already been setuped
     char inmem;         //this l2's page(s) is in memory, "valid" in tlb
-    char R;         //reserved
+    char R;             //R in clock algorithm
     char swap_cnt;      //4: count how many times this page has been swaped
     void* raddr;        //8: this page(s)' addr in physic memory
     int disk_addr;      //12: this page(s)' addr in disk. 0 if it has not been swaped out.
-    int reserved;       //16: for align 16, now is used as R in clock algorithm.
+    int l1_index;          //16: vaddr, for look back.
+    // int reserved;       //16: for align 16, now is used as R in clock algorithm.
     //for each tlb miss, reserved (i.e. R) ++
 }pte_L2;
 
@@ -92,9 +93,11 @@ int next_clock(int);
 int clock_findnext();
 
 // Page Alloc Operations //--------------------------------
+#define STACK_BASE 0xa0b00000
+#define STACK_SIZE 0x10000 
 
-#define MEM_BASE 0x00f00000
-#define MEM_UPPER_BOUND 0x01000000
+#define MEM_BASE ((uint32_t)STACK_BASE-(uint32_t)0xa0000000)
+#define MEM_UPPER_BOUND 0x00f00000
 #define PAGE_SIZE 0x00001000
 
 void* free_mem_page[0x2000];
@@ -129,6 +132,12 @@ int disk_addr;
 int disk_init();
 int alloc_disk(int);
 
+// MEM limitation //--------------------------------
+
+#define MAX_PAGE_PER_PROC 64
+
 // For Debug //-------------------------------
 void wrong_addr();
+void L2_dump();
+
 #endif
