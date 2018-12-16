@@ -1,4 +1,5 @@
 #include "irq.h"
+#include "regs.h"
 #include "time.h"
 #include "sched.h"
 #include "string.h"
@@ -70,6 +71,7 @@ static void irq_timer()
 
     wakeup_sleep();
     screen_reflush();
+    check_recv_block_queue();
 
     if(timeslice_runout())
     {
@@ -94,6 +96,11 @@ void interrupt_helper(uint32_t status, uint32_t cause)
     // read CP0 register to analyze the type of interrupt.
     uint32_t ip=status>>8;
     ip&=0x000000FF;
+    if(ip==(1<<3))//ip[7]==1
+    {
+        if((*(uint32_t*)INT1_SR)&(0x00000001<<3))
+        irq_mac();
+    }
     if(ip==(1<<7))//ip[7]==1
     {
         irq_timer();
@@ -105,3 +112,4 @@ void other_exception_handler()
 {
     // TODO other exception handler
 }
+

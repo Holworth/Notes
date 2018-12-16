@@ -85,4 +85,6 @@ extern void wrong_addr(void);
 extern void handle_syscall(void);
 extern void handle_other(void);
 
+extern void irq_mac(void);
+
 #endif

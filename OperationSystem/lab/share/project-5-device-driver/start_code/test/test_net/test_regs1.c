@@ -30,70 +30,17 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
-    int lcnt=0;
-    // Fst Tx desc
-    uint32_t start_addr=(uint32_t)&send_desc_table;
-    // uint32_t last_addr=desc_addr_now;
 
-    //Not the last one
-    while(++lcnt<(PNUM))
-    {
-        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
-        ((desc_t *)desc_addr_now)->tdes1=0+1<<24;
-        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer;
-        ((desc_t *)desc_addr_now)->tdes3=desc_addr_now+DESC_SIZE;
-        desc_addr_now+=DESC_SIZE;
-    }
-
-    //The last one
-        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
-        ((desc_t *)desc_addr_now)->tdes1=0+1<<25;//TODO 31
-        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer;
-        ((desc_t *)desc_addr_now)->tdes3=start_addr;
-        desc_addr_now+=DESC_SIZE;
-    //buffer size not set
-
-    //Set up mac: TODO
-    mac->td=(uint32_t)send_desc_table;//?
-    mac->td_phy=(uint32_t)send_desc_table;//?
-    mac->saddr_phy=(uint32_t)buffer;
-    mac->saddr=(uint32_t)buffer;
+    init_desc_same_buf(&send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);
 
     return;
 }
 
 static void recv_desc_init(mac_t *mac)
 {
-    int lcnt=0;
-    // Fst Tx desc
-    uint32_t start_addr=(uint32_t)&receive_desc_table;
-    uint32_t buffer_addr=receive_buffer;
-    // uint32_t last_addr=desc_addr_now;
 
-    //Not the last one
-    while(++lcnt<(PNUM))
-    {
-        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
-        ((desc_t *)desc_addr_now)->tdes1=0+1<<24;//TODO 31
-        ((desc_t *)desc_addr_now)->tdes2=(uint32_t)buffer_addr;
-        ((desc_t *)desc_addr_now)->tdes3=desc_addr_now+DESC_SIZE;
-        desc_addr_now+=DESC_SIZE;
-        buffer_addr+=PSIZE*4;
-    }
+    init_desc(&receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 
-    //The last one
-        ((desc_t *)desc_addr_now)->tdes0=0x80000000;
-        ((desc_t *)desc_addr_now)->tdes1=0+1<<25;
-        ((desc_t *)desc_addr_now)->tdes2=buffer_addr;
-        ((desc_t *)desc_addr_now)->tdes3=start_addr;
-        desc_addr_now+=DESC_SIZE;
-    //buffer size not set
-
-    //Set up mac: TODO
-    mac->rd=(uint32_t)receive_desc_table;//?
-    mac->rd_phy=(uint32_t)receive_desc_table;//?
-    mac->saddr_phy=(uint32_t)buffer_addr;
-    mac->saddr=(uint32_t)buffer_addr;
     return;
 }
 
@@ -134,6 +81,10 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 1024bytes
     test_mac.pnum = PNUM;       // pnum
+    test_mac.rd_phy = (uint32_t)&send_desc_table;
+    test_mac.rd = (uint32_t)&send_desc_table;
+    test_mac.saddr = (uint32_t)buffer;
+    test_mac.saddr_phy = (uint32_t)buffer;
 
     send_desc_init(&test_mac);
 
@@ -172,6 +123,11 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
+    test_mac.rd_phy = (uint32_t)&receive_desc_table;
+    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.daddr = (uint32_t)receive_buffer;
+    test_mac.daddr_phy = receive_buffer;
+    test_mac.saddr = (uint32_t)buffer;
     recv_desc_init(&test_mac);
 
     dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);

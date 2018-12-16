@@ -13,6 +13,14 @@ make all
 sudo dd if=image of=disk conv=notrunc
 
 # 启动QEMU
+
+# sudo apt-get install bridge-utils //安装 bridge-utils
+# sudo apt-get install uml-utilities //安装 uml-utilities
+sudo brctl addbr br0 //加入网桥
+sudo tunctl -t tap0 -u stu //让用户 stu 可以控制 tap0
+sudo brctl addif br0 tap0
+sudo ifconfig tap0 up
+
 sudo sh run_pmon.sh
 # sleep 6
 

@@ -5,6 +5,7 @@
 #include "queue.h"
 #include "syscall.h"
 #include "vdisk.h"
+#include "regs.h"
 
 #define GMAC_BASE_ADDR (0xbfe10000)
 #define DMA_BASE_ADDR  (0xbfe11000)
@@ -21,7 +22,7 @@
 int register_irq_handler(uint32_t, uint32_t);
 
 //---------------------------------------
-extern queue_t recv_block_queue;
+queue_t recv_block_queue;
 extern uint32_t recv_flag[PNUM];
 extern uint32_t ch_flag;
 enum GmacRegisters
@@ -796,7 +797,7 @@ typedef struct mac
 uint32_t read_register(uint32_t base, uint32_t offset);
 void reg_write_32(uint32_t addr, uint32_t data);
 void printf_dma_regs();
-void printf_mac_regs(void);;
+void printf_mac_regs(void);
 void print_dma_regs(void);
 void print_mac_regs(void);
 void print_phy_regs(void);
@@ -813,7 +814,7 @@ void check_recv(mac_t *test_mac);
 #define DESC_SIZE 16 //128
 // #define DESC_BASE VDISK_UPPER_BOUND //0xa1d00000
 #define BIG_RECEIVE_BUFFER VDISK_UPPER_BOUND //0xa1d00000
-
+// #define NET_BLOCK
 
 // void init_tx_desc();
 // void init_rx_desc();
@@ -821,9 +822,16 @@ void check_recv(mac_t *test_mac);
 
 // uint32_t receive_buffer[PNUM][PSIZE];
 uint32_t receive_buffer;
+
+#pragma DATA_ALIGN(send_desc_table, 128)
 desc_t send_desc_table[DESC_NUM];
+#pragma DATA_ALIGN(receive_desc_table, 128)
 desc_t receive_desc_table[DESC_NUM];
 
 uint32_t desc_addr_now;
+
+uint32_t init_desc(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
+uint32_t init_desc_same_buf(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
+void enable_mac_int(void);
 
 #endif

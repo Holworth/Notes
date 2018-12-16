@@ -29,11 +29,14 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
+    init_desc_same_buf(&send_desc_table, buffer, PSIZE*sizeof(uint32_t), PNUM);
    
 }
 
 static void recv_desc_init(mac_t *mac)
 {
+    init_desc(&receive_desc_table, receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
+
 }
 
 
@@ -72,6 +75,9 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
+    test_mac.rd_phy = &send_desc_table;
+    test_mac.rd = &send_desc_table;
+    test_mac.saddr = buffer;
 
     send_desc_init(&test_mac);
 
@@ -112,6 +118,11 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
+    test_mac.rd_phy = &receive_desc_table;
+    test_mac.rd = &receive_desc_table;
+    test_mac.daddr = receive_buffer;
+    test_mac.saddr = buffer;
+
     recv_desc_init(&test_mac);
 
     dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);

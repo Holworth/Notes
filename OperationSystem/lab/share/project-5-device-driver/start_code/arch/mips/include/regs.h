@@ -198,4 +198,9 @@
 #define CAUSE_IPL           0xff00
 #define CAUSE_EXCCODE       0x7c
 
+#define INT0_SR 0xbfd01040
+#define INT0_EN 0xbfd01044
+#define INT1_SR 0xbfd01058
+#define INT1_EN 0xbfd0105c
+
 #endif

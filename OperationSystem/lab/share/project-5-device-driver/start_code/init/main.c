@@ -162,12 +162,14 @@ static void init_pcb()
     queue_init(&block_queue);
     queue_init(&sleep_queue);
     queue_init(&wait_queue);
+    // queue_init(&recv_block_queue);
 
     // Setup queue stack.
     stack_push(&queue_stack, (int)&ready_queue);
     stack_push(&queue_stack, (int)&block_queue);
     stack_push(&queue_stack, (int)&sleep_queue);
     stack_push(&queue_stack, (int)&wait_queue);
+    // stack_push(&queue_stack, (int)&recv_block_queue);
     
     last_used_process_id=0;
     exception_handler_p=&exception_handler;

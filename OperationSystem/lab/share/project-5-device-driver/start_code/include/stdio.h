@@ -55,6 +55,8 @@ void gethex(int* mem);
 int panic(char* error_name);
 void error_ps();
 
+#define os_assert(x) ((x)?1:panic("assert failed: "#x""))
+
 int breakpoint;//usage: while(breakpoint)
 int info_cnt;
 
