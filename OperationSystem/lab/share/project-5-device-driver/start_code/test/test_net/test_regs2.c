@@ -8,6 +8,7 @@
 
 #ifdef TEST_REGS2
 
+// queue_t recv_block_queue;
 desc_t *send_desc;
 desc_t *receive_desc;
 uint32_t cnt = 1; //record the time of iqr_mac
@@ -29,14 +30,12 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
-    init_desc_same_buf(&send_desc_table, buffer, PSIZE*sizeof(uint32_t), PNUM);
-   
+    init_desc_send(&send_desc_table, (void*)buffer, PSIZE*sizeof(uint32_t), PNUM);
 }
 
 static void recv_desc_init(mac_t *mac)
 {
-    init_desc(&receive_desc_table, receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
-
+    init_desc_receive(&receive_desc_table, (void*)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 }
 
 
@@ -75,9 +74,10 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = &send_desc_table;
-    test_mac.rd = &send_desc_table;
-    test_mac.saddr = buffer;
+    test_mac.td_phy =PHYADDR((uint32_t)&send_desc_table);
+    test_mac.td = (uint32_t)&send_desc_table;
+    test_mac.saddr = (uint32_t)buffer;
+    test_mac.saddr_phy = PHYADDR((uint32_t)buffer);
 
     send_desc_init(&test_mac);
 
@@ -118,10 +118,11 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = &receive_desc_table;
-    test_mac.rd = &receive_desc_table;
-    test_mac.daddr = receive_buffer;
-    test_mac.saddr = buffer;
+    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
+    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.daddr = (uint32_t)receive_buffer;
+    test_mac.daddr_phy = PHYADDR(receive_buffer);
+    test_mac.saddr = (uint32_t)buffer;
 
     recv_desc_init(&test_mac);
 
@@ -132,17 +133,17 @@ void phy_regs_task2()
 
     queue_init(&recv_block_queue);
     sys_move_cursor(1, print_location);
-    printf("[RECV TASK] start recv:                    ");
+    printf("> [RECV TASK] start recv:                    ");
     ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
     if (ret == 0)
     {
         sys_move_cursor(1, print_location);
-        printf("[RECV TASK]     net recv is ok!                          ");
+        printf("> [RECV TASK]     net recv is ok!                          ");
     }
     else
     {
         sys_move_cursor(1, print_location);
-        printf("[RECV TASK]     net recv is fault!                       ");
+        printf("> [RECV TASK]     net recv is fault!                       ");
     }
 
     ch_flag = 0;
@@ -168,10 +169,12 @@ void phy_regs_task2()
 
 void phy_regs_task3()
 {
-    send_desc=&send_desc_table;
-    receive_desc=&receive_desc_table;
+    //init desc addr
+    send_desc=(desc_t*)&send_desc_table;
+    receive_desc=(desc_t*)&receive_desc_table;
+    receive_buffer=BIG_RECEIVE_BUFFER;
     
-    uint32_t print_location = 1;
+    uint32_t print_location = 14;
     sys_move_cursor(1, print_location);
     printf("> [INIT] Waiting for MAC initialization .\n");
     sys_init_mac();

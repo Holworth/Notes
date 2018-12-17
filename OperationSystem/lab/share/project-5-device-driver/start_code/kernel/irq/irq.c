@@ -4,6 +4,7 @@
 #include "sched.h"
 #include "string.h"
 #include "screen.h"
+#include "test_net.h"
 
 // #define AUTO_UPDATE_PRIORITY
 
@@ -71,7 +72,10 @@ static void irq_timer()
 
     wakeup_sleep();
     screen_reflush();
+
+#ifndef TEST_REGS3
     check_recv_block_queue();
+#endif
 
     if(timeslice_runout())
     {

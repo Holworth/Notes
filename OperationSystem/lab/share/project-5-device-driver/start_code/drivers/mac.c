@@ -2,6 +2,7 @@
 
 #include "mac.h"
 #include "irq.h"
+#include "test_net.h"
 
 uint32_t reg_read_32(uint32_t addr)
 {
@@ -244,12 +245,12 @@ void print_rx_dscrb(mac_t *mac)
 
 void irq_mac(void)
 {
-    if (recv_block_queue.head != 0)
+    os_assert(recv_block_queue.head != 0);
     {
         int pnow = 0;
         while (pnow < (PNUM - 1))
         {
-            if (((desc_t *)(receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
+            if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
             {
                 //pooling
                 panic("net not finished when net irq");
@@ -289,21 +290,40 @@ void check_recv(mac_t *test_mac)
     //     printk("Received package %d, head: %x",pnow,*(test_mac->daddr+pnow*test_mac->psize));
     // }
 
-    uint32_t now = test_mac.rd;
-    uint32_t end = (test_mac.rd + (PNUM - 1) * 16);
+    // uint32_t now = test_mac->rd;
+    // uint32_t end = (test_mac->rd + (PNUM - 1) * DESC_SIZE);
 
-    int right = 1;
-    while (now <= end)
+    // int right = 1;
+    // while (now <= end)
+    // {
+    //     if (((*(uint32_t *)now) & 0x80000000) != 0)
+    //     {
+    //         right = 0;
+    //         vt100_move_cursor(1,14);
+    //         printk("Recv failed at %x\n", now);
+    //     }
+    //     now += DESC_SIZE;
+    // }
+    // if (right)
+    // {
+    //     vt100_move_cursor(1,14);
+    //     printk("Recv completed.\n");
+    // }
+    
+    int pnow = 0;
+    while (pnow < (PNUM - 1))
     {
-        if (((uint32_t *)now) & 0x80000000 != 0)
+        if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
         {
-            right = 0;
-            printk("Recv failed at %x\n", now);
+            //pooling
+            vt100_move_cursor(1,14);
+            printk("Recv failed at pkg %x\n", pnow);
+            return; //not finished
         }
-        now += DESC_SIZE;
+        pnow++;
     }
-    if (right)
-        printk("Recv completed.\n");
+    vt100_move_cursor(1,14);
+    printk("Recv completed.\n");
 
 #endif
 
@@ -355,8 +375,8 @@ uint32_t do_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
     // 们提供的 reg_write_32（）函数对寄存器赋值
     reg_write_32(DMA_BASE_ADDR + 0xC, rd_phy);
 
-    //分别将 mac 第 0 寄存器的第 3 位和第 4 位设置为 1，这样可以分别使能 MAC 传输功能和接收功能
-    reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | 1 << 3 | 1 << 4);
+    //分别将 mac 第 0 寄存器的第 2 位和第 3 位(从0开始)设置为 1，这样可以分别使能 MAC 传输功能和接收功能
+    reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | (1 << 2) | (1 << 3));
     // reg_write_32(GMAC_BASE_ADDR,reg_read_32(GMAC_BASE_ADDR)|1<<3|1<<4);
 
     // 配置 DMA 第 6 寄存器、DMA 第 7 寄存器。这个操作在 do_net_send（）和 do_net_recv（）里已经帮大家实
@@ -374,11 +394,20 @@ uint32_t do_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
     int l;
     for(l=0;l<64;l++)
     {
-        reg_write_32(DMA_BASE_ADDR + 0x8, 0x1);
+        ((desc_t*)(rd+l*DESC_SIZE))->tdes0=0x80000000;
+    }
+
+    for(l=0;l<64;l++)
+    {
+        reg_write_32(DMA_BASE_ADDR + DmaRxPollDemand, 0x1);
+        // while(((desc_t*)(rd_phy+l*DESC_SIZE))->tdes0&0x80000000)
+        // {
+        //     //pooling
+        // }
     }
 
 #ifdef TEST_REGS1
-    while (((desc_t *)(rd_phy + DESC_SIZE * (PNUM - 1)))->tdes0 & 0x80000000) //FIXIT wait for the end
+    while (((desc_t *)(rd + DESC_SIZE * (PNUM - 1)))->tdes0 & 0x80000000) //FIXIT wait for the end
     {
         //pooling
     }
@@ -396,8 +425,8 @@ void do_net_send(uint32_t td, uint32_t td_phy)
     // 们提供的 reg_write_32（）函数对寄存器赋值。
     reg_write_32(DMA_BASE_ADDR + 0x10, td_phy);
 
-    // 分别将 mac 第 0 寄存器的第 3 位和第 4 位设置为 1，这样可以分别使能 MAC 传输功能和接收功能
-    reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | 1 << 3 | 1 << 4);
+    // 分别将 mac 第 0 寄存器的第 2 位和第 3 位设置为 1，这样可以分别使能 MAC 传输功能和接收功能
+    reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | (1 << 2) | (1 << 3));
 
     // 配置 DMA 第 6 寄存器、DMA 第 7 寄存器。
     reg_write_32(DMA_BASE_ADDR + 0x18, reg_read_32(DMA_BASE_ADDR + 0x18) | 0x02202000); //0x02202002); // start tx, rx
@@ -411,15 +440,34 @@ void do_net_send(uint32_t td, uint32_t td_phy)
     int l;
     for(l=0;l<64;l++)
     {
-        reg_write_32(DMA_BASE_ADDR + 0x4, 0x1);
+        ((desc_t*)(td+l*DESC_SIZE))->tdes0=0x80000000;
+    }
+    for(l=0;l<64;l++)
+    {
+        reg_write_32(DMA_BASE_ADDR + DmaTxPollDemand, 0x1);
+        vt100_move_cursor(1,9);
+        printk("\n %p\n",&send_desc_table);
+        vt100_move_cursor(1,14);
+        printk(" [MAC] sending %d pkg",l);
+
+        while((((desc_t*)(td+l*DESC_SIZE))->tdes0)&0x80000000)
+        {
+            //pooling
+            vt100_move_cursor(1,10);
+            printk("tdes0 %x\n",((desc_t*)(td+l*DESC_SIZE))->tdes0);
+            printk("tdes1 %x\n",((desc_t*)(td+l*DESC_SIZE))->tdes1);
+            printk("tdes2 %x\n",((desc_t*)(td+l*DESC_SIZE))->tdes2);
+            printk("tdes3 %x\n",((desc_t*)(td+l*DESC_SIZE))->tdes3);
+            printk(" %x\n",td+l*DESC_SIZE);
+        }
     }
 
-#ifdef TEST_REGS1
-    while (((desc_t *)td_phy + DESC_SIZE * (PNUM - 1))->tdes0 & 0x80000000) //FIXIT wait for the end
-    {
-        //pooling
-    }
-#endif
+// #ifdef TEST_REGS1
+//     while (((desc_t *)td_phy + DESC_SIZE * (PNUM - 1))->tdes0 & 0x80000000) //FIXIT wait for the end
+//     {
+//         //pooling
+//     }
+// #endif
 
     return;
 }
@@ -439,12 +487,25 @@ void do_init_mac(void)
     s_reset(&test_mac);
     disable_interrupt_all(&test_mac);
     set_mac_addr(&test_mac);
+
+#ifdef TEST_REGS3
+    // 在task3中，需要在网卡初始化时加入对第一组中断寄存器组的赋值：
+    // p5无限进网卡中断的解决办法：
+    // 1. INT1_CLR寄存器赋值为0xFFFFFFFF;
+    // 2. INT_POL寄存器赋值为0xFFFFFFFF;
+    // 3. INT_EDGE寄存器赋值为0
+    *(uint32_t *)INT1_CLR = 0xFFFFFFFF;
+    *(uint32_t *)INT1_POL = 0xFFFFFFFF;
+    *(uint32_t *)INT1_EDGE = 0;
+#endif
+
 }
 
 void do_wait_recv_package(void)
 {
 
-    do_block(&recv_block_queue);
+    if((receive_desc_table[63].tdes0&0x80000000)==0x80000000)
+        do_block(&recv_block_queue);
 
     return;
 }
@@ -456,16 +517,18 @@ void check_recv_block_queue(void)
         int pnow = 0;
         while (pnow < (PNUM - 1))
         {
-            if (((desc_t *)(receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
+            if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
             {
                 //pooling
-                vt100_move_cursor(1, 10);
-                printk("[TI] waiting package %d, head: %x", pnow, *(receive_desc_table + pnow * PSIZE));
+                vt100_move_cursor(1, 13);
+                printk(" [TI] waiting package %d, head: %x", pnow, *(receive_desc_table + pnow));
                 return; //not finished
             }
             pnow++;
         }
-        do_unblock(&recv_block_queue);
+        vt100_move_cursor(1, 13);
+        printk(" [TI] package recieve 64 succeed. \n");
+        do_unblock_one(&recv_block_queue);
     }
 }
 
@@ -476,7 +539,7 @@ int register_irq_handler(uint32_t x, uint32_t irq_mac)
 
 //---------------------------------------------------
 
-uint32_t init_desc(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
+uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
 {
     int cnt = 0;
     // Fst Tx desc
@@ -489,24 +552,24 @@ uint32_t init_desc(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnu
     //Not the last one
     while (++cnt < (pnum))
     {
-        ((desc_t *)desc_addr)->tdes0 = 0x80000000;
-        ((desc_t *)desc_addr)->tdes1 = 0 + 1 << 24 + 1 << 31 + bufsize & 0x7ff;
-        ((desc_t *)desc_addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
-        ((desc_t *)desc_addr)->tdes3 = addr + DESC_SIZE;
+        ((desc_t *)addr)->tdes0 = 0x00000000;
+        ((desc_t *)addr)->tdes1 = 0 | (1 << 24) | (1 << 31) | (bufsize & 0x7ff);
+        ((desc_t *)addr)->tdes2 = ((uint32_t)buffer + (cnt - 1) * bufsize)& 0x1fffffff;;
+        ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;;
         addr += DESC_SIZE;
     }
 
     //The last one
-    ((desc_t *)desc_addr)->tdes0 = 0x80000000;
-    ((desc_t *)desc_addr)->tdes1 = 0 + 1 << 25 + 0 << 31 + bufsize & 0x7ff;
-    ((desc_t *)desc_addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
-    ((desc_t *)desc_addr_now)->tdes3 = addr;
+    ((desc_t *)addr)->tdes0 = 0x00000000;
+    ((desc_t *)addr)->tdes1 = 0 | (1 << 25) | (0 << 31) | (bufsize & 0x7ff);
+    ((desc_t *)addr)->tdes2 = ((uint32_t)buffer + (cnt - 1) * bufsize)& 0x1fffffff;;
+    ((desc_t *)addr)->tdes3 = (addr)& 0x1fffffff;;
     addr += DESC_SIZE;
     //buffer size not set
     return start_addr;
 }
 
-uint32_t init_desc_same_buf(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
+uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
 {
     int cnt = 0;
     // Fst Tx desc
@@ -519,18 +582,20 @@ uint32_t init_desc_same_buf(void *desc_addr, void *buffer, uint32_t bufsize, uin
     //Not the last one
     while (++cnt < (pnum))
     {
-        ((desc_t *)desc_addr)->tdes0 = 0x80000000;
-        ((desc_t *)desc_addr)->tdes1 = 0 + 1 << 24 + 1 << 31 + bufsize & 0x7ff;
-        ((desc_t *)desc_addr)->tdes2 = (uint32_t)buffer;
-        ((desc_t *)desc_addr)->tdes3 = addr + DESC_SIZE;
+        ((desc_t *)addr)->tdes0 = 0x00000000;
+        ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 24) | (bufsize & 0x7ff);
+        ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;;
+        // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
+        ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;;
         addr += DESC_SIZE;
     }
 
     //The last one
-    ((desc_t *)desc_addr)->tdes0 = 0x80000000;
-    ((desc_t *)desc_addr)->tdes1 = 0 + 1 << 25 + 0 << 31 + bufsize & 0x7ff;
-    ((desc_t *)desc_addr)->tdes2 = (uint32_t)buffer;
-    ((desc_t *)desc_addr_now)->tdes3 = start_addr;
+    ((desc_t *)addr)->tdes0 = 0x00000000;
+    ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 25) | (1 << 24) | (bufsize & 0x7ff);
+    ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;;
+    // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
+    ((desc_t *)addr)->tdes3 = (start_addr)& 0x1fffffff;;
     addr += DESC_SIZE;
     //buffer size not set
     return start_addr;

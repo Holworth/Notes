@@ -86,6 +86,7 @@ void prepare_proc(pcb_t* pcbp, struct task_info * task)
 
     pcbp->kernel_context.cp0_status=0x0;//close interrupt
     pcbp->kernel_context.cp0_cause=0x0;
+    // pcbp->user_context.cp0_status=0x1000ff02;
     pcbp->user_context.cp0_status=0x10008002;
     pcbp->user_context.cp0_cause=0x0;
 

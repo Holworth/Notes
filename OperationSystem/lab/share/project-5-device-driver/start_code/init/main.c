@@ -339,6 +339,12 @@ static void init_syscall(void)
     return;
 }
 
+static void init_macint(void)
+{
+    enable_mac_int();
+    return;
+}
+
 // jump from bootloader.
 // The beginning of everything >_< ~~~~~~~~~~~~~~
 void __attribute__((section(".entry_function"))) _start(void)
@@ -378,6 +384,10 @@ void __attribute__((section(".entry_function"))) _start(void)
     init_pcb();
     printk("> [INIT] PCB initialization succeeded.\n");
 
+    // init Mac Interrupt (#_#!)
+    init_macint();
+    printk("> [INIT] Mac Interrupt initialization succeeded.\n");
+
     // alloc_basic_page();
     // current_running=&empty_pcb_for_init;//do not touch this
     // printk("> [INIT] Basic Page alloced for each PCB.\n");
@@ -389,11 +399,6 @@ void __attribute__((section(".entry_function"))) _start(void)
     init_screen();
     // printk("> [INIT] SCREEN initialization succeeded.\n");
     #endif
-
-    vt100_move_cursor(1, 1);
-    printk("> Lagenaria Siceraria OS\n");
-    printk("> Copyright (C) 2018 Huaqiang Wang\n");
-    printk("> Compiled at: %s,%s\n",__DATE__,__TIME__);
 
     // Enable interrupt
     // interrupt_enable_init();

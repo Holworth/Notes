@@ -1,10 +1,9 @@
 #ifndef INCLUDE_TEST_NET_H_
 #define INCLUDE_TEST_NET_H_
 #include "queue.h"
-#include "mac.h"
 
-#define TEST_REGS1
-//#define TEST_REGS2
+// #define TEST_REGS1
+#define TEST_REGS2
 //#define TEST_REGS3
 
 extern queue_t recv_block_queue;

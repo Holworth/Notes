@@ -23,8 +23,10 @@ int register_irq_handler(uint32_t, uint32_t);
 
 //---------------------------------------
 queue_t recv_block_queue;
-extern uint32_t recv_flag[PNUM];
-extern uint32_t ch_flag;
+uint32_t recv_flag[PNUM];
+uint32_t ch_flag;
+// extern uint32_t recv_flag[PNUM];
+// extern uint32_t ch_flag;
 enum GmacRegisters
 {
     GmacConfig = 0x0000,      /* Mac config Register                       */
@@ -818,7 +820,7 @@ void check_recv(mac_t *test_mac);
 
 // void init_tx_desc();
 // void init_rx_desc();
-// uint32_t init_desc();
+// uint32_t init_desc_receive();
 
 // uint32_t receive_buffer[PNUM][PSIZE];
 uint32_t receive_buffer;
@@ -830,8 +832,8 @@ desc_t receive_desc_table[DESC_NUM];
 
 uint32_t desc_addr_now;
 
-uint32_t init_desc(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
-uint32_t init_desc_same_buf(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
+uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
+uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum);
 void enable_mac_int(void);
 
 #endif

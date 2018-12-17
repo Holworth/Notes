@@ -26,6 +26,7 @@
 #include "time.h"
 #include "sched.h"
 #include "string.h"
+#include "mac.h"
 
 static void disable_interrupt()
 {
@@ -431,6 +432,17 @@ inline void cmd_test()
     return ;
 }
 
+inline void cmd_ppkg()
+{
+    int i;
+    for(i=0;i< 64;i++)
+    {
+        int *content = (int*)(BIG_RECEIVE_BUFFER + 1024*i);
+        printf("\t%x\t",*content);
+    }
+    return ;
+}
+
 inline void cmd_start()
 {
     if(argc!=2)
@@ -566,6 +578,11 @@ inline void shell_interpret_cmd()
         cmd_start();
         return;
     }
+    if (!strcmp(argv[0], "ppkg"))
+    {
+        cmd_ppkg();
+        return;
+    }
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
@@ -622,6 +639,8 @@ void test_shell()
     shell_drawline();
     sys_move_cursor(1, SHELL_LINE_POSITION + 1);
     start_deamon("vm_deamon");
+    start_deamon("phy_regs_task3");
+    cmd_about();
     shell_newline();
 
     // printf("%x\n",(int)TLBexception_handler_end-(int)TLBexception_handler_begin);

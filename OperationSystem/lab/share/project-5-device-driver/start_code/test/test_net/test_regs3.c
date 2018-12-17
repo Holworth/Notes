@@ -29,12 +29,12 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
-    
+    init_desc_send(&send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);    
 }
 
 static void recv_desc_init(mac_t *mac)
 {
-    
+    init_desc_receive(&receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 }
 
 
@@ -75,6 +75,11 @@ void phy_regs_task1()
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
 
+    test_mac.td_phy =PHYADDR((uint32_t)&send_desc_table);
+    test_mac.td = (uint32_t)&send_desc_table;
+    test_mac.saddr = (uint32_t)buffer;
+    test_mac.saddr_phy = PHYADDR((uint32_t)buffer);
+
     send_desc_init(&test_mac);
 
     dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);
@@ -114,6 +119,13 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
+
+    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
+    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.daddr = (uint32_t)receive_buffer;
+    test_mac.daddr_phy = PHYADDR(receive_buffer);
+    test_mac.saddr = (uint32_t)buffer;
+
     recv_desc_init(&test_mac);
 
     dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);
@@ -123,7 +135,7 @@ void phy_regs_task2()
 
     queue_init(&recv_block_queue);
     sys_move_cursor(1, print_location);
-    printf("[RECV TASK] start recv:                    ");
+    printf("> [RECV TASK] start recv:                    ");
     ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
   
     ch_flag = 0;
@@ -149,10 +161,12 @@ void phy_regs_task2()
 
 void phy_regs_task3()
 {
-    send_desc=&send_desc_table;
-    receive_desc=&receive_desc_table;
+    //init desc addr
+    send_desc=(desc_t*)&send_desc_table;
+    receive_desc=(desc_t*)&receive_desc_table;
+    receive_buffer=BIG_RECEIVE_BUFFER;
     
-    uint32_t print_location = 1;
+    uint32_t print_location = 14;
     sys_move_cursor(1, print_location);
     printf("> [INIT] Waiting for MAC initialization .\n");
     sys_init_mac();
@@ -160,5 +174,53 @@ void phy_regs_task3()
     printf("> [INIT] MAC initialization succeeded.           \n");
     sys_exit();
 }
+
+
+void phy_regs_task_bonus()
+{
+
+    mac_t test_mac;
+    uint32_t i;
+    uint32_t ret;
+    uint32_t print_location = 1;
+
+    test_mac.mac_addr = 0xbfe10000;
+    test_mac.dma_addr = 0xbfe11000;
+
+    test_mac.psize = PSIZE * 4; // 64bytes
+    test_mac.pnum = PNUM;       // pnum
+
+    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
+    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.daddr = (uint32_t)receive_buffer;
+    test_mac.daddr_phy = PHYADDR(receive_buffer);
+    test_mac.saddr = (uint32_t)buffer;
+
+    recv_desc_init(&test_mac);
+
+    dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);
+    clear_interrupt(&test_mac);
+
+    mii_dul_force(&test_mac);
+
+    queue_init(&recv_block_queue);
+    sys_move_cursor(1, print_location);
+    printf("> [RECV TASK] start recv:                    ");
+    sys_move_cursor(1, print_location);
+
+    int cnt=0;
+    while(1)
+    {
+        printf("> [RECV TASK] recving: %d                    ", cnt);
+        recv_desc_init(&test_mac);
+        ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
+        sys_wait_recv_package();
+        cnt++;
+    }
+  
+
+    sys_exit();
+}
+
 
 #endif

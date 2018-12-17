@@ -8,7 +8,7 @@
 
 #ifdef TEST_REGS1
 
-queue_t recv_block_queue;
+// queue_t recv_block_queue;
 desc_t *send_desc;
 desc_t *receive_desc;
 uint32_t cnt = 1; //record the time of iqr_mac
@@ -31,7 +31,7 @@ void clear_interrupt()
 static void send_desc_init(mac_t *mac)
 {
 
-    init_desc_same_buf(&send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_send(&send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);
 
     return;
 }
@@ -39,7 +39,7 @@ static void send_desc_init(mac_t *mac)
 static void recv_desc_init(mac_t *mac)
 {
 
-    init_desc(&receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_receive(&receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 
     return;
 }
@@ -81,10 +81,10 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 1024bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = (uint32_t)&send_desc_table;
-    test_mac.rd = (uint32_t)&send_desc_table;
+    test_mac.td_phy =PHYADDR((uint32_t)&send_desc_table);
+    test_mac.td = (uint32_t)&send_desc_table;
     test_mac.saddr = (uint32_t)buffer;
-    test_mac.saddr_phy = (uint32_t)buffer;
+    test_mac.saddr_phy = PHYADDR((uint32_t)buffer);
 
     send_desc_init(&test_mac);
 
@@ -123,11 +123,12 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = (uint32_t)&receive_desc_table;
+    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
     test_mac.rd = (uint32_t)&receive_desc_table;
     test_mac.daddr = (uint32_t)receive_buffer;
-    test_mac.daddr_phy = receive_buffer;
+    test_mac.daddr_phy = PHYADDR(receive_buffer);
     test_mac.saddr = (uint32_t)buffer;
+
     recv_desc_init(&test_mac);
 
     dma_control_init(&test_mac, DmaStoreAndForward | DmaTxSecondFrame | DmaRxThreshCtrl128);
