@@ -110,13 +110,14 @@ void interrupt_helper(uint32_t status, uint32_t cause)
     {
         if((*(uint32_t*)INT1_SR)&(0x00000001<<3))
         {
+
             irq_mac();
         }
-        printk("invalid interrupt:%x\n",status);
-        panic("irq_mac");
+        // printk("invalid interrupt:%x\n",status);
+        // panic("irq_mac");
         return;
     }
-    
+
     printk("invalid interrupt:%x\n",status);
     panic("invalid interrupt");
 }

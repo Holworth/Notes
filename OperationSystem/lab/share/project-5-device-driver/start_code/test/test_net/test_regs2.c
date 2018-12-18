@@ -31,12 +31,12 @@ void clear_interrupt()
 
 static void send_desc_init(mac_t *mac)
 {
-    init_desc_send(&send_desc_table, (void*)buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_send(send_desc_table, (void*)buffer, PSIZE*sizeof(uint32_t), PNUM);
 }
 
 static void recv_desc_init(mac_t *mac)
 {
-    init_desc_receive(&receive_desc_table, (void*)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_receive(receive_desc_table, (void*)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 }
 
 
@@ -75,8 +75,8 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.td_phy =PHYADDR((uint32_t)&send_desc_table);
-    test_mac.td = (uint32_t)&send_desc_table;
+    test_mac.td_phy =PHYADDR((uint32_t)send_desc_table);
+    test_mac.td = (uint32_t)send_desc_table;
     test_mac.saddr = (uint32_t)buffer;
     test_mac.saddr_phy = PHYADDR((uint32_t)buffer);
 
@@ -119,8 +119,8 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
-    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.rd_phy = PHYADDR((uint32_t)receive_desc_table);
+    test_mac.rd = (uint32_t)receive_desc_table;
     test_mac.daddr = (uint32_t)receive_buffer;
     test_mac.daddr_phy = PHYADDR(receive_buffer);
     test_mac.saddr = (uint32_t)buffer;
@@ -164,6 +164,8 @@ void phy_regs_task2()
         sys_wait_recv_package();
     }
     check_recv(&test_mac);
+    sys_move_cursor(1, print_location);
+    printf("> [RECV TASK] receive finished, now exit.\n");
 
     sys_exit();
 }
@@ -171,8 +173,8 @@ void phy_regs_task2()
 void phy_regs_task3()
 {
     //init desc addr
-    send_desc=(desc_t*)&send_desc_table;
-    receive_desc=(desc_t*)&receive_desc_table;
+    send_desc=(desc_t*)send_desc_table;
+    receive_desc=(desc_t*)receive_desc_table;
     receive_buffer=BIG_RECEIVE_BUFFER;
     
     uint32_t print_location = 14;
@@ -199,8 +201,8 @@ void phy_regs_task_bonus()
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
 
-    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
-    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.rd_phy = PHYADDR((uint32_t)receive_desc_table);
+    test_mac.rd = (uint32_t)receive_desc_table;
     test_mac.daddr = (uint32_t)receive_buffer;
     test_mac.daddr_phy = PHYADDR(receive_buffer);
     test_mac.saddr = (uint32_t)buffer;
@@ -215,23 +217,26 @@ void phy_regs_task_bonus()
     queue_init(&recv_block_queue);
     sys_move_cursor(1, print_location);
     printf("> [RECV TASK] start recv:                    ");
-    sys_move_cursor(1, print_location);
 
     int cnt=0;
     // uint32_t start_time=time_elapsed;
-    while(1)
+    // send pkg for 8s
+    while(cnt<128)
     {
-        sys_move_cursor(1,print_location);
+        // sys_move_cursor(1,print_location);
         // int time_passed=(time_elapsed-start_time);//to be fixed
-        printf("> pkg:%d\n", cnt);
+        // printf("> pkg:%d\n", cnt);
         // printf("> pst:%d\n", time_passed);
         // printf("> spd:%d KBps", cnt*(300000000/150000)/(time_passed));
         // printf("> spd:%d KBps", cnt*(300000000/150000)/(time_passed));
     //     recv_desc_init(&test_mac);
         ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
         sys_wait_recv_package();
-        cnt+=64;
+        cnt++;
     }
+
+    sys_move_cursor(1, print_location);
+    printf("> [RECV TASK] 2**7 pkg received.\n");
   
 
     sys_exit();

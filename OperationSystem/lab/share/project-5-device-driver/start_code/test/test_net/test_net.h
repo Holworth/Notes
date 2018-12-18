@@ -3,8 +3,8 @@
 #include "queue.h"
 
 // #define TEST_REGS1
-#define TEST_REGS2
-//#define TEST_REGS3
+// #define TEST_REGS2
+#define TEST_REGS3
 
 extern queue_t recv_block_queue;
 #define EPT_ARP 0x0608 /* type: ARP */

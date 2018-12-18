@@ -35,7 +35,8 @@ symbol-file main
 
 # 等待连接
 #b *0xa0800200
-b sys_net_recv
+#b sys_net_recv
+b irq_mac
 c
 
 # 附注

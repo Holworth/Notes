@@ -31,7 +31,7 @@ void clear_interrupt()
 static void send_desc_init(mac_t *mac)
 {
 
-    init_desc_send(&send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_send(send_desc_table, (uint32_t)buffer, PSIZE*sizeof(uint32_t), PNUM);
 
     return;
 }
@@ -39,7 +39,7 @@ static void send_desc_init(mac_t *mac)
 static void recv_desc_init(mac_t *mac)
 {
 
-    init_desc_receive(&receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
+    init_desc_receive(receive_desc_table, (uint32_t)receive_buffer, PSIZE*sizeof(uint32_t), PNUM);
 
     return;
 }
@@ -81,7 +81,7 @@ void phy_regs_task1()
 
     test_mac.psize = PSIZE * 4; // 1024bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.td_phy =PHYADDR((uint32_t)&send_desc_table);
+    test_mac.td_phy =PHYADDR((uint32_t)send_desc_table);
     test_mac.td = (uint32_t)&send_desc_table;
     test_mac.saddr = (uint32_t)buffer;
     test_mac.saddr_phy = PHYADDR((uint32_t)buffer);
@@ -123,8 +123,8 @@ void phy_regs_task2()
 
     test_mac.psize = PSIZE * 4; // 64bytes
     test_mac.pnum = PNUM;       // pnum
-    test_mac.rd_phy = PHYADDR((uint32_t)&receive_desc_table);
-    test_mac.rd = (uint32_t)&receive_desc_table;
+    test_mac.rd_phy = PHYADDR((uint32_t)receive_desc_table);
+    test_mac.rd = (uint32_t)receive_desc_table;
     test_mac.daddr = (uint32_t)receive_buffer;
     test_mac.daddr_phy = PHYADDR(receive_buffer);
     test_mac.saddr = (uint32_t)buffer;
@@ -157,8 +157,8 @@ void phy_regs_task2()
 void phy_regs_task3()
 {
     //init desc addr
-    send_desc=(desc_t*)&send_desc_table;
-    receive_desc=(desc_t*)&receive_desc_table;
+    send_desc=(desc_t*)send_desc_table;
+    receive_desc=(desc_t*)receive_desc_table;
     receive_buffer=BIG_RECEIVE_BUFFER;
 
     uint32_t print_location = 1;

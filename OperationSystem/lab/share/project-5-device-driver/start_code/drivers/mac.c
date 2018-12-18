@@ -238,36 +238,40 @@ void print_rx_dscrb(mac_t *mac)
 
 
 // 网卡中断处理函数 irq_mac（），在 irq_mac（）中判断是否唤醒接收线程；
-//  注册中断处理函数 register_irq_handler(int IRQn, irq_handler_t func)；
-//  使能网卡驱动的中断号函数 irq_enable(int IRQn)，我们可以直接用 INT1_EN 的地址对 INT1_EN 的第三位进行赋值 1，
+// 注册中断处理函数 register_irq_handler(int IRQn, irq_handler_t func)；
+// 使能网卡驱动的中断号函数 irq_enable(int IRQn)，我们可以直接用 INT1_EN 的地址对 INT1_EN 的第三位进行赋值 1，
 // 也可以采用通过网卡中断号得到中断配置寄存器组的偏移+中断配置寄存器组的首地址来对 INT1_EN 进行赋值。中
 // 断配置寄存器组的首地址即 INT0_SR 的地址为 0xbfd01040。
 
 void irq_mac(void)
 {
-    os_assert(recv_block_queue.head != 0);
-    {
-        int pnow = 0;
-        while (pnow < (PNUM - 1))
-        {
-            if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
-            {
-                //pooling
-                panic("net not finished when net irq");
-                return; //not finished
-            }
-            pnow++;
-        }
-        clear_interrupt();
-        do_unblock(&recv_block_queue);
-    }
-    // TODO
-    // INT1_SR=0; //TODO
+    //the following code is used for debug
+    // os_assert(recv_block_queue.head != 0);
+    // {
+    //     int pnow = 0;
+    //     while (pnow < (PNUM - 1))
+    //     {
+    //         if (((desc_t *)((uint32_t)receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
+    //         {
+    //             //pooling
+    //             panic("net not finished when net irq");
+    //             return; //not finished
+    //         }
+    //         pnow++;
+    //     }
+    //     clear_interrupt();
+    //     do_unblock_one(&recv_block_queue);
+    // }
+
+    clear_interrupt();
+    do_unblock_one(&recv_block_queue);
+
     return;
 }
 
 void irq_enable(int IRQn)
 {
+    //not used
     //35
     int class = IRQn / 32;
     int num = IRQn % 32;
@@ -278,7 +282,7 @@ void irq_enable(int IRQn)
 void check_recv(mac_t *test_mac)
 {
 
-#ifdef TEST_REGS2
+#ifndef TEST_REGS1
 
     // int pnow = 0;
     // while (pnow < (test_mac->pnum - 1))
@@ -314,7 +318,7 @@ void check_recv(mac_t *test_mac)
     int pnow = 0;
     while (pnow < (PNUM - 1))
     {
-        if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
+        if (((desc_t *)((uint32_t)receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
         {
             //pooling
             vt100_move_cursor(1,14);
@@ -324,7 +328,7 @@ void check_recv(mac_t *test_mac)
         pnow++;
     }
     vt100_move_cursor(1,14);
-    printk("Recv completed.\n");
+    printk(" [CHECK] Recv completed.\n");
 
 #endif
 
@@ -367,6 +371,7 @@ void set_mac_addr(mac_t *mac)
     reg_write_32(mac->mac_addr + MacLow, data);
 }
 
+
 uint32_t do_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
 {
     //PLEASE enable MAC-RX
@@ -374,7 +379,7 @@ uint32_t do_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
     // 分别在DMA寄存器4（Transmit Descriptor List Address Register，偏移为0x10）和DMA寄存器3（Receive Descriptor
     // List Address Register，偏移为 0xC）中填入发送描述符和接收描述符的首物理地址。这个操作大家可以调用我
     // 们提供的 reg_write_32（）函数对寄存器赋值
-    reg_write_32(DMA_BASE_ADDR + 0xC, (uint32_t)&receive_desc_table);
+    reg_write_32(DMA_BASE_ADDR + 0xC, (uint32_t)receive_desc_table);
     // reg_write_32(DMA_BASE_ADDR + 0xC, rd_phy);
 
     //分别将 mac 第 0 寄存器的第 2 位和第 3 位(从0开始)设置为 1，这样可以分别使能 MAC 传输功能和接收功能
@@ -401,6 +406,58 @@ uint32_t do_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
     }
 
     for(l=0;l<64;l++)
+    {
+        reg_write_32(DMA_BASE_ADDR + DmaRxPollDemand, 0x1);
+        // while(((desc_t*)(rd_phy+l*DESC_SIZE))->tdes0&0x80000000)
+        // {
+        //     //pooling
+        // }
+    }
+
+#ifdef TEST_REGS1
+    while (((desc_t *)(rd + DESC_SIZE * (PNUM - 1)))->tdes0 & 0x80000000) //FIXIT wait for the end
+    {
+        //pooling
+    }
+#endif
+
+    return 0; //if recev succeed
+}
+
+uint32_t do_net_fast_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
+{
+    //PLEASE enable MAC-RX
+
+    // 分别在DMA寄存器4（Transmit Descriptor List Address Register，偏移为0x10）和DMA寄存器3（Receive Descriptor
+    // List Address Register，偏移为 0xC）中填入发送描述符和接收描述符的首物理地址。这个操作大家可以调用我
+    // 们提供的 reg_write_32（）函数对寄存器赋值
+    reg_write_32(DMA_BASE_ADDR + 0xC, (uint32_t)receive_desc_table);
+    // reg_write_32(DMA_BASE_ADDR + 0xC, rd_phy);
+
+    //分别将 mac 第 0 寄存器的第 2 位和第 3 位(从0开始)设置为 1，这样可以分别使能 MAC 传输功能和接收功能
+    reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | 0x4);
+    // reg_write_32(GMAC_BASE_ADDR, reg_read_32(GMAC_BASE_ADDR) | (1 << 2) | (1 << 3));
+    // reg_write_32(GMAC_BASE_ADDR,reg_read_32(GMAC_BASE_ADDR)|1<<3|1<<4);
+
+    // 配置 DMA 第 6 寄存器、DMA 第 7 寄存器。这个操作在 do_net_send（）和 do_net_recv（）里已经帮大家实
+    // 现了，请大家查看《Loongson1C300_user_manual_v1.3》手册，了解配置的每一位的含义
+    reg_write_32(DMA_BASE_ADDR + 0x18, reg_read_32(DMA_BASE_ADDR + 0x18) | 0x02200002); // start tx, rx
+    reg_write_32(DMA_BASE_ADDR + 0x1c, 0x10001 | (1 << 6));
+
+    // 在发送和接收前，每个描述符的 OWN 位需置 1，当开始发送和接收后，OWN 位从 1 变成 0 时（硬件自动置
+    // 位），则此描述符已经完成的发送或接收，可以以 OWN 为判断是否完成了发送或接收；
+
+    // 每次接收前需要在 DMA 寄存器 2（Receive Poll Demand Register）中写入任意值，接收 DMA 控制器将会读取
+    // 寄存器 19 对应的描述符，这样当有数据包到达板卡时就会接收一个数据包?
+
+    //注意每次写1对应一个包
+    int l;
+    for(l=0;l<256;l++)
+    {
+        ((desc_t*)(rd+l*DESC_SIZE))->tdes0=0x80000000;
+    }
+
+    for(l=0;l<256;l++)
     {
         reg_write_32(DMA_BASE_ADDR + DmaRxPollDemand, 0x1);
         // while(((desc_t*)(rd_phy+l*DESC_SIZE))->tdes0&0x80000000)
@@ -449,7 +506,7 @@ void do_net_send(uint32_t td, uint32_t td_phy)
     {
         reg_write_32(DMA_BASE_ADDR + DmaTxPollDemand, 0x1);
         vt100_move_cursor(1,9);
-        printk("\n %p\n",&send_desc_table);
+        printk("\n %p\n",send_desc_table);
         vt100_move_cursor(1,14);
         printk(" [MAC] sending %d pkg",l);
 
@@ -502,13 +559,17 @@ void do_init_mac(void)
     *(uint32_t *)INT1_EDGE = 0;
 // #endif
 
-    // send_desc_table=SEND_DESC;
-    // receive_desc_table=RECV_DESC;
+    send_desc_table=(desc_t*)SEND_DESC;
+    receive_desc_table=(desc_t*)RECV_DESC;
 
 }
 
 void do_wait_recv_package(void)
 {
+
+#ifdef TEST_REGS3
+    enable_mac_int();
+#endif
 
     if((receive_desc_table[63].tdes0&0x80000000)==0x80000000)
         do_block(&recv_block_queue);
@@ -523,7 +584,7 @@ void check_recv_block_queue(void)
         int pnow = 0;
         while (pnow < (PNUM - 1))
         {
-            if (((desc_t *)((uint32_t)&receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
+            if (((desc_t *)((uint32_t)receive_desc_table + DESC_SIZE * pnow))->tdes0 & 0x80000000) //FIXIT wait for the end
             {
                 //pooling
                 vt100_move_cursor(1, 13);
@@ -553,12 +614,12 @@ uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint
     uint32_t addr = (uint32_t)desc_addr;
     // uint32_t last_addr=desc_addr_now;
     os_assert(pnum > 0);
-    os_assert(pnum <= DESC_NUM);
+    // os_assert(pnum <= DESC_NUM);
 
     // printk("ssssssss: %x \n",bufsize);
     sys_move_cursor(1,6);
-    printf("rrrrrr1: %x \n",receive_desc_table);
-    printf("rrrrrr2: %x \n",desc_addr);
+    // printf("rrrrrr1: %x \n",receive_desc_table);
+    // printf("rrrrrr2: %x \n",desc_addr);
 
     //Not the last one
     while (++cnt < (pnum))
@@ -580,14 +641,14 @@ uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint
     ((desc_t *)addr)->tdes2 = ((uint32_t)buffer + (cnt - 1) * bufsize)& 0x1fffffff;
     ((desc_t *)addr)->tdes3 = (start_addr)& 0x1fffffff;
     addr += DESC_SIZE;
-    //buffer size not set
+
     return start_addr;
 }
 
 uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
 {
     sys_move_cursor(1,5);
-    printf("ssssssss: %x \n",desc_addr);
+    // printf("ssssssss: %x \n",desc_addr);
 
     int cnt = 0;
     // Fst Tx desc
@@ -595,25 +656,25 @@ uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_
     uint32_t addr = (uint32_t)desc_addr;
     // uint32_t last_addr=desc_addr_now;
     os_assert(pnum > 0);
-    os_assert(pnum <= DESC_NUM);
+    // os_assert(pnum <= DESC_NUM);
 
     //Not the last one
     while (++cnt < (pnum))
     {
         ((desc_t *)addr)->tdes0 = 0x00000000;
         ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 24) | (bufsize & 0x7ff);
-        ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;;
+        ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;
         // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
-        ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;;
+        ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;
         addr += DESC_SIZE;
     }
 
     //The last one
     ((desc_t *)addr)->tdes0 = 0x00000000;
     ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 25) | (1 << 24) | (bufsize & 0x7ff);
-    ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;;
+    ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;
     // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
-    ((desc_t *)addr)->tdes3 = (start_addr)& 0x1fffffff;;
+    ((desc_t *)addr)->tdes3 = (start_addr)& 0x1fffffff;
     addr += DESC_SIZE;
     //buffer size not set
     return start_addr;

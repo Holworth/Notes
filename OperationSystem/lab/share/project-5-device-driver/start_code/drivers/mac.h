@@ -806,6 +806,7 @@ void print_phy_regs(void);
 void print_rx_dscrb(mac_t *mac);
 void print_tx_dscrb(mac_t *mac);
 uint32_t do_net_recv(uint32_t rd,uint32_t rd_phy,uint32_t daddr);
+uint32_t do_net_fast_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr);
 void do_net_send(uint32_t td, uint32_t td_phy);
 void do_init_mac(void);
 void do_wait_recv_package(void);
@@ -830,12 +831,12 @@ uint32_t receive_buffer;
 // desc_t desc_table[DESC_NUM];
 
 // #pragma DATA_ALIGN(send_desc_table, 128)
-desc_t send_desc_table[DESC_NUM];
+// desc_t send_desc_table[DESC_NUM];
 // #pragma DATA_ALIGN(receive_desc_table, 128)
-desc_t receive_desc_table[DESC_NUM];
+// desc_t receive_desc_table[DESC_NUM];
 
-// desc_t* send_desc_table;
-// desc_t* receive_desc_table;
+desc_t* send_desc_table;
+desc_t* receive_desc_table;
 
 uint32_t desc_addr_now;
 

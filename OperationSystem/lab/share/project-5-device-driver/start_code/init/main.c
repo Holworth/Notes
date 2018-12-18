@@ -335,6 +335,7 @@ static void init_syscall(void)
     syscall[SYSCALL_NET_SEND]=&do_net_send;
     syscall[SYSCALL_NET_RECV]=&do_net_recv;
     syscall[SYSCALL_WAIT_RECV_PACKAGE]=&do_wait_recv_package;
+    syscall[SYSCALL_NET_FAST_RECV]=&do_net_fast_recv;
 
     return;
 }
