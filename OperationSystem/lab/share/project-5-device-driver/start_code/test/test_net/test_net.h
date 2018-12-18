@@ -15,6 +15,7 @@ static void init_data(uint32_t *addr);
 void phy_regs_task1(void);
 void phy_regs_task2(void);
 void phy_regs_task3(void);
+void phy_regs_task_bonus(void);
 #endif
 static void init_mac(void);
 //extern uint32_t recv_flag[PNUM];

@@ -101,7 +101,7 @@ static void init_global_space()
     size*=512;
     // printk("%x\n",size);
     size+=0xa0800000;
-    printk("%x\n",size);
+    printk("> [INIT] Global var init at %x\n",size);
     uint32_t i;
     for(i=0xa081f000;i!=size;i+=4)
     {
@@ -385,8 +385,8 @@ void __attribute__((section(".entry_function"))) _start(void)
     printk("> [INIT] PCB initialization succeeded.\n");
 
     // init Mac Interrupt (#_#!)
-    init_macint();
-    printk("> [INIT] Mac Interrupt initialization succeeded.\n");
+    // init_macint();
+    // printk("> [INIT] Mac Interrupt initialization succeeded.\n");
 
     // alloc_basic_page();
     // current_running=&empty_pcb_for_init;//do not touch this

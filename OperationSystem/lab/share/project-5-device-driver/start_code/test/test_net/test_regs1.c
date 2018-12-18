@@ -170,4 +170,9 @@ void phy_regs_task3()
     sys_exit();
 }
 
+void phy_regs_task_bonus(void)
+{
+
+}
+
 #endif

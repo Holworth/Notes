@@ -98,18 +98,27 @@ void interrupt_helper(uint32_t status, uint32_t cause)
     // TODO interrupt handler.
     // Leve3 exception Handler.
     // read CP0 register to analyze the type of interrupt.
-    uint32_t ip=status>>8;
+    uint32_t ip=cause>>8;
     ip&=0x000000FF;
-    if(ip==(1<<3))//ip[7]==1
-    {
-        if((*(uint32_t*)INT1_SR)&(0x00000001<<3))
-        irq_mac();
-    }
-    if(ip==(1<<7))//ip[7]==1
+    if(ip&(1<<7))//ip[7]==1
     {
         irq_timer();
         return;
     }
+
+    if(ip&(1<<3))//ip[3]==1
+    {
+        if((*(uint32_t*)INT1_SR)&(0x00000001<<3))
+        {
+            irq_mac();
+        }
+        printk("invalid interrupt:%x\n",status);
+        panic("irq_mac");
+        return;
+    }
+    
+    printk("invalid interrupt:%x\n",status);
+    panic("invalid interrupt");
 }
 
 void other_exception_handler()

@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "syscall.h"
 #include "sched.h"
+#include "time.h"
 #include "test_net.h"
 
 #ifdef TEST_REGS3
@@ -172,6 +173,9 @@ void phy_regs_task3()
     sys_init_mac();
     sys_move_cursor(1, print_location);
     printf("> [INIT] MAC initialization succeeded.           \n");
+    enable_mac_int();
+    printf("> [INIT] Mac Interrupt initialization succeeded.\n");
+
     sys_exit();
 }
 
@@ -182,7 +186,7 @@ void phy_regs_task_bonus()
     mac_t test_mac;
     uint32_t i;
     uint32_t ret;
-    uint32_t print_location = 1;
+    uint32_t print_location = 4;
 
     test_mac.mac_addr = 0xbfe10000;
     test_mac.dma_addr = 0xbfe11000;
@@ -208,14 +212,20 @@ void phy_regs_task_bonus()
     printf("> [RECV TASK] start recv:                    ");
     sys_move_cursor(1, print_location);
 
-    int cnt=0;
+    // int cnt=0;
+    // uint32_t start_time=time_elapsed;
     while(1)
     {
-        printf("> [RECV TASK] recving: %d                    ", cnt);
-        recv_desc_init(&test_mac);
+        sys_move_cursor(1,print_location);
+        // int time_passed=(time_elapsed-start_time);//to be fixed
+        printf("> pkg:%d\n", cnt);
+        // printf("> pst:%d\n", time_passed);
+        // printf("> spd:%d KBps", cnt*(300000000/150000)/(time_passed));
+        // printf("> spd:%d KBps", cnt*(300000000/150000)/(time_passed));
+    //     recv_desc_init(&test_mac);
         ret = sys_net_recv(test_mac.rd, test_mac.rd_phy, test_mac.daddr);
         sys_wait_recv_package();
-        cnt++;
+        cnt+=64;
     }
   
 

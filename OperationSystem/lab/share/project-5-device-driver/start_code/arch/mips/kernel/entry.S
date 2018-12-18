@@ -20,12 +20,12 @@ msg2: .ascii "> [INFO] ASM critical point.\n"
     mfc0    k0, CP0_STATUS
     li      k1, 0x00000001
     or      k0, k0, k1
-    mtc0    k1, CP0_STATUS
+    mtc0    k0, CP0_STATUS
 .endm
 
 .macro INTERRUPT_ENABLE_AND_ERET
     mfc0    k0, CP0_STATUS
-    li      k1, 0x10008003
+    li      k1, 0x1000ff03
     #li      k1, 0x1000fc03
     #or      k0, k0, k1
     mtc0    k1, CP0_STATUS
@@ -227,20 +227,20 @@ END(update_tlb)
 LEAF(interrupt_enable_init)
 #TODO: FIXIT
     mfc0    k0, CP0_STATUS
-    ori     k0, 0x00008001
+    ori     k0, 0x0000ff01
     mtc0    k0, CP0_STATUS
     nop
     jr  ra
 END(interrupt_enable_init)
 
-LEAF(interrupt_enable_all)
-#TODO: FIXIT
-    mfc0    k0, CP0_STATUS
-    ori     k0, 0x0000fc01
-    mtc0    k0, CP0_STATUS
-    nop
-    jr  ra
-END(interrupt_enable_all)
+#LEAF(interrupt_enable_all)
+##TODO: FIXIT
+#    mfc0    k0, CP0_STATUS
+#    ori     k0, 0x0000ff01
+#    mtc0    k0, CP0_STATUS
+#    nop
+#    jr  ra
+#END(interrupt_enable_all)
 
 LEAF(interrupt_enable)
     mfc0  k0, CP0_STATUS

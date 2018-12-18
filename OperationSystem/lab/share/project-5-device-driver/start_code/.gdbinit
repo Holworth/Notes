@@ -35,15 +35,7 @@ symbol-file main
 
 # 等待连接
 #b *0xa0800200
-#b clock_findnext
-b set_breakpoint
-b do_swap
-b do_L2_swap
-b do_TLB_Refill
-#b do_semaphore_up
-#b *0x80079cd8
-#b read_asm  
-#b *0x800856a8
+b sys_net_recv
 c
 
 # 附注

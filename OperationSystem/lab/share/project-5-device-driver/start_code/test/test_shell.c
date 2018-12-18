@@ -96,6 +96,11 @@ struct task_info L2_swap_test_task = {"L2_swap_test", (uint32_t)&L2_swap_test, U
 struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, USER_PROCESS,1,1};
 struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, USER_PROCESS,1,1};
 struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, USER_PROCESS,1,1};
+struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, USER_PROCESS,10,10};
+// struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, KERNEL_PROCESS,10,10};
 
 static struct task_info *test_tasks[16] = 
     {
@@ -107,9 +112,10 @@ static struct task_info *test_tasks[16] =
         &L2_swap_test_task,//6
         &phy_regs_test1_task,//7
         &phy_regs_test2_task,//8
-        &phy_regs_test3_task//9
+        &phy_regs_test3_task,//9
+        &phy_regs_bonus_task//10
     };
-static int num_test_tasks = 9;
+static int num_test_tasks = 10;
 
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {

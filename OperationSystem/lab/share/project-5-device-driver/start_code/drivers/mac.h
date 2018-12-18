@@ -816,6 +816,8 @@ void check_recv(mac_t *test_mac);
 #define DESC_SIZE 16 //128
 // #define DESC_BASE VDISK_UPPER_BOUND //0xa1d00000
 #define BIG_RECEIVE_BUFFER VDISK_UPPER_BOUND //0xa1d00000
+#define SEND_DESC 0xa1f00000
+#define RECV_DESC 0xa1f10000
 // #define NET_BLOCK
 
 // void init_tx_desc();
@@ -825,10 +827,15 @@ void check_recv(mac_t *test_mac);
 // uint32_t receive_buffer[PNUM][PSIZE];
 uint32_t receive_buffer;
 
-#pragma DATA_ALIGN(send_desc_table, 128)
+// desc_t desc_table[DESC_NUM];
+
+// #pragma DATA_ALIGN(send_desc_table, 128)
 desc_t send_desc_table[DESC_NUM];
-#pragma DATA_ALIGN(receive_desc_table, 128)
+// #pragma DATA_ALIGN(receive_desc_table, 128)
 desc_t receive_desc_table[DESC_NUM];
+
+// desc_t* send_desc_table;
+// desc_t* receive_desc_table;
 
 uint32_t desc_addr_now;
 
