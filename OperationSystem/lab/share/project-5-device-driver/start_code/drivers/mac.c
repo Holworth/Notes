@@ -616,11 +616,6 @@ uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint
     os_assert(pnum > 0);
     // os_assert(pnum <= DESC_NUM);
 
-    // printk("ssssssss: %x \n",bufsize);
-    sys_move_cursor(1,6);
-    // printf("rrrrrr1: %x \n",receive_desc_table);
-    // printf("rrrrrr2: %x \n",desc_addr);
-
     //Not the last one
     while (++cnt < (pnum))
     {
@@ -630,10 +625,6 @@ uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint
         ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;
         addr += DESC_SIZE;
     }
-    // printk("ssssssss: %x \n",((desc_t *)start_addr)->tdes0);
-    // printk("ssssssss: %x \n",((desc_t *)start_addr)->tdes1);
-    // printk("ssssssss: %x \n",((desc_t *)start_addr)->tdes2);
-    // printk("ssssssss: %x \n",((desc_t *)start_addr)->tdes3);
 
     //The last one
     ((desc_t *)addr)->tdes0 = 0x00000000;
@@ -647,8 +638,6 @@ uint32_t init_desc_receive(void *desc_addr, void *buffer, uint32_t bufsize, uint
 
 uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_t pnum)
 {
-    sys_move_cursor(1,5);
-    // printf("ssssssss: %x \n",desc_addr);
 
     int cnt = 0;
     // Fst Tx desc
@@ -664,7 +653,6 @@ uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_
         ((desc_t *)addr)->tdes0 = 0x00000000;
         ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 24) | (bufsize & 0x7ff);
         ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;
-        // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
         ((desc_t *)addr)->tdes3 = (addr + DESC_SIZE)& 0x1fffffff;
         addr += DESC_SIZE;
     }
@@ -673,10 +661,9 @@ uint32_t init_desc_send(void *desc_addr, void *buffer, uint32_t bufsize, uint32_
     ((desc_t *)addr)->tdes0 = 0x00000000;
     ((desc_t *)addr)->tdes1 = 0 | (0 << 31) | (1<<30) | (1<<29) | (1 << 25) | (1 << 24) | (bufsize & 0x7ff);
     ((desc_t *)addr)->tdes2 = ((uint32_t)buffer)& 0x1fffffff;
-    // ((desc_t *)addr)->tdes2 = (uint32_t)buffer + (cnt - 1) * bufsize;
     ((desc_t *)addr)->tdes3 = (start_addr)& 0x1fffffff;
     addr += DESC_SIZE;
-    //buffer size not set
+
     return start_addr;
 }
 
