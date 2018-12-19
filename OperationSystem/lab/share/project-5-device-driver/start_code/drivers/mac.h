@@ -817,8 +817,8 @@ void check_recv(mac_t *test_mac);
 #define DESC_SIZE 16 //128
 // #define DESC_BASE VDISK_UPPER_BOUND //0xa1d00000
 #define BIG_RECEIVE_BUFFER VDISK_UPPER_BOUND //0xa1d00000
-#define SEND_DESC 0xa1f00000
-#define RECV_DESC 0xa1f10000
+#define SEND_DESC 0xa1f10000
+#define RECV_DESC 0xa1f20000
 // #define NET_BLOCK
 
 // void init_tx_desc();

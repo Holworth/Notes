@@ -143,7 +143,7 @@ void phy_regs_task2()
     }
     else
     {
-        sys_move_cursor(1, print_location);
+        sys_move_cursor(1, print_location); 
         printf("> [RECV TASK]     net recv is fault!                       ");
     }
 
@@ -183,6 +183,7 @@ void phy_regs_task3()
     sys_init_mac();
     sys_move_cursor(1, print_location);
     printf("> [INIT] MAC initialization succeeded.           \n");
+    
     sys_exit();
 }
 
