@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
 //                   Lagenaria Siceraria OS
-//                        File System
+//                       Shell IO Header
 // ----------------------------------------------------------------
 //              Copyright (C) 2018 Wang Huaqiang 
 //             email : wanghuaqiang16@mails.ucas.ac.cn
@@ -19,4 +19,37 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------
 
+
+#ifndef INCLUDE_SHELL_H_
+#define INCLUDE_SHELL_H_
+
+#include "stdio.h"
+#include "screen.h"
+#include "syscall.h"
+#include "time.h"
+#include "sched.h"
+#include "string.h"
+#include "mac.h"
+#include "test.h"
 #include "fs.h"
+
+#define SHELL_LINE_POSITION 15
+#define SHELL_BUFFER_SIZE 40
+#define SHELL_LINE_SIZE 40
+#define SHELL_HISTORY 40
+#define SHELL_SCREEN_HEIGHT 15
+char shell_buffer[SHELL_BUFFER_SIZE];
+char shell_history[SHELL_HISTORY][SHELL_LINE_SIZE];
+char argc;
+char argv[10][20];
+
+int shell_history_cnt;
+int shell_history_now;
+int shell_inline_position;
+
+extern void disable_interrupt();
+extern void enable_interrupt();
+extern char read_uart_ch(void);
+
+
+#endif

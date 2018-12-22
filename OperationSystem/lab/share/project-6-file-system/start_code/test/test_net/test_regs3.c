@@ -236,7 +236,7 @@ void phy_regs_task_bonus()
     }
 
     sys_move_cursor(1, print_location);
-    printf("> [RECV TASK] 2**7 pkg received.\n");
+    printf("> [RECV TASK] 2**(8+5) pkg received.\n");
   
     sys_exit();
 }

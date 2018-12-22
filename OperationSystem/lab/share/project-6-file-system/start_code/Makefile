@@ -18,7 +18,7 @@ SRC_SCHED	= ./kernel/sched/sched.c ./kernel/sched/queue.c \
 SRC_SYSCALL	= ./kernel/syscall/syscall.c
 SRC_LIBS	= ./libs/string.c ./libs/printk.c ./libs/scanf.c
 
-SRC_SHELL   = ./test/test_shell.c
+SRC_SHELL   = ./shell/shell.c ./shell/btincmd.c
 
 SRC_TEST	= ./test/test.c
 SRC_TEST2	= ./test/test_project2/test_scheduler1.c ./test/test_project2/test_scheduler2.c ./test/test_project2/test_lock4.c ./test/test_project2/test_sleep.c ./test/test_project2/test_timer.c 
@@ -37,7 +37,7 @@ main : $(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_MM) \
 	$(SRC_LOCK) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_LIBS) \
 	$(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) $(SRC_TEST4) \
 	$(SRC_SHELL) $(SRC_NET) $(SRC_VDISK) $(SRC_FS)
-	${CC} -G 0 -O0 -Iinclude -Ilibs -Iarch/mips/include -Idrivers -Iinclude/os -Iinclude/sys \
+	${CC} -G 0 -O0 -Iinclude -Ilibs -Iarch/mips/include -Idrivers -Iinclude/os -Iinclude/sys -Iinclude/shell \
 	-Itest/test_fs -Itest -Itest/test_project2 -Itest/test_project3 -Itest/test_project4 -Itest/test_net \
 	-fno-pic -mno-abicalls -fno-builtin -nostdinc -mips3 -Ttext=0xffffffffa0800200 -N -o main \
 	$(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_MM) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_PROC) $(SRC_LIBS) $(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) $(SRC_TEST4) \

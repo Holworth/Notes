@@ -19,7 +19,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // -----------------------------------------------------------------
 
-#include "test.h"
+#include "shell.h"
 #include "stdio.h"
 #include "screen.h"
 #include "syscall.h"
@@ -28,21 +28,21 @@
 #include "string.h"
 #include "mac.h"
 
-static void disable_interrupt()
+void disable_interrupt()
 {
     uint32_t cp0_status = get_cp0_status();
     cp0_status &= 0xfffffffe;
     set_cp0_status(cp0_status);
 }
 
-static void enable_interrupt()
+void enable_interrupt()
 {
     uint32_t cp0_status = get_cp0_status();
     cp0_status |= 0x01;
     set_cp0_status(cp0_status);
 }
 
-static char read_uart_ch(void)
+char read_uart_ch(void)
 {
     char ch = 0;
     unsigned char *read_port = (unsigned char *)(0xbfe48000 + 0x00);
@@ -54,68 +54,6 @@ static char read_uart_ch(void)
     }
     return ch;
 }
-
-
-// LAB3
-// struct task_info task1 = {"ready_to_exit_task", (uint32_t)&ready_to_exit_task, USER_PROCESS, 1, 1};
-// struct task_info task2 = {"wait_lock_task", (uint32_t)&wait_lock_task, USER_PROCESS, 1, 1};
-// struct task_info task3 = {"wait_exit_task", (uint32_t)&wait_exit_task, USER_PROCESS, 1, 1};
-
-// struct task_info task4 = {"semaphore_add_task1", (uint32_t)&semaphore_add_task1, USER_PROCESS, 1, 1};
-// struct task_info task5 = {"semaphore_add_task2", (uint32_t)&semaphore_add_task2, USER_PROCESS, 1, 1};
-// struct task_info task6 = {"semaphore_add_task3", (uint32_t)&semaphore_add_task3, USER_PROCESS, 1, 1};
-
-// struct task_info task7 = {"producer_task", (uint32_t)&producer_task, USER_PROCESS, 1, 1};
-// struct task_info task8 = {"consumer_task1", (uint32_t)&consumer_task1, USER_PROCESS, 1, 1};
-// struct task_info task9 = {"consumer_task2", (uint32_t)&consumer_task2, USER_PROCESS, 1, 1};
-
-// struct task_info task10 = {"barrier_task1", (uint32_t)&barrier_task1, USER_PROCESS, 1, 1};
-// struct task_info task11 = {"barrier_task2", (uint32_t)&barrier_task2, USER_PROCESS, 1, 1};
-// struct task_info task12 = {"barrier_task3", (uint32_t)&barrier_task3, USER_PROCESS, 1, 1};
-
-// struct task_info task13 = {"SunQuan", (uint32_t)&SunQuan, USER_PROCESS, 1, 1};
-// struct task_info task14 = {"LiuBei", (uint32_t)&LiuBei, USER_PROCESS, 1, 1};
-// struct task_info task15 = {"CaoCao", (uint32_t)&CaoCao, USER_PROCESS, 1, 1};
-
-// static struct task_info *test_tasks[16] = {&task1, &task2, &task3,
-//                                            &task4, &task5, &task6,
-//                                            &task7, &task8, &task9,
-//                                            &task10, &task11, &task12,
-//                                            &task13, &task14, &task15};
-// static int num_test_tasks = 15;
-
-// LAB 4
-
-struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
-struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
-struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, KERNEL_PROCESS,1,1};
-struct task_info pressure_test_task = {"pressure_test1", (uint32_t)&pressure_test, USER_PROCESS,1,1};
-struct task_info pressure_test_task2 = {"pressure_test2", (uint32_t)&pressure_test2, USER_PROCESS,1,1};
-struct task_info mem_swap_test_task = {"mem_swap_test", (uint32_t)&mem_swap_test, USER_PROCESS,1,1};
-struct task_info L2_swap_test_task = {"L2_swap_test", (uint32_t)&L2_swap_test, USER_PROCESS,1,1};
-struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, USER_PROCESS,1,1};
-struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, USER_PROCESS,1,1};
-struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, USER_PROCESS,1,1};
-struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, KERNEL_PROCESS,10,10};
-// struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, KERNEL_PROCESS,1,1};
-// struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, KERNEL_PROCESS,1,1};
-// struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, KERNEL_PROCESS,1,1};
-// struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, KERNEL_PROCESS,10,10};
-
-static struct task_info *test_tasks[16] = 
-    {
-        &task1, &task2, 
-        &vm_deamon,//2 
-        &pressure_test_task,//3
-        &pressure_test_task2,//4 
-        &mem_swap_test_task,//5
-        &L2_swap_test_task,//6
-        &phy_regs_test1_task,//7
-        &phy_regs_test2_task,//8
-        &phy_regs_test3_task,//9
-        &phy_regs_bonus_task//10
-    };
-static int num_test_tasks = 10;
 
 void init_other_tasks(int task_num, struct task_info **tasks_used)
 {
@@ -142,19 +80,6 @@ void init_other_tasks(int task_num, struct task_info **tasks_used)
     }
 }
 
-#define SHELL_LINE_POSITION 15
-#define SHELL_BUFFER_SIZE 40
-#define SHELL_LINE_SIZE 40
-#define SHELL_HISTORY 40
-#define SHELL_SCREEN_HEIGHT 15
-char shell_buffer[SHELL_BUFFER_SIZE];
-char shell_history[SHELL_HISTORY][SHELL_LINE_SIZE];
-char argc;
-char argv[10][20];
-
-int shell_history_cnt;
-int shell_history_now;
-int shell_inline_position;
 
 inline void shell_drawline()
 {
@@ -274,200 +199,6 @@ inline void shell_update_current_line()
 //     enable_interrupt();\
 // }\
 
-// Shell embedded commands:
-
-inline void cmd_echo()
-{
-    int i = 1;
-    while (i < argc)
-    {
-        // shell_print(argv[i++]);
-        printf("%s\n", argv[i++]);
-    }
-}
-
-inline void cmd_clear()
-{
-    // shell_line_position=0;
-    // int i=0
-    // for(i=0;i<=SHELL_SCREEN_HEIGHT;i++)
-    // {
-    //     sys_move_cursor(1,SHELL_LINE_POSITION+i);
-    //     printf("                                                   \n");
-    // }
-    disable_interrupt();
-    screen_clear_area(SHELL_LINE_POSITION, SHELL_LINE_POSITION + SHELL_SCREEN_HEIGHT);
-    enable_interrupt();
-    sys_move_cursor(1, SHELL_LINE_POSITION + 1);
-    return;
-}
-
-inline void cmd_ps()
-{
-    sys_ps();
-}
-
-inline void cmd_about()
-{
-    printf(" Lagenaria Siceraria OS\n");
-    printf(" Copyright (C) 2018 Huaqiang Wang\n");
-    printf(" Compiled at: %s,%s\n",__DATE__,__TIME__);
-}
-
-inline void cmd_history()
-{
-    //TODO
-    printf(" Lagenaria Siceraria OS\n");
-    printf(" Copyright (C) 2018 Huaqiang Wang\n");
-}
-
-inline void cmd_exec()
-{
-    if (argc == 1)
-    {
-        printf("No enough args for exec.\n");
-        return;
-    }
-    int i;
-    for (i = 1; i <= (argc - 1); i++)
-    {
-        int num = atoi(argv[i]);
-        if(num<16)
-        {
-            printf("Exec task: %d\n", num);
-            sys_spawn(test_tasks[num]);
-        }
-        else
-        {
-            printf("Exec: Task: %d does not exist!\n", num);
-        }
-    }
-}
-
-inline void cmd_kill()
-{
-    int kill_id = atoi(argv[1]);
-    if (kill_id == current_running->pid)
-    {
-        printf("#Shell: You wanna kill yourself? That's not socialism.\n");
-        return;
-    }
-    if (proc_exist(kill_id))
-    {
-        sys_kill(kill_id);
-    }
-    else
-    {
-        printf("#Shell: Process does not exist.\n");
-    }
-    return;
-}
-
-inline void cmd_reboot()
-{
-    disable_interrupt();
-    int i;
-    for (i = 0; i < NUM_MAX_TASK; i++)
-    {
-        pcb[i].valid = 0;
-    }
-    asm("jal _start\n nop\n");
-}
-
-inline void cmd_dump()
-{
-    if(argc!=2)
-    {
-        printf("Dump: Invalid arguments. Usage: dump [vaddr (in hex, no 0x)] / [l2]\n");
-        return;
-    }
-    if(strcmp("l2",argv[1]))
-    {
-        uint32_t* dumpaddr=(uint32_t *)htoi(argv[1]);
-        uint32_t dumpval=*dumpaddr;
-        printf("Dump addr 0x%x, result: 0x%x, %d\n",dumpaddr,dumpval, dumpval);
-    }else
-    {
-        L2_dump();
-    }
-    return;
-}
-
-inline void cmd_find()
-{
-    if(argc!=2)
-    {
-        printf("Find: Invalid arguments. Usage: find [val]\n");
-        return;
-    }
-        uint32_t findval=(uint32_t)htoi(argv[1]);
-        uint32_t findaddr=0xa0000000;
-        for(;findaddr<0xa1f00000;findaddr+=4)
-        {
-            if((*(uint32_t*)findaddr)==findval)
-                printf("Find in addr 0x%x\n",findaddr);
-        }
-    return;
-}
-
-inline void cmd_set()
-{
-    if(argc!=3)
-    {
-        printf("Set: Invalid arguments.\n");
-        printf("Usage: set [vaddr (in hex, no 0x)] [val (in hex, no 0x)]\n");
-        return;
-    }
-    uint32_t* setaddr=(uint32_t *)htoi(argv[1]);
-    uint32_t setval=htoi(argv[2]);
-    printf("Set addr 0x%x to: 0x%x, %d\n",setaddr ,setval, setval);
-    *(setaddr)=setval;
-    return;
-}
-
-inline void cmd_test()
-{
-    unsigned int i=0;
-    for(i=0xa0000000;i<0xa1f00000;i+=4)
-    {
-        if(*(int*)i==0x4321)
-        {
-            printf("%x\n",i);
-        }
-    }
-    return ;
-}
-
-inline void cmd_ppkg()
-{
-    int i;
-    for(i=0;i< 64;i++)
-    {
-        int *content = (int*)(BIG_RECEIVE_BUFFER + 1024*i);
-        printf("\t%x\t",*content);
-    }
-    return ;
-}
-
-inline void cmd_start()
-{
-    if(argc!=2)
-    {
-        printf("Usage: start [proc name]\n");
-        return;
-    }
-    int i;
-    for(i=0;i<NUM_MAX_TASK;i++)
-    {
-        if((test_tasks[i])&&(!strcmp(test_tasks[i]->name,argv[1])))
-        {
-            sys_spawn(test_tasks[i]);
-            return;
-        }
-    }
-    printf("Failed to start %s.\n");
-}
-
 
 inline void shell_interpret_cmd()
 {
@@ -564,9 +295,9 @@ inline void shell_interpret_cmd()
         cmd_dump();
         return;
     }
-    if (!strcmp(argv[0], "find"))
+    if (!strcmp(argv[0], "findmem"))
     {
-        cmd_find();
+        cmd_findmem();
         return;
     }
     if (!strcmp(argv[0], "set"))

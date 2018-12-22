@@ -66,3 +66,55 @@ struct task_info shell_task={"Shell", (uint32_t)&test_shell, USER_PROCESS,1,1};
 struct task_info *shell_tasks[16] = {&shell_task};
 int num_shell_tasks= 1;
 
+//------------------------------------------------------------
+// Lab 4+
+//------------------------------------------------------------
+
+
+// LAB 4,5
+
+struct task_info task1 = {"lab4_drawing_task1", (uint32_t)&lab4_drawing_task1, USER_PROCESS,1,1};
+struct task_info task2 = {"rw_task1", (uint32_t)&rw_task1, USER_PROCESS,1,1};
+struct task_info vm_deamon = {"vm_deamon", (uint32_t)&deamon_vm, KERNEL_PROCESS,1,1};
+struct task_info pressure_test_task = {"pressure_test1", (uint32_t)&pressure_test, USER_PROCESS,1,1};
+struct task_info pressure_test_task2 = {"pressure_test2", (uint32_t)&pressure_test2, USER_PROCESS,1,1};
+struct task_info mem_swap_test_task = {"mem_swap_test", (uint32_t)&mem_swap_test, USER_PROCESS,1,1};
+struct task_info L2_swap_test_task = {"L2_swap_test", (uint32_t)&L2_swap_test, USER_PROCESS,1,1};
+struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, USER_PROCESS,1,1};
+struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, USER_PROCESS,1,1};
+struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, USER_PROCESS,1,1};
+struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, KERNEL_PROCESS,10,10};
+// struct task_info phy_regs_test1_task = {"phy_regs_task1", (uint32_t)&phy_regs_task1, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_test2_task = {"phy_regs_task2", (uint32_t)&phy_regs_task2, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_test3_task = {"phy_regs_task3", (uint32_t)&phy_regs_task3, KERNEL_PROCESS,1,1};
+// struct task_info phy_regs_bonus_task = {"phy_regs_task_bonus", (uint32_t)&phy_regs_task_bonus, KERNEL_PROCESS,10,10};
+
+// static struct task_info *test_tasks[16] = 
+//     {
+//         &task1, &task2, 
+//         &vm_deamon,//2 
+//         &pressure_test_task,//3
+//         &pressure_test_task2,//4 
+//         &mem_swap_test_task,//5
+//         &L2_swap_test_task,//6
+//         &phy_regs_test1_task,//7
+//         &phy_regs_test2_task,//8
+//         &phy_regs_test3_task,//9
+//         &phy_regs_bonus_task//10
+//     };
+
+struct task_info *test_tasks[16] = 
+    {
+        &task1, &task2, 
+        &vm_deamon,//2 
+        &pressure_test_task,//3
+        &pressure_test_task2,//4 
+        &mem_swap_test_task,//5
+        &L2_swap_test_task,//6
+        &phy_regs_test1_task,//7
+        &phy_regs_test2_task,//8
+        &phy_regs_test3_task,//9
+        &phy_regs_bonus_task//10
+    };
+int num_test_tasks = 10;
+// static int num_test_tasks = 10;
