@@ -126,7 +126,7 @@ char* L2_pt_swap_buffer[512];
 
 // Disk Regulation //-------------------------------
 
-#define SWAP_BASE 0x00100000
+#define SWAP_BASE (0x00100000)
 int disk_addr;
 // int disk_addr=SWAP_BASE;
 int disk_init();

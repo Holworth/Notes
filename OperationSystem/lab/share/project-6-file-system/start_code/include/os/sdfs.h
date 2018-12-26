@@ -21,28 +21,28 @@
 
 // SD card file system for OS seminar
 // This filesystem looks like this:
-// 
-// --------------------------------------------------
-// | Superblock   | Inode Bitmap | Inode |  Blocks  |
-// | Block Bitmap | 1 Block 4KB  |  1MB  |  Others  |
-// --------------------------------------------------
-
+// Max FS size: 2GB
+// Min FS size: 2MB
+// -----------------------------------------------------------------------
+// | Superblock | Block Bitmap | Inode Bitmap | Inode         |  Blocks  |
+// | 1 Block    | 8 Block 32KB | 1 Block 4KB  | 256 Block 1MB |  Others  |
+// -----------------------------------------------------------------------
 
 #include "fs.h"
 #ifndef INCLUDE_SDFS_H_
 #define INCLUDE_SDFS_H_
 
-#define SUPER_BLOCK_HEAD_MAGIC 0xABCD1111
-#define BLOCKSIZE 4096
-#define FILEALIGN BLOCKSIZE
-#define FSSTART 0x‭20000000‬ //TODO
+#define SUPER_BLOCK_HEAD_MAGIC_SD 0xABCD1111
+#define BLOCKSIZE_SD 4096
+#define FILEALIGN_SD BLOCKSIZE
+#define FSSTART_SD 0x10000000
 
 typedef struct inode_sd
 {
     char type;
-    char addr_level;
     char hardlink_cnt;
-    char bit_mask;
+    char res1; //not used
+    char res2; //not used
     //1
     uint32_t owner;
     uint32_t group;
@@ -55,12 +55,12 @@ typedef struct inode_sd
     uint32_t size;
     //8
 
-    void *blocks[16];
+    diskaddr blocks[16];
     //24
 
-    struct inode_sd* ext_inode1;
-    struct inode_sd* ext_inode2;
-    struct inode_sd* ext_inode3;
+    struct inode_sd *ext_inode1;
+    struct inode_sd *ext_inode2;
+    struct inode_sd *ext_inode3;
     //27
 
     uint32_t allign[5];
@@ -75,17 +75,19 @@ typedef struct superblock_head_sd
     uint32_t fs_end;
 
     uint32_t block_map_size;
-    void *block_map_start;
+    uint32_t block_map_start;
 
     uint32_t inode_map_size;
-    void *inode_map_start;
+    uint32_t inode_map_start;
 
     uint32_t inode_size;
     uint32_t inode_num;
-    void *inode_start;
+    uint32_t inode_start;
 
-    uint32_t *data_size;
-    void *data_start;
+    uint32_t data_size;
+    uint32_t data_start;
+
+    // inode_sd_t* root_node;
     // int      is_backup;
 } superblock_head_sd_t;
 
@@ -98,29 +100,21 @@ typedef struct partition_table_sd
 typedef struct dentry_sd
 {
     char name[24];
-    uint32_t type;
-    inode_sd_t *inode;
+    diskaddr inode; //==0 means not used
+    int valid;
 } dentry_t; //32Byte
+
+#define DIR_FILE_MAX 32
 
 typedef struct directory_sd
 {
-    uint32_t hardlink_num;
+    // uint32_t hardlink_num;
     uint32_t file_num;
-    dentry_t dentry[16];
-    char file_type[16];
+    dentry_t dentry[DIR_FILE_MAX];
 } dir_t;
 
-typedef struct file_descriptor_sd
-{
-    void* buffer;
-    uint32_t pos;
-    uint32_t size;
-    uint32_t mode_mask;
-    uint32_t access;//r/w/rw
-    //reserved
-}fdesc_t;
-
 int mkfs_sd(uint32_t size);  // mkfs 初始化文件系统
+int mnt_sd();                // mnt 挂载文件系统
 int mkdir_sd(char *name);    // mkdir 创建目录
 int rmdir_sd(char *name);    // rmdir 删除目录
 int read_dir_sd();           // ls 打印目录目录的内容
@@ -141,7 +135,9 @@ int rename_sd(char *old_name, char *new_name);
 int hardlink_sd(char *target, char *linkname);
 int softlink_sd(char *target, char *linkname);
 
-virtual_file_system_t sdfs;
+file_system_t sdfs;
+struct superblock_head_sd head_buffer;
+superblock_head_sd_t superblock;
 
 // mkfs_sd
 // mkdir_sd

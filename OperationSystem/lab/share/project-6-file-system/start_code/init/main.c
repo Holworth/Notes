@@ -352,6 +352,7 @@ static void init_fs()
 {
     //now use sdfs
     sdfs.mkfs=mkfs_sd; 
+    sdfs.mnt=mnt_sd; 
     sdfs.mkdir=mkdir_sd; 
     sdfs.rmdir=rmdir_sd; 
     sdfs.read_dir=read_dir_sd; 

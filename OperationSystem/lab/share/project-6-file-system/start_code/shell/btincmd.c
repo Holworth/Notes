@@ -224,7 +224,7 @@ inline void cmd_read()
     }
     // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
     uint32_t buff;
-    sd_card_read(&buff, argv[1], sizeof(uint32_t));
+    sdread(&buff, argv[1], sizeof(uint32_t));
     printf("Read addr 0x%x, result: 0x%x\n", argv[1],buff);
     return;
 }
@@ -237,7 +237,7 @@ inline void cmd_write()
         return;
     }
     // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
-    sd_card_read(&argv[2], argv[1], sizeof(uint32_t));
+    sdwrite(&argv[2], argv[1], sizeof(uint32_t));
     printf("Write addr 0x%x, data: 0x%x\n", argv[1],argv[2]);
     return;
 }

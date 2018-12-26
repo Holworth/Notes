@@ -26,15 +26,22 @@
 
 #define FILETYPE_FILE 0
 #define FILETYPE_DIR 1
+#define FILETYPE_SL 2
+#define FILETYPE_HL 3
 
 #define ACCESS_R 0
 #define ACCESS_W 1
 #define ACCESS_RW 2
 
-#define BITMAP(bitmap, num) (bitmap & (1 << num))
+#define DIR_DEPTH_MAX 12
+#define FDESC_NUM 16
 
-unsigned char file_buffer[16][4096];       //16*4KB=64KB
-unsigned char file_write_buffer[16][4096]; //16*4KB=64KB
+#define BITMAP(bitmap, num) (bitmap & (1 << num))
+#define BITMAP_SET0(bitmap, num) (bitmap & (0xffffffff - (1 << num)))
+#define BITMAP_SET1(bitmap, num) (bitmap | (1 << num))
+
+#define diskaddr uint32_t
+
 
 // 目录操作
 // 函数名 shell 命令 说明
@@ -78,9 +85,12 @@ int cmd_ln();
 int cmd_touch(); // touch 建立一个文件
 int cmd_cat();   // cat 将文件的内容打印到屏幕
 
-typedef struct virtual_file_system
+char *filetype(char type);
+
+typedef struct file_system
 {
     int (*mkfs)(uint32_t size);  // mkfs 初始化文件系统
+    int (*mnt)();                // mnt  挂载文件系统
     int (*mkdir)(char *name);    // mkdir 创建目录
     int (*rmdir)(char *name);    // rmdir 删除目录
     int (*read_dir)();           // ls 打印目录目录的内容
@@ -100,15 +110,41 @@ typedef struct virtual_file_system
     int (*rename)(char *old_name, char *new_name);
     int (*hardlink)(char *target, char *linkname);
     int (*softlink)(char *target, char *linkname);
-}virtual_file_system_t;
+} file_system_t;
 
-virtual_file_system_t* global_fs;
+typedef struct file_descriptor
+{
+    // void* buffer;
+    uint32_t diskbase;
+    uint32_t pos;
+    uint32_t size;
+    uint32_t mode_mask; //mask from file
+    uint32_t access;    //r/w/rw
+    //reserved
+} fdesc_t;
 
-// int register_vfs()
-// {
+unsigned char file_buffer[4096];  //4KB
+unsigned char dir_buffer[4096];   //4KB
+unsigned char mkdir_buffer[4096]; //4KB
+// unsigned char file_read_buffer[16][4096];  //16*4KB=64KB
+// unsigned char file_write_buffer[16][4096]; //16*4KB=64KB
 
-// }
+char filetype_file_str[] = "file";
+char filetype_dir_str[] = "dir";
+char filetype_sl_str[] = "softlink";
+char filetype_hl_str[] = "hardlink";
 
+file_system_t *global_fs;
+
+diskaddr current_dir;
+diskaddr root_dir;
+diskaddr current_dir_block;
+diskaddr root_dir_block;
+
+char current_dir_name[DIR_DEPTH_MAX][32];
+int current_dir_level;
+
+fdesc_t fdesc[FDESC_NUM];
 //TODO deal with absolute/relative path
 
 #endif

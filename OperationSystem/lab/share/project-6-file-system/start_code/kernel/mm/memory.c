@@ -484,10 +484,13 @@ int disk_init()
     disk_addr = SWAP_BASE;
 }
 
+#define VM_MEM_UPPERBOUND 2*SWAP_BASE
+
 int alloc_disk(int sectors)
 {
     int tmp = disk_addr;
     disk_addr += sectors * 512;
+    os_assert(tmp<VM_MEM_UPPERBOUND);
     return tmp;
 }
 

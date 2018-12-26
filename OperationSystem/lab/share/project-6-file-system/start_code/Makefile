@@ -11,6 +11,7 @@ SRC_INT		= ./kernel/irq/irq.c
 SRC_LOCK	= ./kernel/locking/lock.c
 SRC_MM		= ./kernel/mm/memory.c
 SRC_FS		= ./kernel/fs/fs.c
+SRC_SDFS	= ./kernel/fs/sdfs.c
 SRC_VDISK	= ./kernel/vdisk/vdisk.c
 SRC_SYNC    = ./kernel/locking/cond.c ./kernel/locking/sem.c ./kernel/locking/barrier.c
 SRC_SCHED	= ./kernel/sched/sched.c ./kernel/sched/queue.c \
@@ -36,12 +37,12 @@ bootblock: $(SRC_BOOT)
 main : $(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_MM) \
 	$(SRC_LOCK) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_LIBS) \
 	$(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) $(SRC_TEST4) \
-	$(SRC_SHELL) $(SRC_NET) $(SRC_VDISK) $(SRC_FS)
+	$(SRC_SHELL) $(SRC_NET) $(SRC_VDISK) $(SRC_FS) $(SRC_SDFS)
 	${CC} -G 0 -O0 -Iinclude -Ilibs -Iarch/mips/include -Idrivers -Iinclude/os -Iinclude/sys -Iinclude/shell \
 	-Itest/test_fs -Itest -Itest/test_project2 -Itest/test_project3 -Itest/test_project4 -Itest/test_net \
 	-fno-pic -mno-abicalls -fno-builtin -nostdinc -mips3 -Ttext=0xffffffffa0800200 -N -o main \
 	$(SRC_ARCH) $(SRC_DRIVER) $(SRC_INIT) $(SRC_INT) $(SRC_LOCK) $(SRC_MM) $(SRC_SYNC) $(SRC_SCHED) $(SRC_SYSCALL) $(SRC_PROC) $(SRC_LIBS) $(SRC_MBOXLIB) $(SRC_TEST) $(SRC_TEST2) $(SRC_TEST3) $(SRC_TEST4) \
-	$(SRC_SHELL) $(SRC_NET) $(SRC_VDISK) $(SRC_FS) \
+	$(SRC_SHELL) $(SRC_NET) $(SRC_VDISK) $(SRC_FS) $(SRC_SDFS) \
 	-L libs/libepmon -lepmon \
 	-nostdlib -Wl,-m -Wl,elf32ltsmip -T ld.script		
 
