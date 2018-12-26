@@ -214,3 +214,30 @@ inline void cmd_start()
     }
     printf("Failed to start %s.\n");
 }
+
+inline void cmd_read()
+{
+    if(argc!=2)
+    {
+        printf("Usage: read [disk addr]\n");
+        return;
+    }
+    // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
+    uint32_t buff;
+    sd_card_read(&buff, argv[1], sizeof(uint32_t));
+    printf("Read addr 0x%x, result: 0x%x\n", argv[1],buff);
+    return;
+}
+
+inline void cmd_write()
+{
+    if(argc!=3)
+    {
+        printf("Usage: write [disk addr] [data(uint32_t)]\n");
+        return;
+    }
+    // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
+    sd_card_read(&argv[2], argv[1], sizeof(uint32_t));
+    printf("Write addr 0x%x, data: 0x%x\n", argv[1],argv[2]);
+    return;
+}

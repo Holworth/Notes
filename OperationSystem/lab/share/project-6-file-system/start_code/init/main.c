@@ -54,6 +54,8 @@
 #include "sync.h"
 #include "mm.h"
 #include "mac.h"
+#include "fs.h"
+#include "sdfs.h"
 
 #define PORT 0xbfe48000
 #define bios_printstr 0x8007b980
@@ -346,6 +348,31 @@ static void init_macint(void)
     return;
 }
 
+static void init_fs()
+{
+    //now use sdfs
+    sdfs.mkfs=mkfs_sd; 
+    sdfs.mkdir=mkdir_sd; 
+    sdfs.rmdir=rmdir_sd; 
+    sdfs.read_dir=read_dir_sd; 
+    sdfs.fs_info=fs_info_sd; 
+    sdfs.enter_fs=enter_fs_sd; 
+    sdfs.mknod=mknod_sd; 
+    sdfs.cat=cat_sd; 
+    sdfs.open=open_sd; 
+    sdfs.read=read_sd; 
+    sdfs.write=write_sd; 
+    sdfs.close=close_sd; 
+    sdfs.find=find_sd; 
+    sdfs.rename=rename_sd; 
+    sdfs.hardlink=hardlink_sd; 
+    sdfs.softlink=softlink_sd; 
+
+    global_fs=&sdfs;
+
+    return;
+}
+
 // jump from bootloader.
 // The beginning of everything >_< ~~~~~~~~~~~~~~
 void __attribute__((section(".entry_function"))) _start(void)
@@ -384,6 +411,10 @@ void __attribute__((section(".entry_function"))) _start(void)
     // init Process Control Block (-_-!)
     init_pcb();
     printk("> [INIT] PCB initialization succeeded.\n");
+
+    // init File System (-_-!)
+    init_fs();
+    printk("> [INIT] FS initialization succeeded.\n");
 
     // init Mac Interrupt (#_#!)
     // init_macint();

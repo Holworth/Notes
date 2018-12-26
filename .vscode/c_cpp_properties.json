@@ -46,12 +46,12 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}",
-                "G:/mingw/bin",
-                "G:\\mingw\\include",
-                "G:\\mingw\\lib\\gcc\\mingw32\\5.3.0\\include",
-                "G:\\mingw\\include\\c++\\3.4.5",
-                "G:/mingw/include/c++/3.4.5",
-                "G:\\mingw\\include\\c++\\3.4.5\\mingw32\\bits"
+                "F:/mingw/bin",
+                "F:\\mingw\\include",
+                "F:\\mingw\\lib\\gcc\\mingw32\\5.3.0\\include",
+                "F:\\mingw\\include\\c++\\3.4.5",
+                "F:/mingw/include/c++/3.4.5",
+                "F:\\mingw\\include\\c++\\3.4.5\\mingw32\\bits"
             ],
             "defines": [
                 "_DEBUG",
@@ -61,11 +61,11 @@
             "browse": {
                 "path": [
                     "${workspaceRoot}",
-                    "G:\\mingw\\include\\c++\\3.4.5",
-                    "G:\\mingw\\lib\\gcc\\mingw32\\5.3.0\\include",
-                    "G:\\mingw\\include",
-                    "G:/mingw/bin",
-                    "G:/mingw/include/c++/3.4.5"
+                    "F:\\mingw\\include\\c++\\3.4.5",
+                    "F:\\mingw\\lib\\gcc\\mingw32\\5.3.0\\include",
+                    "F:\\mingw\\include",
+                    "F:/mingw/bin",
+                    "F:/mingw/include/c++/3.4.5"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

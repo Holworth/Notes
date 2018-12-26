@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <string.h>
 #include <map>
 #include <queue>
 #include <cstring>
@@ -116,29 +117,30 @@ struct DFS_para
     long long upperbound;
     DFS_para(int s, int t, long long upperbound):
     s(s), t(t), upperbound(upperbound)
-}
+    {}
+};
 
-long long D_DFS_nrec(int s, int t, long long upperbound)
-{
-    //recursion version
-    long long flow =0;
-    int k=V[s].size();
-    if(s==t)return upperbound;
-    for(int i=0;i<k;i++)
-        {
-            Edge &e=E[V[s][i]];
-            Edge &nege=E[V[s][i]^1];
-            if(((e.cap-e.flow)>0)&&(Vlevel[e.to]==(Vlevel[s]+1))&&(e.from==s))
-            {
-                //DFS in
-                long long this_flow=D_DFS(e.to,t,min(upperbound-flow,(e.cap-e.flow)));
-                flow+=this_flow;
-                e.flow+=this_flow;
-                nege.flow-=this_flow;
-            }
-        }
-    return flow;
-}
+// long long D_DFS_nrec(int s, int t, long long upperbound)
+// {
+//     //recursion version
+//     long long flow =0;
+//     int k=V[s].size();
+//     if(s==t)return upperbound;
+//     for(int i=0;i<k;i++)
+//         {
+//             Edge &e=E[V[s][i]];
+//             Edge &nege=E[V[s][i]^1];
+//             if(((e.cap-e.flow)>0)&&(Vlevel[e.to]==(Vlevel[s]+1))&&(e.from==s))
+//             {
+//                 //DFS in
+//                 long long this_flow=D_DFS(e.to,t,min(upperbound-flow,(e.cap-e.flow)));
+//                 flow+=this_flow;
+//                 e.flow+=this_flow;
+//                 nege.flow-=this_flow;
+//             }
+//         }
+//     return flow;
+// }
 
 long long D_DFS(int s, int t, long long upperbound)
 {

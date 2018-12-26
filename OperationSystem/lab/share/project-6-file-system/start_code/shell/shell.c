@@ -320,6 +320,16 @@ inline void shell_interpret_cmd()
         cmd_ppkg();
         return;
     }
+    if (!strcmp(argv[0], "write"))
+    {
+        cmd_write();
+        return;
+    }
+    if (!strcmp(argv[0], "read"))
+    {
+        cmd_read();
+        return;
+    }
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
