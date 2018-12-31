@@ -124,7 +124,7 @@ static void init_memory()
     {
         //FIXIT
         int i=STACK_BASE;
-        for(i=STACK_BASE;i<0xa1f00000;i+=4)
+        for(i=STACK_BASE;i<(MEM_UPPER_BOUND+(uint32_t)0xa0000000);i+=4)
         {
             *(int*)i=i;
         }
@@ -368,6 +368,7 @@ static void init_fs()
     sdfs.rename=rename_sd; 
     sdfs.hardlink=hardlink_sd; 
     sdfs.softlink=softlink_sd; 
+    sdfs.rm=rm_sd; 
 
     global_fs=&sdfs;
 

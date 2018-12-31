@@ -330,6 +330,75 @@ inline void shell_interpret_cmd()
         cmd_read();
         return;
     }
+
+    //FS related commands:
+    if (!strcmp(argv[0], "pwd"))
+    {
+        cmd_pwd();
+        return;
+    }
+
+    if (!strcmp(argv[0], "mkfs"))
+    {
+        mkfs(htoi(argv[1]));
+        return;
+    }
+    if (!strcmp(argv[0], "mkdir"))
+    {
+        mkdir(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "rmdir"))
+    {
+        rmdir(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "ls"))
+    {
+        read_dir(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "statfs"))
+    {
+        fs_info(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "cd"))
+    {
+        enter_fs(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "touch"))
+    {
+        mknod(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "rm"))
+    {
+        rm(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "cat"))
+    {
+        cat(argv[1]);
+        return;
+    }
+    if (!strcmp(argv[0], "find"))
+    {
+        find(argv[1], argv[2]);
+        return;
+    }
+    if (!strcmp(argv[0], "rename"))
+    {
+        rename(argv[1], argv[2]);
+        return;
+    }
+    if (!strcmp(argv[0], "ln"))
+    {
+        cmd_ln(argv[1], argv[2], argv[3]);
+        return;
+    }
+
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);
@@ -340,7 +409,7 @@ inline void shell_interpret_cmd()
 
 inline void shell_newline()
 {
-    printf("> root@LSOS# ");
+    printf("> root@LSOS: ");
 }
 
 inline void show_ascii(char ch)

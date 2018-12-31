@@ -35,37 +35,75 @@
 
 // unsigned char file_buffer[4096];       //4KB
 
+char block_bitmap_buffer[32*1024];
+char inode_bitmap_buffer[4*1024];
+
+static diskaddr_t inode_to_block(diskaddr_t inode_addr)
+{
+    //load inode
+    inode_sd_t buff;
+    sdread(&buff, inode_addr, sizeof(inode_sd_t));
+    return buff.blocks[0];
+}
+
+static int load_block_bitmap()
+{
+    os_assert(superblock.superblock_head_magic==SUPER_BLOCK_HEAD_MAGIC_SD);
+    return sdread(&block_bitmap_buffer,superblock.block_map_start,sizeof(block_bitmap_buffer));
+}
+
+static int load_inode_bitmap()
+{
+    os_assert(superblock.superblock_head_magic==SUPER_BLOCK_HEAD_MAGIC_SD);
+    return sdread(&inode_bitmap_buffer,superblock.inode_map_start,sizeof(inode_bitmap_buffer));
+}
+
 static int write_buffer(uint32_t sd_position)
 {
     return sdwrite(&file_buffer, sd_position, BLOCKSIZE_SD);
 }
 
-static int write_dir()
+static int write_dir(diskaddr_t dir_addr)
 {
-    return sdwrite(&dir_buffer, current_dir_block, BLOCKSIZE_SD);
+    return sdwrite(&dir_buffer, dir_addr, BLOCKSIZE_SD);
+}
+
+static int write_inode(diskaddr_t inode_addr, inode_sd_t* buffer)
+{
+    return sdwrite(buffer, inode_addr, sizeof(inode_sd_t));
 }
 
 static int sync_dir()
 {
-    return sdwrite(&dir_buffer, current_dir_block, BLOCKSIZE_SD);
+    return sdwrite(&dir_buffer, inode_to_block(current_dir), BLOCKSIZE_SD);
+}
+
+static int sync_block_bitmap_all()
+{
+    // panic("TBD");
+    return sdwrite(&block_bitmap_buffer, superblock.block_map_start, sizeof(block_bitmap_buffer));
 }
 
 static int sync_block_bitmap()
 {
     panic("TBD");
-    return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
+    sync_block_bitmap_all();
+    // return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
 }
 
-static int sync_block_bitmap_all()
-{
-    panic("TBD");
-    return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
-}
+// static int load_block_bitmap()
+// {
+//     return sdread(&block_bitmap_buffer, superblock.block_map_start, sizeof(block_bitmap_buffer));
+// }
+
+// static int load_inode_bitmap()
+// {
+//     return sdread(&inode_bitmap_buffer, superblock.inode_map_start, sizeof(inode_bitmap_buffer));
+// }
 
 static int sync_inode_bitmap()
 {
-    panic("TBD");
-    return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
+    return sdwrite(&inode_bitmap_buffer, superblock.inode_map_start, sizeof(inode_bitmap_buffer));
 }
 
 static int sync_sblock()
@@ -73,9 +111,22 @@ static int sync_sblock()
     return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
 }
 
-static int sync_file();
+static int sync_file()
+{
+    panic("TBD sync_file");
+}
 
-static int insert_sys_dir(inode_sd_t *self, inode_sd_t *parent)
+
+static diskaddr_t locate_block_addr(diskaddr_t inode_addr, uint32_t offset)
+{
+    panic("TBD");
+    //load inode
+    inode_sd_t buff;
+    sdread(&buff, inode_addr, sizeof(inode_sd_t));
+    return buff.blocks[0];
+}
+
+static int insert_sys_dir(diskaddr_t self, diskaddr_t parent)
 {
     // os_assert(((dir_t*)dir_buffer)->file_num<DIR_FILE_MAX);
     os_assert(((dir_t *)mkdir_buffer)->file_num == 0);
@@ -84,8 +135,8 @@ static int insert_sys_dir(inode_sd_t *self, inode_sd_t *parent)
     ((dir_t *)mkdir_buffer)->dentry[1].name[0] = '.';
     ((dir_t *)mkdir_buffer)->dentry[1].name[1] = '.';
     ((dir_t *)mkdir_buffer)->dentry[1].name[2] = '\0';
-    ((dir_t *)mkdir_buffer)->dentry[0].inode = (inode_sd_t *)self;
-    ((dir_t *)mkdir_buffer)->dentry[1].inode = (inode_sd_t *)parent;
+    ((dir_t *)mkdir_buffer)->dentry[0].inode = self;
+    ((dir_t *)mkdir_buffer)->dentry[1].inode = parent;
     ((dir_t *)mkdir_buffer)->dentry[0].valid = 1;
     ((dir_t *)mkdir_buffer)->dentry[1].valid = 1;
     ((dir_t *)mkdir_buffer)->file_num = 2;
@@ -93,42 +144,29 @@ static int insert_sys_dir(inode_sd_t *self, inode_sd_t *parent)
 }
 
 static int set_block_bitmap(uint32_t block_num)
+//This func init the blockmap in memory and then sync it to the sdcard.
 {
-    panic("TBD");
-    uint32_t disk_point = FSSTART_SD;
-
     int i;
-    for (i = 0; i < BLOCKSIZE_SD; i++)
+    for(i=0;i<sizeof(block_bitmap_buffer);i++)
     {
-        file_buffer[i] = 0xff;
-    }
-    for (i = 0; i < 16; i++)
-    {
-        disk_point += BLOCKSIZE_SD;
-        write_buffer(disk_point);
+        block_bitmap_buffer[i]=1;//set to used
     }
 
-    int block_left = (int)block_num;
-    uint32_t bufferp = (uint32_t)&file_buffer;
-    disk_point = FSSTART_SD + BLOCKSIZE_SD;
-    while (block_left >= 8)
+    for(i=0;block_num>0;i++)
     {
-        *(char *)bufferp = 0;
-        block_left -= 8;
-        bufferp += 1;
-        if (bufferp == BLOCKSIZE_SD)
+        if(block_num>=8)
         {
-            bufferp = 0;
-            write_buffer(disk_point);
-            disk_point += BLOCKSIZE_SD;
-            int i;
-            for (i = 0; i < BLOCKSIZE_SD; i++)
-            {
-                file_buffer[i] = 0xff;
-            }
+            block_bitmap_buffer[i]=0;//set to unused
+            block_num-=8;
+        }
+        else
+        {
+            block_bitmap_buffer[i]=0xff<<block_num;//set to unused
+            block_num=0;
         }
     }
-    write_buffer(disk_point); //the last 0-6 blocks not alloced
+
+    sync_block_bitmap_all();
     return 0;
 }
 
@@ -156,21 +194,17 @@ static int set_superblock(int size)
 
 static int set_inode_bitmap()
 {
-    panic("TBD");
-
     int i;
     for (i = 0; i < BLOCKSIZE_SD; i++)
     {
-        file_buffer[i] = 0x00;
+        inode_bitmap_buffer[i] = 0x00;
     }
-    file_buffer[0] = 0x1;
-    write_buffer(superblock.inode_map_start);
+    inode_bitmap_buffer[0] = 0x1;
+    sync_inode_bitmap();
 }
 
 static int set_root_inode()
 {
-    panic("TBD");
-
     inode_sd_t *root_node = (inode_sd_t *)&file_buffer;
     root_node->type = FILETYPE_DIR;
     root_node->hardlink_cnt = 0;
@@ -182,37 +216,100 @@ static int set_root_inode()
     root_node->modify_timestamp = 0;
     root_node->size = BLOCKSIZE_SD;
     root_node->blocks[0] = superblock.data_start;
-    char tmp = 1;
-    sdwrite(&tmp, superblock.block_map_start, 1);
+    sdwrite(&root_node, superblock.inode_start, sizeof(inode_sd_t));
 }
 
 static int set_root_dir()
 {
-    panic("TBD");
-
+    memset(mkdir_buffer,0,sizeof(mkdir_buffer));
+    insert_sys_dir(superblock.inode_start,superblock.inode_start);
+    current_dir=superblock.inode_start;
+    sync_dir();
+    return 0;
 }
 
-static int load_superblock();//return 1 if load_sblock failed
-static int load_block_bitmap();
-static int load_inode_bitmap();
-static int load_root_dir();
-
-static uint32_t alloc_inode()
+static int load_superblock()
+//return 1 if load_sblock failed
 {
+    sdread(&superblock,FSSTART_SD,sizeof(superblock_head_sd_t));
+    if(superblock.superblock_head_magic==SUPER_BLOCK_HEAD_MAGIC_SD)
+    {
+        return 0;//succeed
+    }
+    return 1;
+    //failed
 }
 
 uint32_t block_alloc_cnt;
+uint32_t inode_alloc_cnt;
+
+static uint32_t alloc_inode()
+//return the new inode's addr if succeed.
+//return 0 if failed.
+{
+    //TODO: use faster method
+    int a, b;
+    for(a=0;a<sizeof(inode_bitmap_buffer);a++)
+    {
+        for(b=0;b<8;b++)
+        {
+            if(BITMAP(inode_bitmap_buffer[a],b)==0)
+            {
+                //succeed in finding
+                BITMAP_SET1(inode_bitmap_buffer[a],b);
+                sync_inode_bitmap();
+                return ((a*8+b)*sizeof(inode_sd_t)+superblock.inode_start);
+            }
+        }
+    }
+    return 0;//failed
+}
 
 static uint32_t alloc_block()
+//return the new block's addr if succeed.
+//return 0 if failed.
 {
+    //TODO: use faster method
+    int a, b;
+    for(a=0;a<sizeof(block_bitmap_buffer);a++)
+    {
+        for(b=0;b<8;b++)
+        {
+            if(BITMAP(block_bitmap_buffer[a],b)==0)
+            {
+                //succeed in finding
+                BITMAP_SET1(block_bitmap_buffer[a],b);
+                sync_block_bitmap_all();
+                return ((a*8+b)*BLOCKSIZE_SD+superblock.data_start);
+            }
+        }
+    }
+    return 0;//failed
 }
 
-static uint32_t free_inode()
+//Remark: do free_block first, then free inode.
+static uint32_t free_inode(diskaddr_t addr)
+//free inode from bitmap.
+//do make sure that you give a valid addr.
 {
+    int position = ((addr - superblock.inode_start)/sizeof(inode_sd_t));
+    int a, b;
+    a=position/8;
+    b=position%8;
+    BITMAP_SET0(inode_bitmap_buffer[a],b);
+    sync_inode_bitmap();
+    return 0;
 }
 
-static uint32_t free_block()
+static uint32_t free_block(diskaddr_t addr)
 {
+    int position = ((addr - superblock.data_start)/BLOCKSIZE_SD);
+    int a, b;
+    a=position/8;
+    b=position%8;
+    BITMAP_SET0(block_bitmap_buffer[a],b);
+    sync_block_bitmap_all();
+    return 0;
 }
 
 static int path_add(char* name)
@@ -247,14 +344,18 @@ int mkfs_sd(uint32_t size) //size: Block
     set_superblock(size);
     sync_sblock();
 
+    //set global vars
+    current_dir_level = 0;
+    current_dir_name[0][0] = '\0';
+    current_dir = (diskaddr_t) superblock.inode_start;
+    root_dir = (diskaddr_t) superblock.inode_start;
+
     //set block bitmap
     //set buffer to 1
     set_block_bitmap(block_num);
-    sync_block_bitmap_all();
 
     //set inode bitmap
     set_inode_bitmap();
-    sync_inode_bitmap();
 
     //set root inode
     set_root_inode();
@@ -262,13 +363,8 @@ int mkfs_sd(uint32_t size) //size: Block
     //set root dir
     set_root_dir();
 
-    //set global points
-    current_dir_level = 0;
-    current_dir_name[0][0] = '\0';
-    current_dir = (void *)superblock.inode_start;
-    root_dir = (void *)superblock.inode_start;
-    current_dir_block = (void *)superblock.data_start;
-    root_dir_block = (void *)superblock.data_start;
+    //set "pwd" 
+    path_reset();
 
     return 0;
 }
@@ -287,7 +383,7 @@ int mnt_sd()
     // load_superblock();//load_sblock failed
     load_block_bitmap();
     load_inode_bitmap();
-    load_root_dir();
+    path_reset();
 
     return 0;
     //TODO
@@ -336,7 +432,15 @@ int mkdir_sd(char *name)
     //setup sys dir
     memset(&dir_buffer, 0, BLOCKSIZE_SD);
     ((dir_t *)mkdir_buffer)->file_num = 0;
-    insert_sys_dir((inode_sd_t *)inode, (inode_sd_t *)current_dir);
+    insert_sys_dir((diskaddr_t)inode, (diskaddr_t)current_dir);
+
+    inode_sd_t new_inode;
+    new_inode.blocks[0]=block;
+    new_inode.create_timestamp=0;
+    new_inode.type=FILETYPE_DIR;
+
+    write_dir(block);
+    write_inode(inode, &new_inode);
     printf("Made dir %s.\n", name);
 
     return 0;
@@ -374,6 +478,9 @@ int rmdir_sd(char *name)
             {
                 ((dir_t *)dir_buffer)->dentry[i].valid = 0;
                 ((dir_t *)dir_buffer)->file_num -= 1;
+                diskaddr_t inode_addr=((dir_t *)dir_buffer)->dentry[i].inode;
+                free_block(inode_to_block(inode_addr));
+                free_inode(inode_addr);
                 sync_dir();
                 printf("Deleted dir %s.\n", name);
                 return 0; //succeed
@@ -404,20 +511,37 @@ int read_dir_sd()
     }
 }
 
+#define pprintf(x) printf(""#x": 0x%x\n", x);
+
 int fs_info_sd()
 // statfs 打印文件系统信息，包括数据块的使用情况等
 {
+    if(superblock.superblock_head_magic!=SUPER_BLOCK_HEAD_MAGIC_SD)
+    {
+        printf("file system SDfs not found.");
+        return 0;
+    }
+    pprintf(superblock.fs_size);
+    pprintf(superblock.fs_start);
+    pprintf(superblock.fs_end);
+    pprintf(superblock.inode_size);
+    pprintf(superblock.inode_num);
+    pprintf(superblock.inode_start);
+    pprintf(superblock.inode_map_size);
+    pprintf(superblock.inode_map_start);
+    pprintf(superblock.block_map_size);
+    pprintf(superblock.block_map_start);
+    pprintf(superblock.data_size);
+    pprintf(superblock.data_start);
+    return 0;
 }
 
 int enter_fs_sd(char *path) 
 // cd 进入目录 (递归实现?)
 {
-    diskaddr temp_inode;
-    diskaddr temp_block;
+    diskaddr_t temp_inode;
 
     current_dir=temp_inode;
-    current_dir_block=temp_block;
-    
     return 0;
 
 failed:
@@ -437,3 +561,4 @@ int find_sd(char *path, char *name) {}
 int rename_sd(char *old_name, char *new_name) {}
 int hardlink_sd(char *target, char *linkname) {}
 int softlink_sd(char *target, char *linkname) {}
+int rm_sd(char *name){}

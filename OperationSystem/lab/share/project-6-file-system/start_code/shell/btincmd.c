@@ -224,8 +224,8 @@ inline void cmd_read()
     }
     // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
     uint32_t buff;
-    sdread(&buff, argv[1], sizeof(uint32_t));
-    printf("Read addr 0x%x, result: 0x%x\n", argv[1],buff);
+    sdread(&buff, htoi(argv[1]), sizeof(uint32_t));
+    printf("Read addr 0x%x, result: 0x%x\n", htoi(argv[1]),buff);
     return;
 }
 
@@ -237,7 +237,30 @@ inline void cmd_write()
         return;
     }
     // sdwrite(char	*buff, uint32_t offset,	uint32_t size);
-    sdwrite(&argv[2], argv[1], sizeof(uint32_t));
-    printf("Write addr 0x%x, data: 0x%x\n", argv[1],argv[2]);
+    uint32_t buff=htoi(argv[2]);
+    sdwrite(&buff, htoi(argv[1]), sizeof(uint32_t));
+    printf("Write addr 0x%x, data: 0x%x\n", htoi(argv[1]),htoi(argv[2]));
+    return;
+}
+
+inline void show_path()
+{
+    int i;
+    if(current_dir_level)
+        printf("/");
+    else
+    {
+        while(i!=current_dir_level)
+        {
+            printf("/%s",current_dir);
+        }
+    }
+    return;
+}
+
+inline void cmd_pwd()
+{
+    show_path();
+    printf("\n");
     return;
 }

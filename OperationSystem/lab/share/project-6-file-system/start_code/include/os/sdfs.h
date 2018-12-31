@@ -37,6 +37,9 @@
 #define FILEALIGN_SD BLOCKSIZE
 #define FSSTART_SD 0x10000000
 
+extern char block_bitmap_buffer[32*1024];
+extern char inode_bitmap_buffer[4*1024];
+
 typedef struct inode_sd
 {
     char type;
@@ -55,7 +58,7 @@ typedef struct inode_sd
     uint32_t size;
     //8
 
-    diskaddr blocks[16];
+    diskaddr_t blocks[16];
     //24
 
     struct inode_sd *ext_inode1;
@@ -100,7 +103,7 @@ typedef struct partition_table_sd
 typedef struct dentry_sd
 {
     char name[24];
-    diskaddr inode; //==0 means not used
+    diskaddr_t inode; //==0 means not used
     int valid;
 } dentry_t; //32Byte
 
@@ -134,6 +137,7 @@ int find_sd(char *path, char *name);
 int rename_sd(char *old_name, char *new_name);
 int hardlink_sd(char *target, char *linkname);
 int softlink_sd(char *target, char *linkname);
+int rm_sd(char *name);
 
 file_system_t sdfs;
 struct superblock_head_sd head_buffer;

@@ -40,7 +40,7 @@
 #define BITMAP_SET0(bitmap, num) (bitmap & (0xffffffff - (1 << num)))
 #define BITMAP_SET1(bitmap, num) (bitmap | (1 << num))
 
-#define diskaddr uint32_t
+#define diskaddr_t uint32_t
 
 
 // 目录操作
@@ -70,20 +70,39 @@ int softlink(char *target, char *linkname);
 
 // 目录操作
 // 函数名 shell 命令 说明
-int cmd_mkfs();   // mkfs 初始化文件系统
-int cmd_mkdir();  // mkdir 创建目录
-int cmd_rmdir();  // rmdir 删除目录
-int cmd_ls();     // ls 打印目录目录的内容
-int cmd_statfs(); // statfs 打印文件系统信息，包括数据块的使用情况等
-int cmd_cd();     // cd 进入目录
-int cmd_find();
-int cmd_rename();
-int cmd_ln();
+// int cmd_mkfs();   // mkfs 初始化文件系统
+// int cmd_mkdir();  // mkdir 创建目录
+// int cmd_rmdir();  // rmdir 删除目录
+// int cmd_ls();     // ls 打印目录目录的内容
+// int cmd_statfs(); // statfs 打印文件系统信息，包括数据块的使用情况等
+// int cmd_cd();     // cd 进入目录
+// int cmd_find();
+// int cmd_rename();
+// int cmd_ln();
 
-// 文件操作
-// 函数名 shell 命令 说明
-int cmd_touch(); // touch 建立一个文件
-int cmd_cat();   // cat 将文件的内容打印到屏幕
+// // 文件操作
+// // 函数名 shell 命令 说明
+// int cmd_touch(); // touch 建立一个文件
+// int cmd_cat();   // cat 将文件的内容打印到屏幕
+
+int mkfs(uint32_t size);
+int mkdir(char *name);
+int rmdir(char *name);
+int read_dir();
+int fs_info();
+int enter_fs(char *path);
+int mknod(char *name);
+int rm(char *name);
+int cat(char *name);
+int open(char *name, int access); // 打开一个文件;
+int read(int fd, char *buff, int size);
+int write(int fd, char *buff, int size);
+int close(int fd);
+int find(char *path, char *name);
+int rename(char *old_name, char *new_name);
+int hardlink(char *target, char *linkname);
+int softlink(char *target, char *linkname);
+void cmd_ln(char *target, char *linkname, char *para);
 
 char *filetype(char type);
 
@@ -110,6 +129,7 @@ typedef struct file_system
     int (*rename)(char *old_name, char *new_name);
     int (*hardlink)(char *target, char *linkname);
     int (*softlink)(char *target, char *linkname);
+    int (*rm)(char *name);
 } file_system_t;
 
 typedef struct file_descriptor
@@ -129,17 +149,15 @@ unsigned char mkdir_buffer[4096]; //4KB
 // unsigned char file_read_buffer[16][4096];  //16*4KB=64KB
 // unsigned char file_write_buffer[16][4096]; //16*4KB=64KB
 
-char filetype_file_str[] = "file";
-char filetype_dir_str[] = "dir";
-char filetype_sl_str[] = "softlink";
-char filetype_hl_str[] = "hardlink";
+extern char filetype_file_str[];
+extern char filetype_dir_str[];
+extern char filetype_sl_str[];
+extern char filetype_hl_str[];
 
 file_system_t *global_fs;
 
-diskaddr current_dir;
-diskaddr root_dir;
-diskaddr current_dir_block;
-diskaddr root_dir_block;
+diskaddr_t current_dir;
+diskaddr_t root_dir;
 
 char current_dir_name[DIR_DEPTH_MAX][32];
 int current_dir_level;

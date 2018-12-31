@@ -20,6 +20,12 @@
 // -----------------------------------------------------------------
 
 #include "fs.h"
+#include "shell.h"
+
+char filetype_file_str[] = "file";
+char filetype_dir_str[] = "dir";
+char filetype_sl_str[] = "softlink";
+char filetype_hl_str[] = "hardlink";
 
 char *filetype(char type)
 {
@@ -40,6 +46,7 @@ char *filetype(char type)
 
 // 目录操作
 // 函数名 shell 命令 说明
+// TODO para check
 int mkfs(uint32_t size)
 // mkfs 初始化文件系统
 {
@@ -78,6 +85,12 @@ int mknod(char *name)
 // touch 建立一个文件
 {
     return global_fs->mknod(name);
+}
+
+int rm(char *name)
+// touch 建立一个文件
+{
+    return global_fs->rm(name);
 }
 
 int cat(char *name)
@@ -124,4 +137,9 @@ int hardlink(char *target, char *linkname)
 int softlink(char *target, char *linkname)
 {
     return global_fs->softlink(target, linkname);
+}
+
+void cmd_ln(char *target, char *linkname, char *para)
+{
+    panic("TBD");
 }
