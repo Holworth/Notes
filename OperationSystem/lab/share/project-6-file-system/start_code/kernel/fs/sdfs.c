@@ -536,6 +536,57 @@ int fs_info_sd()
     return 0;
 }
 
+char parsed_dir_name[10][20];
+int dir_depth;
+
+static int parse_path(char* path)
+{
+    int i=0;
+    int p=0;
+    int inlinep=0;
+    dir_depth=0;
+    if(path[p]=='/')//absolute path
+    {
+        parsed_dir_name[i][0]='\0';
+        i++;
+        p++;
+    }
+    else//realtive path
+    {
+    
+    }
+    while(path[p]!='\0')
+    {
+        if(path[p]!='/')
+        {
+            parsed_dir_name[i][inlinep++]=path[p++];
+        }
+        else
+        {
+            parsed_dir_name[i][inlinep]='\0';
+            inlinep=0;
+            p++;
+        }
+    }
+    return;
+}
+
+static int is_right_path(char* path)
+//return 1 if the path is right
+{
+    inode_sd_t inodebuff;
+    dir_t dirbuff;
+    diskaddr_t dir_now=current_dir;
+    if(path[0]=='/')//absolute path
+    {
+
+    }
+    else//realtive path
+    {
+
+    }
+}
+
 int enter_fs_sd(char *path) 
 // cd 进入目录 (递归实现?)
 {

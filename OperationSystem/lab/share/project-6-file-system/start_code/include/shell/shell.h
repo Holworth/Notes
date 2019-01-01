@@ -41,7 +41,7 @@
 char shell_buffer[SHELL_BUFFER_SIZE];
 char shell_history[SHELL_HISTORY][SHELL_LINE_SIZE];
 char argc;
-char argv[10][20];
+char argv[10][32];
 
 int shell_history_cnt;
 int shell_history_now;
