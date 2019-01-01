@@ -4,7 +4,7 @@
 
 using namespace std;
 #define TIMES 1000000
-#define ASM_STEP 8
+#define ASM_STEP 13
 
 int main()
 {
