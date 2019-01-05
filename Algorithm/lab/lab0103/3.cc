@@ -49,6 +49,11 @@ typedef class Box
         //2 2 2 2
     }
 
+    bool not_fit_with(class Box in)
+    {
+        return not_fit_with(in.x, in.y, in.w, in.h);
+    }
+
     bool have_point(int x, int y)
     {
         return ((x >= this->x) && (x < (this->x + this->w)) && (y >= this->y) && (y < (this->y + this->h)));
@@ -56,6 +61,7 @@ typedef class Box
 } box_t;
 
 vector<class Box> boxs;
+vector<class Box> boxs_cp;
 
 //检查扫过的面积
 int basic_move(int num, int dx, int dy) //num 是箱子的编号
@@ -94,6 +100,43 @@ int basic_move(int num, int dx, int dy) //num 是箱子的编号
     return 0; //succeed
 }
 
+int basic_move_cp(int num, int dx, int dy) //num 是箱子的编号
+{
+    //dx only
+    // cout<<num<<" "<<dx<<" "<<dy<<endl;
+    while (dx > 0)
+    {
+        int x = boxs_cp[num].x + 1, y = boxs_cp[num].y;
+        int s = boxs_cp.size();
+        {
+            if (((x + boxs_cp[num].w) > W) || ((y + boxs_cp[num].h) > H))
+            {
+                return dx; //failed
+            }
+        }
+        int res = 0;
+        for (int i = 0; i < s; i++)
+        {
+            if ((i != num) && boxs_cp[i].valid && boxs_cp[i].not_fit_with(x, y, boxs_cp[num].w, boxs_cp[num].h))
+            {
+                res = basic_move(i, 1, 0);
+            }
+        }
+        if (res) //move failed
+        {
+            return dx;
+        }
+        else
+        {
+            boxs_cp[num].x = x;
+            boxs_cp[num].y = y;
+        }
+        dx--;
+    }
+    return 0; //succeed
+}
+
+
 int basic_move_left(int num, int dx, int dy) //num 是箱子的编号
 {
     //dx only
@@ -130,6 +173,61 @@ int basic_move_left(int num, int dx, int dy) //num 是箱子的编号
     return 0; //succeed
 }
 
+int test_move(int num, int dx, int dy)
+{
+    int right=boxs_cp[num].x+dx+boxs_cp[num].w;
+    if(right>W)
+    {
+        dx=dx-(right-W);
+    }
+
+    int s=boxs_cp.size();
+    for(int i=0;i<s;i++)
+    {
+        if((i!=num)&&(boxs_cp[i].valid)&&(boxs_cp[i].not_fit_with(boxs_cp[num].x,boxs_cp[num].y,boxs_cp[num].w+dx,boxs_cp[num].h)))
+        {
+            int should_move=dx-(boxs_cp[i].x-(boxs_cp[num].x+boxs_cp[num].w));
+            dx-=(should_move-test_move(i,should_move,dy));
+        }
+    }
+    boxs_cp[num].x+=dx;
+    // cout<<"boxs_cp[num].x "<<boxs_cp[num].x<<" "<<num<<endl;
+    // cout<<"dx "<<dx<<endl;
+    return dx;
+}
+
+
+int real_move(int num, int dx, int dy)
+{
+    int right=boxs[num].x+dx+boxs[num].w;
+    if(right>W)
+    {
+        dx=dx-(right-W);
+    }
+
+    int s=boxs.size();
+    for(int i=0;i<s;i++)
+    {
+        if((i!=num)&&(boxs[i].valid)&&(boxs[i].not_fit_with(boxs[num].x,boxs[num].y,boxs[num].w+dx,boxs[num].h)))
+        {
+            int should_move=dx-(boxs[i].x-(boxs[num].x+boxs[num].w));
+            dx-=(should_move-real_move(i,should_move,dy));
+        }
+    }
+    boxs[num].x+=dx;
+    return dx;
+}
+
+int move(int num, int dx, int dy)
+{
+    boxs_cp.clear();
+    boxs_cp.assign(boxs.begin(), boxs.end());
+    int rx=test_move(num, dx, dy);
+    // cout<<rx<<endl;
+    real_move(num, rx, dy);
+    return dx-rx;
+}
+
 int main()
 {
     ios::sync_with_stdio(false);
@@ -164,7 +262,6 @@ int main()
                 }
             }
 
-            if((w>0)&&(h>0))
             boxs.push_back(Box(x, y, w, h));
         }
 
@@ -254,7 +351,34 @@ int main()
                     int res;
                     if (dx >= 0)
                     {
-                        res = basic_move(i, dx, dy);
+                        // boxs_cp.clear();
+                        // boxs_cp.assign(boxs.begin(), boxs.end());
+                        // basic_move_cp(i, dx, dy);
+                        res=move(i,dx,dy);
+                        // {
+                        //     int s=boxs_cp.size();
+                        //     for(int i=0;i<s;i++)
+                        //     {
+                        //         if(
+                        //             (boxs[i].x!=boxs_cp[i].x)||
+                        //             (boxs[i].y!=boxs_cp[i].y)||
+                        //             (boxs[i].w!=boxs_cp[i].w)||
+                        //             (boxs[i].h!=boxs_cp[i].h)
+                        //             )
+                        //         {
+                        //             cout<<"new: "<<
+                        //                 boxs[i].x<<" "<<
+                        //                 boxs[i].y<<" "<<
+                        //                 boxs[i].w<<" "<<
+                        //                 boxs[i].h<<" "<<endl;
+                        //             cout<<"old: "<<
+                        //                 boxs_cp[i].x<<" "<<
+                        //                 boxs_cp[i].y<<" "<<
+                        //                 boxs_cp[i].w<<" "<<
+                        //                 boxs_cp[i].h<<" "<<endl;
+                        //         }
+                        //     }
+                        // }
                         if (res == 0)
                             goto end_inst;
                         else
@@ -309,3 +433,4 @@ int main()
     }
     return 0;
 }
+
