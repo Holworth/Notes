@@ -137,5 +137,6 @@
     "spellright.documentTypes": [
         "latex",
         "plaintext"
-    ]
+    ],
+    "python.pythonPath": "F:\\opt\\anaconda\\python.exe"
 }
