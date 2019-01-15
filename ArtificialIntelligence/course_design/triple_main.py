@@ -40,7 +40,7 @@ if __name__=='__main__':
         idx2word, word2idx = voc_dict['idx2word'], voc_dict['word2idx'] 
         # idx2word[index] is a word
         # word2idx[word] is an index
-        triple_model.train(args.input, args.output, args.model, args.hidden_dim, args.epochs)
+        triple_model.train(args.input, args.output, args.method, args.hidden_dim, args.epochs)
 
     if(args.predict):
         result=triple_model.predict(args.input, args.output)

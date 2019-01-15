@@ -5,7 +5,11 @@ P2=[6]
 
 def atvp2_taged_map(data):
     result=[]
+    counter=0
+    print('Now parsing input json file.')
     for i in data:
+        # print('Now parsing: ',counter)
+        # counter=counter+1
         i['testset']=[]
         for t in i['times']:
             for a in i['attributes']:
@@ -17,12 +21,11 @@ def atvp2_taged_map(data):
                             is_triple=1
                             break
                     #now gen results
-                    is_considered=0
                     input_vecs=[]
                     debug_vec=[]
                     for iii in range(len(i['indexes'])):
                         #[is_picked, T, A, V, P1, P2]                        
-                        input_vecs.append([])
+                        is_considered=0
                         input_vec=[]
 
                         if(iii in triple):
@@ -65,17 +68,20 @@ def atvp2_taged_map(data):
                         else:
                             input_vec.append(0)
 
-                        input_vecs.append(input_vec)
+                        if(is_considered):
+                            input_vecs.append(input_vec)
 
-                    print(debug_vec)     
-                    if(is_considered):
-                        i['testset'].append({'is_triple':is_triple, 'input_vecs':input_vecs, 'debug_vec':debug_vec, 'tav':[t,a,v]})
+                    # print(debug_vec)     
+                    i['testset'].append({'is_triple':is_triple, 'input_vecs':input_vecs, 'debug_vec':debug_vec, 'tav':[t,a,v]})
         result.append(i)
     return result
 
 def atvp2_untaged_map(data):
+    counter=0
     result=[]
     for i in data:
+        counter=counter+1
+        i['testset']=[]
         i['testset']=[]
         for t in i['times']:
             for a in i['attributes']:

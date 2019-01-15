@@ -25,7 +25,8 @@ def get_next_input(data_list):
             yield ii
 
 class LSTMTagger(nn.Module):
-
+    # ref: https://blog.csdn.net/u012609509/article/details/81203436
+    # ref: https://juejin.im/entry/5bcab91c5188255c6c62756f
     def __init__(self, input_dim, hidden_dim, output_dim):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
@@ -42,8 +43,8 @@ class LSTMTagger(nn.Module):
         # embeds = self.word_embeddings(sentence)
         # lstm_out, self.hidden = self.lstm(embeds.view(len(sentence), 1, -1), self.hidden)
         # self.parsed_sentence=parse_sentence_atvp2(sentence)
-        lstm_out, self.hidden = self.lstm(self.sentence, self.hidden)
-        tag_space = self.hidden2tag(lstm_out.view(len(self.parsed_sentence), -1))
+        lstm_out, self.hidden = self.lstm(sentence, self.hidden)
+        tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
         tag_scores = F.log_softmax(tag_space)
         return tag_scores
 
@@ -82,10 +83,20 @@ def train(input, output, model, hidden_dim, epochs):
                 # 准备网络可以接受的的输入数据和真实标签数据，这是一个监督式学习
                 is_triple, sentence_in = each_case['is_triple'], each_case['input_vecs']
 
+                print(sentence_in) 
+                print(is_triple)
+                print(each_case['debug_vec'])
+                print(each_case['tav'])
+
                 tags=[int(is_triple), int(not is_triple)]
 
+                torch.IntTensor(sentence_in).shape()
+
+                input_var=autograd.Variable(torch.IntTensor(sentence_in))
+                input_var.show()
+
                 # 运行我们的模型，直接将模型名作为方法名看待即可
-                tag_scores = model(sentence_in)
+                tag_scores = model()
 
                 # 计算损失，反向传递梯度及更新模型参数
                 loss = loss_function(tag_scores, tags)
