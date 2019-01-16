@@ -61,9 +61,9 @@ typedef struct inode_sd
     diskaddr_t blocks[16];
     //24
 
-    struct inode_sd *ext_inode1;
-    struct inode_sd *ext_inode2;
-    struct inode_sd *ext_inode3;
+    diskaddr_t ext_inode1;
+    diskaddr_t ext_inode2;
+    diskaddr_t ext_inode3;
     //27
 
     uint32_t allign[5];

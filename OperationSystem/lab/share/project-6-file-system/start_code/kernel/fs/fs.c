@@ -53,6 +53,11 @@ int mkfs(uint32_t size)
     return global_fs->mkfs(size);
 }
 
+int mnt()
+{
+    return global_fs->mnt();
+}
+
 int mkdir(char *name)
 // mkdir 创建目录
 {
@@ -114,6 +119,11 @@ int write(int fd, char *buff, int size)
     return global_fs->write(fd, buff, size);
 }
 
+int seek(int fd, uint32_t offset)
+{
+    fdesc[fd].pos = offset;
+}
+
 int close(int fd)
 // 关闭一个文件
 {
@@ -141,5 +151,114 @@ int softlink(char *target, char *linkname)
 
 void cmd_ln(char *target, char *linkname, char *para)
 {
-    panic("TBD");
+    if (!strcmp(para, "-s"))
+    {
+        hardlink(target, linkname);
+    }
+    else
+    {
+        softlink(target, linkname);
+    }
+}
+
+int sdread_not_aligned(char *buff, uint32_t position, uint32_t size)
+{
+    //test if position is 512 aligned
+    uint32_t position_offset = (position % 512);
+    uint32_t size_offset = (position % 512);
+
+    if (!position_offset)
+    {
+        if (!size_offset)
+        {
+            sdread(buff, position, size);
+            return 0;
+        }
+        else
+        {
+            uint32_t tail_offset = size - size_offset;
+            sdread(buff, position, size - size_offset);
+            char *tmp_buff[512];
+            sdread(tmp_buff, position + size - size_offset, 512);
+            int i;
+            for (i = 0; i < size_offset; i++)
+            {
+                buff[tail_offset + i] = tmp_buff[i];
+            }
+            return 0;
+        }
+    }
+    else
+    {
+        char *tmp_buff[512];
+        uint32_t start_position = position - position % 512;
+
+        // int valid_size=512-position%512;
+        int valid_offset = position % 512;
+        int current_offset = 0;
+        do
+        {
+            sdread(tmp_buff, start_position, 512);
+            while (valid_offset < 512)
+            {
+                buff[current_offset++] = tmp_buff[valid_offset++];
+                if (current_offset == size)
+                    break;
+            }
+            valid_offset = 0;
+        } while (current_offset < size);
+        return 0;
+    }
+}
+
+int sdwrite_not_aligned(char *buff, uint32_t position, uint32_t size)
+{
+    //test if position is 512 aligned
+    uint32_t position_offset = (position % 512);
+    uint32_t size_offset = (position % 512);
+
+    if (!position_offset)
+    {
+        if (!size_offset)
+        {
+            sdwrite(buff, position, size);
+            return 0;
+        }
+        else
+        {
+            uint32_t tail_offset = size - size_offset;
+            char *tmp_buff[512];
+            sdread(tmp_buff, position + size - size_offset, 512);
+            int i;
+            for (i = 0; i < size_offset; i++)
+            {
+                tmp_buff[i] = buff[tail_offset + i];
+            }
+            sdwrite(buff, position, size - size_offset);
+            sdwrite(tmp_buff, position + size - size_offset, 512);
+            return 0;
+        }
+    }
+    else
+    {
+        char *tmp_buff[512];
+        uint32_t position_now = position - position % 512;
+
+        int valid_offset = position % 512;
+        int copyed_now = 0;
+        do
+        {
+            sdread(tmp_buff, position_now, 512);
+            while (valid_offset < 512)
+            {
+                if (copyed_now < size)
+                    tmp_buff[valid_offset++] = buff[copyed_now++];
+            }
+            sdwrite(tmp_buff, position_now, 512);
+            valid_offset = 0;
+        } while (copyed_now < size);
+
+        // int valid_size=512-position%512;
+        return 0;
+    }
 }

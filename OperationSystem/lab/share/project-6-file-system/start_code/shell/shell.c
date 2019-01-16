@@ -399,6 +399,18 @@ inline void shell_interpret_cmd()
         return;
     }
 
+    if (!strcmp(argv[0], "fs1"))
+    {
+        test_fs();
+        return;
+    }
+    
+    if (!strcmp(argv[0], "fs2"))
+    {
+        test_bigfile();
+        return;
+    }
+
     //TODO
     if (argc != 0)
         printsys("Can not interpret command: %s, argc: %d\n", argv[0], argc);

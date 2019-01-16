@@ -40,6 +40,13 @@
 #define BITMAP_SET0(bitmap, num) (bitmap & (0xffffffff - (1 << num)))
 #define BITMAP_SET1(bitmap, num) (bitmap | (1 << num))
 
+#define ALIGN_512(x) (x-x%512)
+
+#define O_NONE 0x0
+#define O_RD   0x1 //0b...0001
+#define O_WR   0x2 //0b...0010
+#define O_RDWR 0x3 //0b...0011
+
 #define diskaddr_t uint32_t
 
 
@@ -97,6 +104,7 @@ int cat(char *name);
 int open(char *name, int access); // 打开一个文件;
 int read(int fd, char *buff, int size);
 int write(int fd, char *buff, int size);
+int seek(int fd, uint32_t offset);
 int close(int fd);
 int find(char *path, char *name);
 int rename(char *old_name, char *new_name);
@@ -135,11 +143,15 @@ typedef struct file_system
 typedef struct file_descriptor
 {
     // void* buffer;
-    uint32_t diskbase;
+    diskaddr_t inode;
+    diskaddr_t diskbase;
     uint32_t pos;
-    uint32_t size;
+    // uint32_t size;
     uint32_t mode_mask; //mask from file
     uint32_t access;    //r/w/rw
+    int valid;
+
+    inode_sd_t inode_buffer;
     //reserved
 } fdesc_t;
 
@@ -164,5 +176,8 @@ int current_dir_level;
 
 fdesc_t fdesc[FDESC_NUM];
 //TODO deal with absolute/relative path
+
+int sdread_not_aligned(char* buff, uint32_t position, uint32_t size);
+int sdwrite_not_aligned(char* buff, uint32_t position, uint32_t size);
 
 #endif

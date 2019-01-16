@@ -339,6 +339,17 @@ static void init_syscall(void)
     syscall[SYSCALL_WAIT_RECV_PACKAGE]=&do_wait_recv_package;
     syscall[SYSCALL_NET_FAST_RECV]=&do_net_fast_recv;
 
+    syscall[SYSCALL_FTOUCH]=&mknod;
+    syscall[SYSCALL_FCAT]=&cat;
+    syscall[SYSCALL_FOPEN]=&open;
+    syscall[SYSCALL_FCLOSE]=&close;
+    syscall[SYSCALL_FREAD]=&read;
+    syscall[SYSCALL_FWRITE]=&write;
+    syscall[SYSCALL_FFIND]=&find;
+    syscall[SYSCALL_FRENAME]=&rename;
+    syscall[SYSCALL_FLN]=&cmd_ln;
+    syscall[SYSCALL_FSEEK]=&sys_fseek;
+
     return;
 }
 

@@ -77,6 +77,16 @@
 #define SYSCALL_WAIT_RECV_PACKAGE 47
 #define SYSCALL_NET_FAST_RECV 48
 
+#define SYSCALL_FTOUCH 49
+#define SYSCALL_FCAT 50
+#define SYSCALL_FOPEN 51
+#define SYSCALL_FCLOSE 52
+#define SYSCALL_FREAD 53
+#define SYSCALL_FWRITE 54
+#define SYSCALL_FFIND 55
+#define SYSCALL_FRENAME 56
+#define SYSCALL_FLN 57
+#define SYSCALL_FSEEK 58
 
 /* syscall function pointer */
 int (*syscall[NUM_SYSCALLS])();
@@ -122,5 +132,15 @@ int sys_net_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr);
 int sys_wait_recv_package();
 int sys_net_fast_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr);
 
+int sys_ftouch(char *name);
+int sys_fcat(char *name);
+int sys_fopen(char *name, int access);
+int sys_fclose(int fd);
+int sys_fread(int fd, char *buff, int size);
+int sys_fwrite(int fd, char *buff, int size);
+int sys_ffind(char *path, char *name);
+int sys_frename(char *old_name, char *new_name);
+int sys_fln(char *target, char *linkname, char *para);
+int sys_fseek(int fd, uint32_t offset);
 
 #endif
