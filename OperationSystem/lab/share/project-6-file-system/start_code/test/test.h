@@ -29,8 +29,8 @@
 #include "test3.h"
 #include "test4.h"
 #include "test_net.h"
+#include "test_fs.h"
 #include "sched.h"
-
 
 extern struct task_info *sched1_tasks[16];
 extern int num_sched1_tasks;

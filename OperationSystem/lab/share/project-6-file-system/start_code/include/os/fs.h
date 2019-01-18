@@ -37,8 +37,8 @@
 #define FDESC_NUM 16
 
 #define BITMAP(bitmap, num) (bitmap & (1 << num))
-#define BITMAP_SET0(bitmap, num) (bitmap & (0xffffffff - (1 << num)))
-#define BITMAP_SET1(bitmap, num) (bitmap | (1 << num))
+#define BITMAP_SET0(bitmap, num) (bitmap=(bitmap & (0xffffffff - (1 << num))))
+#define BITMAP_SET1(bitmap, num) (bitmap=(bitmap | (1 << num)))
 
 #define ALIGN_512(x) (x-x%512)
 
@@ -151,8 +151,8 @@ typedef struct file_descriptor
     uint32_t access;    //r/w/rw
     int valid;
 
-    inode_sd_t inode_buffer;
-    //reserved
+    // inode_sd_t inode_buffer;
+
 } fdesc_t;
 
 unsigned char file_buffer[4096];  //4KB

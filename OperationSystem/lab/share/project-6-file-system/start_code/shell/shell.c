@@ -340,9 +340,25 @@ inline void shell_interpret_cmd()
 
     if (!strcmp(argv[0], "mkfs"))
     {
-        mkfs(htoi(argv[1]));
+        if(argc<2)
+        {
+            printf("Usage: mkfs (<size in block>)\n");
+            printf("Set size to 262144 (1G) in default.\n");
+            mkfs(262144);
+        }
+        else
+        {
+            mkfs(htoi(argv[1]));
+        }
         return;
     }
+
+    if (!strcmp(argv[0], "mnt"))
+    {
+        mnt();
+        return;
+    }
+
     if (!strcmp(argv[0], "mkdir"))
     {
         mkdir(argv[1]);

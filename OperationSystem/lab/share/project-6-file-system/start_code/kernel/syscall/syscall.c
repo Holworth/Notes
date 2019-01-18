@@ -176,19 +176,19 @@ int sys_net_fast_recv(uint32_t rd, uint32_t rd_phy, uint32_t daddr)
 
 int sys_ftouch(char *name)
 {
-    return invoke_syscall(SYSCALL_FTOUCH, (int)name);
+    return invoke_syscall(SYSCALL_FTOUCH, (int)name,IGNORE,IGNORE);
 }
 int sys_fcat(char *name)
 {
-    return invoke_syscall(SYSCALL_FCAT, (int)name);
+    return invoke_syscall(SYSCALL_FCAT, (int)name,IGNORE,IGNORE);
 }
 int sys_fopen(char *name, int access)
 {
-    return invoke_syscall(SYSCALL_FOPEN, (int)name, (int)access);
+    return invoke_syscall(SYSCALL_FOPEN, (int)name, (int)access,IGNORE);
 }
 int sys_fclose(int fd)
 {
-    return invoke_syscall(SYSCALL_FCLOSE, (int)fd);
+    return invoke_syscall(SYSCALL_FCLOSE, (int)fd,IGNORE,IGNORE);
 }
 int sys_fread(int fd, char *buff, int size)
 {
@@ -200,11 +200,11 @@ int sys_fwrite(int fd, char *buff, int size)
 }
 int sys_ffind(char *path, char *name)
 {
-    return invoke_syscall(SYSCALL_FFIND, (int)path, (int)name);
+    return invoke_syscall(SYSCALL_FFIND, (int)path, (int)name,IGNORE);
 }
 int sys_frename(char *old_name, char *new_name)
 {
-    return invoke_syscall(SYSCALL_FRENAME, (int)old_name, (int)new_name);
+    return invoke_syscall(SYSCALL_FRENAME, (int)old_name, (int)new_name,IGNORE);
 }
 int sys_fln(char *target, char *linkname, char *para)
 {
@@ -212,5 +212,5 @@ int sys_fln(char *target, char *linkname, char *para)
 }
 int sys_fseek(int fd, uint32_t offset)
 {
-    return invoke_syscall(SYSCALL_FSEEK, (int)fd, (int)offset);
+    return invoke_syscall(SYSCALL_FSEEK, (int)fd, (int)offset,IGNORE);
 }

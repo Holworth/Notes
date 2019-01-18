@@ -2,6 +2,7 @@
     "files.associations": {
         "sched.h": "c",
         "time.h": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "shell.h": "c"
     }
 }

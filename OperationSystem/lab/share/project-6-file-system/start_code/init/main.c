@@ -348,7 +348,7 @@ static void init_syscall(void)
     syscall[SYSCALL_FFIND]=&find;
     syscall[SYSCALL_FRENAME]=&rename;
     syscall[SYSCALL_FLN]=&cmd_ln;
-    syscall[SYSCALL_FSEEK]=&sys_fseek;
+    syscall[SYSCALL_FSEEK]=&seek;
 
     return;
 }

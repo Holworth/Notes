@@ -42,15 +42,21 @@ char parsed_dir_name[10][20];
 int dir_depth;
 int absolute_path;
 int name_pointer;
-char *current_path_string[128];
+char current_path_string[128];
+
+inode_sd_t inode_buffer_sd[FDESC_NUM];
 
 static diskaddr_t inode_to_block(diskaddr_t inode_addr)
 {
     //load inode
     char buff[512];
     uint32_t offset = inode_addr % 512;
-    sdread(&buff, inode_addr - offset, 512);
-    return (*(inode_sd_t *)(&buff[offset]))->blocks[0];
+    // pprintf(inode_addr);
+    // pprintf(offset);
+    // pprintf(inode_addr - offset);
+    //TODO inode failed?
+    sdread(buff, inode_addr - offset, 512);
+    return ((inode_sd_t *)(&buff[offset]))->blocks[0];
 }
 
 static int load_block_bitmap()
@@ -83,7 +89,7 @@ static int write_inode(diskaddr_t inode_addr, inode_sd_t *buffer)
     int i;
     for (i = 0; i < sizeof(inode_sd_t); i++)
     {
-        buff[offset + i] = buffer[i];
+        buff[offset + i] = ((char *)buffer)[i];
     }
     return sdwrite(buff, inode_addr - offset, 512);
 }
@@ -123,7 +129,8 @@ static int sync_inode_bitmap()
 
 static int sync_sblock()
 {
-    return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
+    // return sdwrite(&superblock, FSSTART_SD, sizeof(superblock_head_sd_t));
+    return sdwrite(&superblock, FSSTART_SD, 512);
 }
 
 static int sync_file()
@@ -163,7 +170,7 @@ static int set_block_bitmap(uint32_t block_num)
     int i;
     for (i = 0; i < sizeof(block_bitmap_buffer); i++)
     {
-        block_bitmap_buffer[i] = 1; //set to used
+        block_bitmap_buffer[i] = 0xff; //set to used
     }
 
     for (i = 0; block_num > 0; i++)
@@ -180,6 +187,8 @@ static int set_block_bitmap(uint32_t block_num)
         }
     }
 
+    block_bitmap_buffer[0] = 0x1;
+
     sync_block_bitmap_all();
     return 0;
 }
@@ -190,7 +199,7 @@ static int set_superblock(int size)
     superblock.superblock_head_magic = SUPER_BLOCK_HEAD_MAGIC_SD; //size: B
     superblock.fs_size = size << 12;
     superblock.fs_start = FSSTART_SD;
-    superblock.fs_end = FSSTART_SD + size << 12;
+    superblock.fs_end = FSSTART_SD + (size << 12);
     superblock.block_map_size = 16 * BLOCKSIZE_SD;
     superblock.block_map_start = FSSTART_SD + BLOCKSIZE_SD;
     superblock.inode_map_size = 1 * BLOCKSIZE_SD;
@@ -203,6 +212,7 @@ static int set_superblock(int size)
     // sblock->root_node=FSSTART_SD+(18+256)*BLOCKSIZE_SD;
 
     // write_buffer(disk_point);
+    sync_sblock();
     return 0;
 }
 
@@ -230,7 +240,8 @@ static int set_root_inode()
     root_node->modify_timestamp = 0;
     root_node->size = BLOCKSIZE_SD;
     root_node->blocks[0] = superblock.data_start;
-    sdwrite(&root_node, superblock.inode_start, sizeof(inode_sd_t));
+    // sdwrite(root_node, superblock.inode_start, sizeof(inode_sd_t));
+    sdwrite(root_node, superblock.inode_start, sizeof(inode_sd_t));
 }
 
 static int set_root_dir()
@@ -245,6 +256,15 @@ static int set_root_dir()
     }
     sync_dir();
     return 0;
+}
+
+static int load_root_dir()
+{
+    //set current dir to root
+    current_dir = superblock.inode_start;
+    root_dir = superblock.inode_start;
+    pprintf(inode_to_block(current_dir));
+    return sdread(&dir_buffer, inode_to_block(current_dir), BLOCKSIZE_SD);
 }
 
 static int load_superblock()
@@ -327,6 +347,8 @@ static uint32_t free_inode(diskaddr_t addr)
 //free inode from bitmap.
 //do make sure that you give a valid addr.
 {
+    if (addr == 0)
+        return 1;
     int position = ((addr - superblock.inode_start) / sizeof(inode_sd_t));
     int a, b;
     a = position / 8;
@@ -340,6 +362,8 @@ static uint32_t free_inode(diskaddr_t addr)
 
 static uint32_t free_block(diskaddr_t addr)
 {
+    if (addr == 0)
+        return 1;
     int position = ((addr - superblock.data_start) / BLOCKSIZE_SD);
     int a, b;
     a = position / 8;
@@ -368,7 +392,7 @@ static int path_leave()
 static int path_reset()
 {
     current_path_string[0] = '/';
-    current_path_string[1] = '0';
+    current_path_string[1] = '\0';
     return 0;
 }
 
@@ -380,7 +404,6 @@ int mkfs_sd(uint32_t size) //size: Block
 
     //set superblock
     set_superblock(size);
-    sync_sblock();
 
     //set global vars
     current_dir_level = 0;
@@ -415,14 +438,17 @@ int mnt_sd()
 {
     if (load_superblock()) //load_sblock failed
     {
+        printf("[MNT] mount file system failed.\n");
         return 1;
     }
 
     // load_superblock();//load_sblock failed
     load_block_bitmap();
     load_inode_bitmap();
+    load_root_dir();
     path_reset();
 
+    printf("[MNT] mount file system succeed.\n");
     return 0;
     //TODO
 }
@@ -476,6 +502,7 @@ int mkdir_sd(char *name)
     inode_sd_t new_inode;
     new_inode.blocks[0] = block;
     new_inode.create_timestamp = 0;
+    new_inode.size = 4096;
     new_inode.type = FILETYPE_DIR;
 
     // write_dir(block);
@@ -524,11 +551,28 @@ int rmdir_sd(char *name)
         printf("You can not rm '..'\n");
         return 2;
     }
-    os_assert(((dir_t *)dir_buffer)->file_num >= 2);
-    if (((dir_t *)dir_buffer)->file_num > 2)
-    {
-        printf("[WARNING] rm a nonempty forder.\n");
-    }
+    // os_assert(((dir_t *)dir_buffer)->file_num >= 2);
+
+    // char sdir_buffer[512];
+
+    // int fnum=0;
+    // int h=0;
+    // for(h=0;h<DIR_FILE_MAX;h++)
+    // {
+    //     if(((dir_t *)dir_buffer)->dentry[h].valid)
+    //     {
+    //         fnum++;
+    //     }
+    // }
+
+    // // if (((dir_t *)dir_buffer)->file_num > 2)
+    // if (fnum > 2)
+    // {
+    //     printf("[WARNING] rm a nonempty forder.\n");
+    // }
+
+    // printf("Rm a forder and all its contents.\n");
+
     int i;
     for (i = 0; i < DIR_FILE_MAX; i++)
     {
@@ -554,24 +598,26 @@ int rmdir_sd(char *name)
 int read_dir_sd()
 // ls 打印目录目录的内容
 {
-    inode_sd_t inode_buf;
+    char inode_buf[512];
+    pprintf(current_dir);
 
     int i;
     for (i = 0; i < DIR_FILE_MAX; i++)
     {
         if (((dir_t *)dir_buffer)->dentry[i].valid)
         {
-            sdread(&inode_buf, ((dir_t *)dir_buffer)->dentry[i].inode, sizeof(inode_sd_t));
-            inode_sd_t *node = &inode_buf;
-            printf("%s::  %d  %s  %xB\n",
-                   node->mode_mask,
+            sdread(inode_buf, ALIGN_512(((dir_t *)dir_buffer)->dentry[i].inode), 512);
+            inode_sd_t *node = (inode_sd_t *)&(inode_buf[((dir_t *)dir_buffer)->dentry[i].inode % 512]);
+            printf("%s | %s | %xB | inode: 0x%x | block: 0x%x\n",
+                   ((dir_t *)dir_buffer)->dentry[i].name,
+                   //    node->mode_mask,
                    filetype(node->type),
-                   node->size);
+                   node->size,
+                   ((dir_t *)dir_buffer)->dentry[i].inode,
+                   node->blocks[0]);
         }
     }
 }
-
-#define pprintf(x) printf("" #x ": 0x%x\n", x);
 
 int fs_info_sd()
 // statfs 打印文件系统信息，包括数据块的使用情况等
@@ -607,25 +653,50 @@ static int parse_path(char *path)
     {
         absolute_path = 1;
         p++;
+        if (path[p] == '\0')
+        {
+            parsed_dir_name[0][0] = '/';
+            parsed_dir_name[0][1] = '\0';
+            return 0; //dir depth means root dir
+        }
     }
     else //realtive path
     {
         absolute_path = 0;
     }
+
+    pprintf(absolute_path);
+    printf("%s\n", path);
+
     while (path[p] != '\0')
     {
         if (path[p] != '/')
         {
-            parsed_dir_name[i][inlinep++] = path[p++];
+            parsed_dir_name[dir_depth][inlinep++] = path[p++];
         }
         else
         {
-            parsed_dir_name[i][inlinep] = '\0';
+            parsed_dir_name[dir_depth][inlinep] = '\0';
             inlinep = 0;
             p++;
             dir_depth++;
         }
     }
+    {
+        parsed_dir_name[i][inlinep] = '\0';
+        inlinep = 0;
+        p++;
+        dir_depth++;
+    }
+
+    pprintf(dir_depth);
+    //for debug
+    int y;
+    for (y = 0; y < dir_depth; y++)
+    {
+        printf("parsed_dir_name: %s\n", parsed_dir_name[y]);
+    }
+
     return dir_depth;
 }
 
@@ -635,6 +706,13 @@ static int detect_dir(diskaddr_t dir_now)
 //need check outside if the result is a dir's inode
 //ie: return the lowest level element's inode in path
 {
+    if (!strcmp("/", parsed_dir_name[0]))
+    {
+        return root_dir;
+    }
+
+    pprintf(dir_now);
+
     char buff[512];
     inode_sd_t inodebuff;
     dir_t dirbuff;
@@ -664,53 +742,71 @@ static int detect_dir(diskaddr_t dir_now)
         }
     }
 
-    if (dir_depth == 0)
+    name_pointer++;
+
+    pprintf(dir_now);
+
+    if (find_flag)
     {
-        return dir_now;
+        dir_depth -= 1;
+        if (dir_depth == 0)
+        {
+            return dir_now;
+        }
+        else
+        {
+            return detect_dir(dir_now);
+        }
     }
     else
     {
-        dir_depth -= 1;
-        return detect_dir(dir_now);
+        return 0;
     }
 }
 
 int enter_fs_sd(char *path)
 // cd 进入目录 (内部递归实现?)
 {
-    diskaddr_t temp_inode;
+    diskaddr_t target_inode;
     parse_path(path);
     if (absolute_path)
     {
-        temp_inode = detect_dir(root_dir);
+        pprintf(root_dir);
+        target_inode = detect_dir(root_dir);
     }
     else
     {
-        temp_inode = detect_dir(current_dir);
+        target_inode = detect_dir(current_dir);
     }
 
-    if (temp_inode)
+    pprintf(target_inode);
+
+    if (target_inode)
     {
         char buff[512];
         inode_sd_t inodebuff;
 
         //load inode into memory
-        sdread(buff, ALIGN_512(temp_inode), 512);
-        inodebuff = *(inode_sd_t *)(&buff[temp_inode % 512]);
+        sdread(buff, ALIGN_512(target_inode), 512);
+        inodebuff = *(inode_sd_t *)(&buff[target_inode % 512]);
         if (inodebuff.type != FILETYPE_DIR)
         {
             printf("cd: Find a file/link, not a dir.\n");
             return 1;
         }
         int i;
+        char dirbuff[512];
+        pprintf(inodebuff.blocks[0]);
+        sdread(dirbuff, inodebuff.blocks[0], 512);
         for (i = 0; i < 512; i++)
         {
             //load dir to mem
-            dir_buffer[i] = buff[i];
+            dir_buffer[i] = dirbuff[i];
         }
+        current_dir = target_inode;
     }
 
-    if (temp_inode)
+    if (target_inode)
     //the path is right
     {
         if (absolute_path)
@@ -748,18 +844,18 @@ int enter_fs_sd(char *path)
 diskaddr_t path_to_inode(char *path)
 // cd 进入目录 (内部递归实现?)
 {
-    diskaddr_t temp_inode;
+    diskaddr_t target_inode;
     parse_path(path);
     if (absolute_path)
     {
-        temp_inode = detect_dir(root_dir);
+        target_inode = detect_dir(root_dir);
     }
     else
     {
-        temp_inode = detect_dir(current_dir);
+        target_inode = detect_dir(current_dir);
     }
 
-    return temp_inode;
+    return target_inode;
 }
 
 // 文件操作
@@ -819,12 +915,28 @@ int mknod_sd(char *name)
     {
         new_inode.blocks[j] = 0;
     }
+    new_inode.ext_inode1 = 0;
+    new_inode.ext_inode2 = 0;
     new_inode.create_timestamp = 0;
 
+    //write inode
     write_inode(inode, &new_inode);
-    printf("Made file %s.\n", name);
 
-    return 0;
+    //TODO write to dir.
+    for (i = 0; i < DIR_FILE_MAX; i++)
+    {
+        if (!((dir_t *)dir_buffer)->dentry[i].valid)
+        {
+            ((dir_t *)dir_buffer)->dentry[i].valid = 1;
+            ((dir_t *)dir_buffer)->dentry[i].inode = inode;
+            strcpy(&(((dir_t *)dir_buffer)->dentry[i].name), name);
+            sync_dir();
+            printf("Made file %s.\n", name);
+            return 0;
+        }
+    }
+
+    printf("Touch: too many files in this dir.\n");
 }
 // touch 建立一个文件
 
@@ -843,6 +955,36 @@ int cat_sd(char *name)
                 diskaddr_t inode = ((dir_t *)dir_buffer)->dentry[i].inode;
                 sdread(ibuff, ALIGN_512(inode), 512);
                 inode_sd_t inodebuff = *(inode_sd_t *)(&ibuff[inode % 512]);
+
+                if (inodebuff.type == FILETYPE_DIR)
+                {
+                    printf("Dir %s\n", name);
+                    return 0;
+                }
+
+                if (inodebuff.type == FILETYPE_SL)
+                {
+                    diskaddr_t target_inode;
+                    parse_path(&inodebuff.blocks[0]);
+                    if (absolute_path)
+                    {
+                        pprintf(root_dir);
+                        target_inode = detect_dir(root_dir);
+                    }
+                    else
+                    {
+                        target_inode = detect_dir(current_dir);
+                    }
+                    if (!target_inode)
+                    {
+                        printsys("Cat: softlink invalid.\n");
+                        return -1;
+                    }
+
+                    sdread(ibuff, ALIGN_512(target_inode), 512);
+                    inodebuff = *(inode_sd_t *)(&ibuff[inode % 512]);
+                }
+
                 int size = inodebuff.size;
                 if (size > 4096)
                 {
@@ -857,6 +999,7 @@ int cat_sd(char *name)
                 {
                     printf("%c", buff[now++]);
                 }
+                return 0;
             }
         }
     }
@@ -870,17 +1013,17 @@ int open_sd(char *name, int access)
     if (!strcmp(name, "."))
     {
         printf("You can not open file '.'\n");
-        return 1;
+        return -1;
     }
     if (!strcmp(name, ".."))
     {
         printf("You can not open file '..'\n");
-        return 2;
+        return -1;
     }
     if (!strcmp(name, ""))
     {
         printf("You can not open file with empty name.\n");
-        return 3;
+        return -1;
     }
     int i;
     diskaddr_t file_inode = 0;
@@ -895,11 +1038,18 @@ int open_sd(char *name, int access)
         }
     }
 
+    //check if file exists
+    if (!file_inode)
+    {
+        printf("Open: file %s does not exist.\n", name);
+        return -1;
+    }
+
     //check access
-    if ((access != O_RD) || (access != O_WR) || (access != O_RDWR))
+    if ((access != O_RD) && (access != O_WR) && (access != O_RDWR))
     {
         printf("Invalid access in fopen. Fopen failed.\n");
-        return 4;
+        return -1;
     }
 
     //load inode
@@ -910,7 +1060,27 @@ int open_sd(char *name, int access)
     if (inodebuff->type == FILETYPE_DIR)
     {
         printf("[FOPEN] Can not fopen a dir.\n");
-        return 8;
+        return -1;
+    }
+    if (inodebuff->type == FILETYPE_SL)
+    {
+        diskaddr_t target_inode;
+        parse_path(&inodebuff->blocks[0]);
+        if (absolute_path)
+        {
+            pprintf(root_dir);
+            target_inode = detect_dir(root_dir);
+        }
+        else
+        {
+            target_inode = detect_dir(current_dir);
+        }
+        if (!target_inode)
+        {
+            printsys("Fopen: softlink invalid.\n");
+            return -1;
+        }
+        file_inode = target_inode;
     }
 
     //find and setup a free fd
@@ -926,41 +1096,49 @@ int open_sd(char *name, int access)
             //open inode
             fdesc[j].mode_mask = inodebuff->mode_mask;
             fdesc[j].pos = 0;
-            fdesc[j].inode_buffer = *(inode_sd_t *)(&buff[file_inode % 512]);
+            inode_buffer_sd[j] = *(inode_sd_t *)(&buff[file_inode % 512]);
+            // printf("opened\n");
+            // while(1);
+            return j;
         }
     }
 
     printf("[FOPEN] No free file descripter found.\n");
-    return 9;
+    return -1;
 }
 
 static diskaddr_t seek_block(int fdesc_num, int offset)
 //this func is for fwrite
 //for fread: check the offset is in bound before using this func.
-//before running this func, make sure that the newest inode is buffed in fdsc.inode_buffer
+//before running this func, make sure that the newest inode is buffed in inode_buffer_sd[x]
 {
     //fst 16 blocks
     //16*4KB=64KB
     if (offset < 4096 * 16)
     {
         int block_num = offset / 4096;
-        diskaddr_t res = fdesc[fdesc_num].inode_buffer.blocks[block_num];
+        diskaddr_t res = inode_buffer_sd[fdesc_num].blocks[block_num];
+        // pprintf(res);
+        // while(1);
         if (!res)
         {
             //projection has not been established
             res = alloc_block();
             if (!res)
             {
-                printf("Alloc new block failed.\n");
+                printsys("Alloc new block failed.\n");
+                panic("sdcard fulled");
             }
-            fdesc[fdesc_num].inode_buffer.blocks[block_num] = res;
-            if (fdesc[fdesc_num].inode_buffer.size < offset)
+            inode_buffer_sd[fdesc_num].blocks[block_num] = res;
+            if (inode_buffer_sd[fdesc_num].size < offset)
             {
-                fdesc[fdesc_num].inode_buffer.size = ((offset % 4096) ? (offset - offset % 4096 + 4096) : offset);
+                // inode_buffer_sd[fdesc_num].size = offset - offset % 4096 + 4096;
             }
-            write_inode(fdesc[fdesc_num].inode, &fdesc[fdesc_num].inode_buffer);
+
+            write_inode(fdesc[fdesc_num].inode, &inode_buffer_sd[fdesc_num]);
         }
         fdesc[fdesc_num].pos = offset;
+        // printsys("%x res\n", res);
         return res;
     }
 
@@ -970,14 +1148,14 @@ static diskaddr_t seek_block(int fdesc_num, int offset)
     {
         int block_num = (offset - (4096 * 16)) / 4096;
 
-        if (!fdesc[fdesc_num].inode_buffer.ext_inode1)
+        if (!inode_buffer_sd[fdesc_num].ext_inode1)
         {
-            fdesc[fdesc_num].inode_buffer.ext_inode1 = alloc_block();
-            write_inode(fdesc[fdesc_num].inode, &fdesc[fdesc_num].inode_buffer);
+            inode_buffer_sd[fdesc_num].ext_inode1 = alloc_block();
+            write_inode(fdesc[fdesc_num].inode, &inode_buffer_sd[fdesc_num]);
         }
 
         char buff[4096];
-        sdread(buff, fdesc[fdesc_num].inode_buffer.ext_inode1, 4096);
+        sdread(buff, inode_buffer_sd[fdesc_num].ext_inode1, 4096);
 
         diskaddr_t res = ((diskaddr_t *)buff)[block_num];
         if (!res)
@@ -986,15 +1164,15 @@ static diskaddr_t seek_block(int fdesc_num, int offset)
             res = alloc_block();
             if (!res)
             {
-                printf("Alloc new block failed.\n");
+                printsys("Alloc new block failed.\n");
             }
             ((diskaddr_t *)buff)[block_num] = res;
-            if (fdesc[fdesc_num].inode_buffer.size < offset)
+            if (inode_buffer_sd[fdesc_num].size < offset)
             {
-                fdesc[fdesc_num].inode_buffer.size = ((offset % 4096) ? (offset - offset % 4096 + 4096) : offset);
+                // inode_buffer_sd[fdesc_num].size = offset - offset % 4096 + 4096;
             }
-            write_inode(fdesc[fdesc_num].inode, &fdesc[fdesc_num].inode_buffer);
-            sdwrite(buff, fdesc[fdesc_num].inode_buffer.ext_inode1, 4096);
+            write_inode(fdesc[fdesc_num].inode, &inode_buffer_sd[fdesc_num]);
+            sdwrite(buff, inode_buffer_sd[fdesc_num].ext_inode1, 4096);
         }
         fdesc[fdesc_num].pos = offset;
         return res;
@@ -1007,13 +1185,13 @@ static diskaddr_t seek_block(int fdesc_num, int offset)
         int block_num = (offset - (4096 * (16 + 1024))) / 4096 / 1024;
         int block_num2 = (offset - (4096 * (16 + 1024))) / 4096 % 1024;
 
-        if (!fdesc[fdesc_num].inode_buffer.ext_inode2)
+        if (!inode_buffer_sd[fdesc_num].ext_inode2)
         {
-            fdesc[fdesc_num].inode_buffer.ext_inode2 = alloc_block();
+            inode_buffer_sd[fdesc_num].ext_inode2 = alloc_block();
         }
 
         char buff1[4096];
-        sdread(buff1, fdesc[fdesc_num].inode_buffer.ext_inode2, 4096);
+        sdread(buff1, inode_buffer_sd[fdesc_num].ext_inode2, 4096);
 
         diskaddr_t res1 = ((diskaddr_t *)buff1)[block_num];
         if (!res1)
@@ -1022,10 +1200,10 @@ static diskaddr_t seek_block(int fdesc_num, int offset)
             res1 = alloc_block();
             if (!res1)
             {
-                printf("Alloc new block failed.\n");
+                printsys("Alloc new block failed.\n");
             }
             ((diskaddr_t *)buff1)[block_num] = res1;
-            sdwrite(buff1, fdesc[fdesc_num].inode_buffer.ext_inode2, 4096);
+            sdwrite(buff1, inode_buffer_sd[fdesc_num].ext_inode2, 4096);
         }
 
         char buff2[4096];
@@ -1046,12 +1224,12 @@ static diskaddr_t seek_block(int fdesc_num, int offset)
             sdwrite(buff2, res1, 4096);
         }
 
-        if (fdesc[fdesc_num].inode_buffer.size < offset)
+        if (inode_buffer_sd[fdesc_num].size < offset)
         {
-            fdesc[fdesc_num].inode_buffer.size = ((offset % 4096) ? (offset - offset % 4096 + 4096) : offset);
+            // inode_buffer_sd[fdesc_num].size = offset - offset % 4096 + 4096;
         }
         fdesc[fdesc_num].pos = offset;
-        write_inode(fdesc[fdesc_num].inode, &fdesc[fdesc_num].inode_buffer);
+        write_inode(fdesc[fdesc_num].inode, &inode_buffer_sd[fdesc_num]);
         return res;
     }
 
@@ -1064,6 +1242,12 @@ int read_sd(int fd, char *buff, int size)
 {
     //read fd
 
+    //check status
+    if (!(fdesc[fd].access & O_RD))
+    {
+        printsys("Read: read permission denied.\n");
+    }
+
     char sdbuff[4096];
 
     int can_read = 4096 - fdesc[fd].pos % 4096;
@@ -1073,9 +1257,9 @@ int read_sd(int fd, char *buff, int size)
     diskaddr_t daddr = seek_block(fd, fdesc[fd].pos);
     sdread(sdbuff, daddr, 4096);
 
-    if ((size + fdesc[fd].pos) > fdesc[fd].inode_buffer.size)
+    if ((size + fdesc[fd].pos) > inode_buffer_sd[fd].size)
     {
-        printf("[READ] Warning: read exceed file size, will extend file with 0\n");
+        printsys("[READ] Warning: read exceed file size, will extend file with 0\n");
     }
 
     //1st round
@@ -1130,6 +1314,11 @@ int write_sd(int fd, char *buff, int size)
 {
     //read fd
 
+    if (!(fdesc[fd].access & O_WR))
+    {
+        printsys("Write: write permission denied.\n");
+    }
+
     char sdbuff[4096];
 
     int can_write = 4096 - fdesc[fd].pos % 4096;
@@ -1137,15 +1326,24 @@ int write_sd(int fd, char *buff, int size)
     uint32_t writed = 0;
 
     diskaddr_t daddr = seek_block(fd, fdesc[fd].pos);
+
     sdread(sdbuff, daddr, 4096);
 
-    if ((size + fdesc[fd].pos) > fdesc[fd].inode_buffer.size)
+    if ((size + fdesc[fd].pos) > inode_buffer_sd[fd].size)
     {
-        printf("[WRITE] Write exceed file size, will extend file.\n");
+        printsys("[WRITE] Write exceed file size, will extend file.\n");
+        inode_buffer_sd[fd].size = size + fdesc[fd].pos;
+        //sync inode
+        write_inode(fdesc[fd].inode, &inode_buffer_sd[fd]);
     }
 
     //1st round
     //read no more than can_read
+
+    // pprintf(size);
+    // pprintf(daddr);
+    // pprintf(can_write);
+    // pprintf(write_start);
 
     if (writed < size)
     {
@@ -1170,8 +1368,11 @@ int write_sd(int fd, char *buff, int size)
     }
     sdwrite(sdbuff, daddr, 4096);
 
+    //TODO: problem here
+
     //2nd round
     //read no more than 4096
+    // pprintf(size);
     while (writed < size)
     {
         daddr = seek_block(fd, fdesc[fd].pos);
@@ -1187,6 +1388,7 @@ int write_sd(int fd, char *buff, int size)
             }
             else
             {
+                break;
             }
         }
         sdwrite(sdbuff, daddr, 4096);
@@ -1213,6 +1415,7 @@ diskaddr_t find_sd_sub(diskaddr_t dir_now, char *name)
     //check if dir now is a valid dir
     char buff[512];
     char dbuff[512];
+    // memset(dbuff,0,512);
     uint32_t offset = dir_now % 512;
     sdread(&buff, dir_now - offset, 512);
     inode_sd_t *inodebuff = (inode_sd_t *)(&buff[offset]);
@@ -1222,12 +1425,13 @@ diskaddr_t find_sd_sub(diskaddr_t dir_now, char *name)
     if (inodebuff->type == FILETYPE_DIR)
     {
         //load dir into memory
+        pprintf(inodebuff->blocks[0]);
         sdread(dbuff, inodebuff->blocks[0], 512);
         dir_t *dirbuff = (dir_t *)dbuff;
         int k = 0;
         for (k = 0; k < DIR_FILE_MAX; k++)
         {
-            if (dirbuff->dentry[k].valid)
+            if (dirbuff->dentry[k].valid == 1)
             {
                 //check if is this file
                 if (!strcmp(name, dirbuff->dentry[k].name))
@@ -1237,9 +1441,15 @@ diskaddr_t find_sd_sub(diskaddr_t dir_now, char *name)
                 }
                 else
                 {
-                    diskaddr_t res = find_sd_sub(dirbuff->dentry[k].inode, name);
-                    if (res)
-                        return res;
+                    if (strcmp(".", dirbuff->dentry[k].name) && strcmp("..", dirbuff->dentry[k].name))
+                    {
+                        // printf("%s\n", dirbuff->dentry[k].name);
+                        // printf("valid %x\n", dirbuff->dentry[k].valid);
+                        // printf("inode %x\n", dirbuff->dentry[k].inode);
+                        diskaddr_t res = find_sd_sub(dirbuff->dentry[k].inode, name);
+                        if (res)
+                            return res;
+                    }
                 }
             }
         }
@@ -1255,8 +1465,28 @@ diskaddr_t find_sd_sub(diskaddr_t dir_now, char *name)
 int find_sd(char *path, char *name)
 {
     // First we get path's addr and inode
-    diskaddr_t dir_now;
-    diskaddr_t res = find_sd_sub(dir_now, name);
+    diskaddr_t target_dir;
+    parse_path(path);
+    if (absolute_path)
+    {
+        pprintf(root_dir);
+        target_dir = detect_dir(root_dir);
+    }
+    else
+    {
+        target_dir = detect_dir(current_dir);
+    }
+
+    if (!target_dir)
+    {
+        printf("Find: invalid path.\n");
+        return 1;
+    }
+
+    pprintf(target_dir);
+
+    diskaddr_t res = find_sd_sub(target_dir, name);
+
     if (res)
     {
         printf("Find file/dir at diskaddr %x\n", res);
@@ -1270,6 +1500,20 @@ int find_sd(char *path, char *name)
 int rename_sd(char *old_name, char *new_name)
 {
     int k = 0;
+
+    for (k = 0; k < DIR_FILE_MAX; k++)
+    {
+        if (((dir_t *)dir_buffer)->dentry[k].valid)
+        {
+            //check if is this file
+            if (!strcmp(new _name, ((dir_t *)dir_buffer)->dentry[k].name))
+            {
+                printf("Rename: newname already exists.\n");
+                return -1;
+            }
+        }
+    }
+
     for (k = 0; k < DIR_FILE_MAX; k++)
     {
         if (((dir_t *)dir_buffer)->dentry[k].valid)
@@ -1307,11 +1551,24 @@ int hardlink_sd(char *target, char *linkname)
         inode_sd_t *inodebuff = (inode_sd_t *)(&buff[inode % 512]);
 
         inodebuff->hardlink_cnt++;
-        write_inode(inode, inodebuff)
+        write_inode(inode, inodebuff);
+        int i;
+        for (i = 0; i < DIR_FILE_MAX; i++)
+        {
+            if (!((dir_t *)dir_buffer)->dentry[i].valid)
+            {
+                ((dir_t *)dir_buffer)->dentry[i].valid = 1;
+                ((dir_t *)dir_buffer)->dentry[i].inode = inode;
+                strcpy(&(((dir_t *)dir_buffer)->dentry[i].name), linkname);
+                sync_dir();
+                printsys("Made hardlink %s.\n", linkname);
+                return 0;
+            }
+        }
     }
     else
     {
-        printf("[LN] Target not found.\n");
+        printsys("[LN] Target not found.\n");
         return 1;
     }
     //look for target, then add its inode to this dir, while
@@ -1320,8 +1577,35 @@ int hardlink_sd(char *target, char *linkname)
 int softlink_sd(char *target, char *linkname)
 {
     //not implemented, too many codes to write.
-    printf("Too complected..., need to mod open, close, cat\n");
-    return 0;
+    // printsys("Too complected..., need to mod open, close, cat\n");
+    if (mknod_sd(linkname))
+        return 1;
+
+    int i;
+    for (i = 0; i < DIR_FILE_MAX; i++)
+    {
+        if (!strcmp(((dir_t *)dir_buffer)->dentry[i].name, linkname))
+        {
+            diskaddr_t target_inode = ((dir_t *)dir_buffer)->dentry[i].inode;
+            char buff[512];
+            sdread(buff, ALIGN_512(target_inode), 512);
+            inode_sd_t inodebuff = *(inode_sd_t *)(&buff[target_inode % 512]);
+            inodebuff.type = FILETYPE_SL;
+            inodebuff.size = 4096;
+            strcpy(&inodebuff.blocks[0], target);
+
+            //note: we use blocks[16] to save softlink path
+
+            //or use a whole block to save it:
+
+            // inodebuff.blocks[0]=alloc_block();
+            // sdwrite(target, inodebuff.blocks[0], strlen(target)+1);
+
+            write_inode(target_inode, &inodebuff);
+            printsys("Made softlink %s.\n", linkname);
+            return 0;
+        }
+    }
 }
 
 int recycle_blocks(diskaddr_t inode)
@@ -1350,7 +1634,7 @@ int recycle_blocks(diskaddr_t inode)
         {
             if (((diskaddr_t *)buff1)[k] != 0)
             {
-                free_block((diskaddr_t*)buff1)[k]);
+                free_block(((diskaddr_t *)buff1)[k]);
             }
         }
         free_block(inodebuff->ext_inode1);
@@ -1373,11 +1657,11 @@ int recycle_blocks(diskaddr_t inode)
                 {
                     if (((diskaddr_t *)buff2)[s] != 0)
                     {
-                        free_block((diskaddr_t*)buff2[s]);
+                        free_block(((diskaddr_t *)buff2)[s]);
                     }
                 }
 
-                free_block((diskaddr_t*)buff1)[k]);
+                free_block(((diskaddr_t *)buff1)[k]);
             }
         }
         free_block(inodebuff->ext_inode1);
@@ -1388,6 +1672,16 @@ int recycle_blocks(diskaddr_t inode)
 
 int rm_sd(char *name)
 {
+    if (!strcmp(name, "."))
+    {
+        printf("You can not rm '.'\n");
+        return 1;
+    }
+    if (!strcmp(name, ".."))
+    {
+        printf("You can not rm '..'\n");
+        return 2;
+    }
     int k = 0;
     for (k = 0; k < DIR_FILE_MAX; k++)
     {

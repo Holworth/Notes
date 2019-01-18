@@ -46,7 +46,7 @@ typedef struct inode_sd
     char hardlink_cnt;
     char res1; //not used
     char res2; //not used
-    //1
+    //1 0x0
     uint32_t owner;
     uint32_t group;
     uint32_t mode_mask;
@@ -55,8 +55,8 @@ typedef struct inode_sd
     uint32_t modify_timestamp;
     //7
 
-    uint32_t size;
-    //8
+    uint32_t size;//0x1c
+    //8 
 
     diskaddr_t blocks[16];
     //24

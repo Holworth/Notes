@@ -36,11 +36,12 @@ symbol-file main
 # 等待连接
 #b *0xa0800200
 #b *0x8005ced0
-b *0x8005ceb0
+#b *0x8005ceb0
 #b *0x8005cec0
 #b sys_net_recv
 #b irq_mac
-b cmd_read
+#b cmd_read
+b find_sd_sub
 c
 
 # 附注

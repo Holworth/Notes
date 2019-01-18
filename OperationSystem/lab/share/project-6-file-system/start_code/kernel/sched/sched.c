@@ -432,6 +432,7 @@ pid_t new_pid()
 
 int panic(char* error_name)
 {
+
     printk("# [ERROR] %s\n",error_name);
     other_check(current_running->pid);
     // other_check(current_running->status);

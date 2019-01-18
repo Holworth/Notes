@@ -52,6 +52,8 @@ void gethex(int* mem);
 // #define check(x) printk("1",x)
 #define other_check(x) printk("> [INFO:%d] "#x":0x%x               \n",info_cnt++,x)
 
+#define pprintf(x) printf("" #x ": 0x%x\n", x);
+
 int panic(char* error_name);
 void error_ps();
 

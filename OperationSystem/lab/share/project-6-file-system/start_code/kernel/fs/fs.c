@@ -40,7 +40,8 @@ char *filetype(char type)
     case FILETYPE_HL:
         return filetype_hl_str;
     default:
-        panic("undefined filetype");
+        // panic("undefined filetype");
+        return filetype_sl_str;
     }
 }
 
@@ -153,11 +154,11 @@ void cmd_ln(char *target, char *linkname, char *para)
 {
     if (!strcmp(para, "-s"))
     {
-        hardlink(target, linkname);
+        softlink(target, linkname);
     }
     else
     {
-        softlink(target, linkname);
+        hardlink(target, linkname);
     }
 }
 
@@ -178,7 +179,7 @@ int sdread_not_aligned(char *buff, uint32_t position, uint32_t size)
         {
             uint32_t tail_offset = size - size_offset;
             sdread(buff, position, size - size_offset);
-            char *tmp_buff[512];
+            char tmp_buff[512];
             sdread(tmp_buff, position + size - size_offset, 512);
             int i;
             for (i = 0; i < size_offset; i++)
@@ -190,7 +191,7 @@ int sdread_not_aligned(char *buff, uint32_t position, uint32_t size)
     }
     else
     {
-        char *tmp_buff[512];
+        char tmp_buff[512];
         uint32_t start_position = position - position % 512;
 
         // int valid_size=512-position%512;
@@ -227,7 +228,7 @@ int sdwrite_not_aligned(char *buff, uint32_t position, uint32_t size)
         else
         {
             uint32_t tail_offset = size - size_offset;
-            char *tmp_buff[512];
+            char tmp_buff[512];
             sdread(tmp_buff, position + size - size_offset, 512);
             int i;
             for (i = 0; i < size_offset; i++)
@@ -241,7 +242,7 @@ int sdwrite_not_aligned(char *buff, uint32_t position, uint32_t size)
     }
     else
     {
-        char *tmp_buff[512];
+        char tmp_buff[512];
         uint32_t position_now = position - position % 512;
 
         int valid_offset = position % 512;
