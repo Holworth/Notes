@@ -7,3 +7,6 @@
 [submodule "OperationSystem/xv6-book"]
 	path = OperationSystem/xv6-book
 	url = git://github.com/mit-pdos/xv6-book.git
+[submodule "PLImplementation/program-laguage-implement-NUS"]
+	path = PLImplementation/program-laguage-implement-NUS
+	url = https://github.com/AugustusWillisWang/program-laguage-implement-NUS

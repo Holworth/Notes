@@ -1,0 +1,94 @@
+Timer unit: 1e-07 s
+
+Total time: 185.651 s
+File: F:\workpath\Notes\ArtificialIntelligence\course_design\triple_model.py
+Function: train at line 77
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    77                                           @profile
+    78                                           def train(input, output, model, hidden_dim, epochs):
+    79                                               
+    80         1    1161858.0 1161858.0      0.1      jsonstr=triple_support.load_data(input)
+    81         1  439246881.0 439246881.0     23.7      data_list=atvp_map.atvp2_taged_map(jsonstr)
+    82                                           
+    83         1      33876.0  33876.0      0.0      torch.manual_seed(1)
+    84                                           
+    85         1   35406162.0 35406162.0      1.9      model = LSTMTagger(INPUT_DIM, hidden_dim, OUTPUT_DIM).cuda()
+    86                                               # model = RNN(INPUT_DIM, hidden_dim, OUTPUT_DIM).cuda()
+    87                                               # loss_function = nn.NLLLoss(size_average=False)
+    88         1       7587.0   7587.0      0.0      loss_function = nn.CrossEntropyLoss(size_average=False).cuda()
+    89         1       1608.0   1608.0      0.0      optimizer = optim.SGD(model.parameters(), lr=0.1)
+    90                                               
+    91                                               # inputs = prepare_sequence(training_data[0][0], word_to_ix)
+    92                                               # tag_scores = model(inputs)
+    93                                               # print(training_data[0][0])
+    94                                               # print(inputs)
+    95                                               # print(tag_scores)
+    96                                               
+    97         1       1260.0   1260.0      0.0      print("Now training.")
+    98                                               
+    99         1         35.0     35.0      0.0      for epoch in range(epochs): # 我们要训练300次，可以根据任务量的大小酌情修改次数。
+   100         1       1780.0   1780.0      0.0          print('epoch:',epoch)
+   101         1         14.0     14.0      0.0          now_at=0
+   102         1          8.0      8.0      0.0          cases=0
+   103         1          7.0      7.0      0.0          right=0
+   104       684      13565.0     19.8      0.0          for sentence in data_list:
+   105       684    2770739.0   4050.8      0.1              print(now_at)
+   106       684      28658.0     41.9      0.0              now_at=now_at+1
+   107     23072     705757.0     30.6      0.0              for each_case in sentence['testset']:
+   108                                                           # 清除网络先前的梯度值，梯度值是Pytorch的变量才有的数据，Pytorch张量没有
+   109     22389   79287694.0   3541.4      4.3                  model.zero_grad()
+   110                                                           # 重新初始化隐藏层数据，避免受之前运行代码的干扰
+   111     22389   79162292.0   3535.8      4.3                  model.hidden = model.init_hidden()
+   112                                                           # 准备网络可以接受的的输入数据和真实标签数据，这是一个监督式学习
+   113     22389     576643.0     25.8      0.0                  is_triple, sentence_in = each_case['is_triple'], each_case['input_vecs']
+   114                                           
+   115                                                           # print(sentence_in) 
+   116                                                           # print(is_triple)
+   117                                                           # print(each_case['debug_vec'])
+   118                                                           # print(each_case['tav'])
+   119                                           
+   120     22389     757225.0     33.8      0.0                  tags=[int(is_triple), int(not is_triple)]
+   121                                           
+   122                                                           # torch.IntTensor(sentence_in).shape()
+   123                                           
+   124                                                           # input_var=autograd.Variable(torch.IntTensor(sentence_in))
+   125                                                           # input_var.show()
+   126                                           
+   127                                                           # 运行我们的模型，直接将模型名作为方法名看待即可
+   128     22389  305162883.0  13630.0     16.4                  tag_scores = model(torch.tensor(sentence_in, dtype=torch.float).view(len(sentence_in), 1, -1).cuda())
+   129                                                           # output
+   130                                                           # for i in range(len(sentence_in)):
+   131                                                           #     print(sentence_in[i])
+   132                                                           #     output, hidden = model(torch.tensor(sentence_in[i], dtype=torch.float).cuda())
+   133                                                           # tag_scores=[output]
+   134                                           
+   135                                                           # 计算损失，反向传递梯度及更新模型参数
+   136                                                           # print(tag_scores[-1].view(1,-1))
+   137                                                           # print(torch.autograd.Variable(torch.tensor(tags)).view(1,-1))
+   138                                                           # loss = loss_function(tag_scores[-1].view(1,-1), torch.autograd.Variable(torch.tensor(tags)).view(1,-1))
+   139                                                           # loss = loss_function(tag_scores[-1], torch.autograd.Variable(torch.tensor(tags)))
+   140     22389   72726942.0   3248.3      3.9                  if tag_scores[-1][1]>tag_scores[-1][0]:
+   141        43        867.0     20.2      0.0                      if(is_triple):
+   142         4         49.0     12.2      0.0                          right=right+1
+   143                                                           else:
+   144     22346     553902.0     24.8      0.0                      if(not is_triple):
+   145     20279     341088.0     16.8      0.0                          right=right+1
+   146     22389     253428.0     11.3      0.0                  cases=cases+1
+   147     22389  103073194.0   4603.7      5.6                  loss = loss_function(tag_scores[-1].view(1,-1).cuda(), torch.autograd.Variable(torch.tensor([int(is_triple)])).cuda())
+   148     22389  647027069.0  28899.3     34.9                  loss.backward()
+   149     22388   88209542.0   3940.0      4.8                  optimizer.step()
+   150                                               
+   151                                                   print(cases, right, right/cases)
+   152                                               # # 来检验下模型训练的结果
+   153                                               # inputs = parse_sentence_atvp2(training_data[0][0])
+   154                                               # tag_scores = model(inputs)
+   155                                               # print(tag_scores)
+   156                                               # print(training_data[0][1])
+   157                                           
+   158                                               
+   159                                               # 保存模型到指定目录
+   160                                               torch.save(model, PATH)
+   161                                               print('Train finished.')
+

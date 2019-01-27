@@ -94,7 +94,6 @@ def atvp2_untaged_map(data):
                     debug_vec=[]
                     for iii in range(len(i['indexes'])):
                         #[is_picked, T, A, V, P1, P2]                        
-                        input_vecs.append([])
                         input_vec=[]
 
                         if(iii in triple):
@@ -139,7 +138,7 @@ def atvp2_untaged_map(data):
 
                         input_vecs.append(input_vec)
 
-                    print(debug_vec)     
+                    # print(debug_vec)     
                     if(is_considered):
                         i['testset'].append({'input_vecs':input_vecs, 'debug_vec':debug_vec, 'tav':[t,a,v]})
         result.append(i)

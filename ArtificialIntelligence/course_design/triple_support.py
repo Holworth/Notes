@@ -26,9 +26,9 @@ def k_fold_cv(model, k):
         errors[i]=model.errorcnt()
     return sum(errors)/float(k)
 
-def evalute_model(model):
-    info = json.load(open("data.json", 'r'))  # original data json
-    answers = json.load(open("output.json", 'r'))  # your prediction
+def evalute_model(input):
+    info = json.load(open(input, 'r'))  # original data json
+    answers = json.load(open("predict_result.json", 'r'))  # your prediction
 
     n_info = len(info)
     n_answers = len(answers)

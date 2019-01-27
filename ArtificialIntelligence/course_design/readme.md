@@ -139,10 +139,10 @@ Getting fancy: Long Short-Term Memory (LSTM) network
 
 网络类型|计算节点|隐变量维度|是否处理整句|是否处理关键词|分类器|梯度下降算法
 -|-|-|-|-|-|-
-基本RNN|tanh(Wi*I+Wh*H)|?|否|否|Softmax|mini-batch SGD
-基本LSTM|Torch.nn.Module.lstm|?|否|否|Softmax|mini-batch SGD
-整句LSTM|Torch.nn.Module.lstm|?|是|否|Softmax|mini-batch SGD
-整句+关键词LSTM|Torch.nn.Module.lstm|?|是|是|Softmax|mini-batch SGD
+基本RNN|tanh(Wi*I+Wh*H)|?|否|否|Softmax|SGD/mini-batch SGD
+基本LSTM|Torch.nn.Module.lstm|?|否|否|Softmax|SGD/mini-batch SGD
+整句LSTM|Torch.nn.Module.lstm|?|是|否|Softmax|SGD/mini-batch SGD
+整句+关键词LSTM|Torch.nn.Module.lstm|?|是|是|Softmax|SGD/mini-batch SGD
 
 # 5. RNN学习手记
 
@@ -156,17 +156,7 @@ The takeaway is that even if your data is not in form of sequences, you can stil
 
 使用[-1,1]来对应激活函数 np.tanh()? [0,1]对应Relu? 写两个版本测试一下.
 
-# 6. 网络顶层代码
-
-```
-TBD
-```
-
-# 7. 测试结果
-
-TBD
-
-# 8. Reference
+# Reference
 
 语法:
 

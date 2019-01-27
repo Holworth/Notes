@@ -4,14 +4,17 @@ import pickle
 
 import triple_support
 import atvp_map
-import triple_model
+# import triple_model
+import model_lstm
+import model_rnn
+import model_rules
 
 parser = argparse.ArgumentParser(description="Triple classifier by William Wang.")
 parser.add_argument("-i", "--input", help="set input file's name", default='./assignment_training_data_word_segment.json')
 parser.add_argument("-p","--predict", help="do predict with exist model", action="store_true")
 parser.add_argument("-t","--train", help="train and save model", action="store_true")
-parser.add_argument("-m", "--method", help="network build method, atvp-rnn in default", default="atvp-rnn")
-parser.add_argument("-o", "--output", help="set output file's name", default='output.json')
+parser.add_argument("-m", "--method", help="network build method, atvp-rnn in default", default="rules")
+parser.add_argument("-o", "--output", help="set output file's name", default='predict_result.json')
 parser.add_argument("-e", "--epochs", help="set epohs for training", type=int, default=300)
 parser.add_argument("-hd", "--hidden_dim", help="hidden layer dimension", type=int, default=5)
 parser.add_argument("-eva", "--evalute", help="evalute result", action="store_true")
@@ -22,6 +25,9 @@ parser.add_argument("-eva", "--evalute", help="evalute result", action="store_tr
 
 # def predict(input, output):
 #     pass
+
+train_dict={'lstm':model_lstm.train, 'rnn':model_rnn.train}
+predict_dict={'rules': model_rules.predict, 'lstm':model_lstm.predict, 'rnn':model_rnn.predict}
 
 if __name__=='__main__':
     print('Triple classifier by William Wang.')
@@ -40,12 +46,12 @@ if __name__=='__main__':
         idx2word, word2idx = voc_dict['idx2word'], voc_dict['word2idx'] 
         # idx2word[index] is a word
         # word2idx[word] is an index
-        triple_model.train(args.input, args.output, args.method, args.hidden_dim, args.epochs)
+        train_dict[args.method](args.input, args.output, args.method, args.hidden_dim, args.epochs)
 
     if(args.predict):
-        result=triple_model.predict(args.input, args.output)
+        result=predict_dict[args.method](args.input, args.output)
     
     if(args.evalute):
-        triple_support.evalute_model(0)
+        triple_support.evalute_model(args.input)
 
 
