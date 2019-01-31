@@ -72,7 +72,7 @@ a noble indivial, a retired sharef | still noble idea protect the innocent peopl
 
 Clint Eastwood
 
-V)	Butch Cassidy and the Sundance Kid (1969)
+## V)	Butch Cassidy and the Sundance Kid (1969)
 Robert Leroy Parker and Harry Longabaugh
 
 Butch Cassidy (Paul Newman)
@@ -80,4 +80,68 @@ The Sundance Kid (Robert Redford)
 Etta Place (Katherine Ross)
 
 
+## VI)	Conclusion
+
+<!-- HY2260: Pop Culture and History -->
+# Lecture 2: “You Believe What You Want.” Bullitt
+A/P Ian Gordon
+
+I)	Introduction: Questioning Society
+USA: 1968
+
+
+II)	San Francisco and American Culture
+
+1849 Gold Rush
+
+1906 Earthquake
+
+Berkeley
+
+Silicon Valley
+
+
+III)	Summer of Love (1967)
+
+Haight-Ashbury: an area in sf
+
+Hair
+
+Hippies
+
+Monterey Pop Festival (June 1967)
+
+"San Francisco (Be Sure to Wear Flowers in Your Hair)" Scott McKenzie
+
+Filmore West
+
+The Grateful Dead
+
+Jefferson Airplane
+
+Sly and the Family Stone
+
+Underground comix.
+
+
+IV)	Cops
+
+The pigs. 
+
+Dragnet (1951-1959, 1967-1970)
+
+Mod Squad (1968-1973)
+
+Streets of San Francisco (1972-1977)
+
+
+V)	Bullitt  (1968)
+Frank Bullitt (Steve McQueen)
+Walter Chalmers (Robert Vaughn)
+Cathy (Jacqueline Bisset)
+Baker (Norman Fell)
+Dr Willard (Georg Stanford Brown)
+
+
 VI)	Conclusion
+
