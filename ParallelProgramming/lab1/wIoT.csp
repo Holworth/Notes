@@ -1,0 +1,330 @@
+//Author: Wang Huaqiang
+//Version: 0.2: no grammar problems, attacker tbd
+//Based on first version by NiCoLe
+
+//////////////////////////////////////////////////
+///Synchronized channels define
+//////////////////////////////////////////////////
+channel wifio1 0;
+channel wifio2 0;
+channel wifio3 0;
+
+channel openwifi1 0;
+channel openwifi2 0;
+channel openwifi3 0;
+channel openwifi4 0;
+channel openwifi5 0;
+channel openwifi6 0;
+channel openwifi7 0;
+channel openwifi8 0;
+channel openwifi9 0;
+channel openwifi10 0;
+
+channel wifi1 0;
+channel wifi2 0;
+channel wifi3 0;
+channel wifi4 0;
+channel wifi5 0;
+channel wifi6 0;
+channel wifi7 0;
+channel wifi8 0;
+channel wifi9 0;
+channel wifi10 0;
+
+//////////////////////////////////////////////////
+///Messages define
+//////////////////////////////////////////////////
+enum{WifiBeancon, ssid, bssid, OpenSystemAuthenticationRequest,
+  AssocResponse, GetService1, StateService, udp, Port, Port2, ssid1, bssid1,
+  Station, EncryptedPasswd, GetLights, GetLights1, SetColorRequest1, 
+  SetPowerRequest1, LightState, SetPowerRequest, SetColorRequest,
+  Config, Password, Homessid, GetService, Homessid1, EncryptedPasswd1,
+  SD, CP, Attacker, Success1, Success2, LightState1, chromecastWifiBeacon1,
+  Success, 
+  x,y //not knowing what's for x, y? 
+  };
+
+///Results define 
+// var Success = true;
+// var Failure = false; 
+
+
+//////////////////////////////////////////////////
+///Assertions
+//////////////////////////////////////////////////
+
+// val attacker_get_wifiCredentials=false???;
+
+// #define AttackerGotwifiCredentials attacker_get_wifiCredentials == true; 
+// #assert System() reaches AttackerGotwifiCredentials; 
+
+//////////////////////////////////////////////////
+//Test
+//////////////////////////////////////////////////
+
+System()=ControlPoint()||SmartDevice();//TODO: add mCP, mSD
+
+//////////////////////////////////////////////////
+///Control Point Model
+//////////////////////////////////////////////////
+
+ControlPoint()=CP_b0();
+
+CP_b0()=
+    wifio1?chromecastWifiBeacon1->
+    wifio1?ssid1->
+    wifio1?bssid1->
+    CP_b1();
+
+CP_b1()=
+    wifio1?chromecastWifiBeacon1->
+    wifio1?ssid1->
+    wifio1?bssid1->
+    CP_b1()
+    []
+    wifio2!ssid1->
+    wifio2!OpenSystemAuthenticationRequest->
+    CP_b2();
+
+CP_b2()=
+	wifio3?AssocResponse->
+	CP_b3();
+
+CP_b3()=
+    openwifi1!GetService1->
+    CP_b4();
+
+CP_b4()=
+    openwifi2?StateService->
+    openwifi2?udp->
+    openwifi2?Port->
+    CP_b5()
+    []
+    wifi2?StateService->
+    wifi2?Config->
+    wifi2?Port2->
+    CP_b13();
+
+CP_b5()=
+    openwifi1!GetService->
+    CP_b3()
+    []
+    openwifi3!Station->
+    openwifi3!Homessid->
+    openwifi3!Password->
+    CP_b6()
+    []
+    openwifi7!SetPowerRequest->
+    CP_b10()
+    []
+    openwifi5!GetLights->
+    CP_b8()
+    []
+    openwifi9!SetColorRequest->
+    CP_b12();
+
+CP_b6()=
+    openwifi4?Station->
+    openwifi4?Homessid1->
+    openwifi4?EncryptedPasswd1->
+    CP_b7();
+
+CP_b7()=
+    wifi1?GetService->
+    CP_b3();
+
+CP_b8()=
+    openwifi6?LightState1->
+    CP_b9()
+    []
+    wifi8?LightState1->
+    CP_b9();
+
+CP_b9()=
+    openwifi5!GetLights->
+    CP_b8()
+    []
+    wifi7!GetLights->
+    CP_b8();
+
+CP_b10()=
+    openwifi8?Success1->
+    CP_b11()
+    []
+    wifi4?Success1->
+    CP_b11();
+
+CP_b11()=
+    openwifi7!SetPowerRequest->
+    CP_b10()
+    []
+    wifi3!SetPowerRequest->
+    CP_b10()
+    []
+    //Note: the graph lacks an arrow. We assume the line is from b11 to b12;
+    //TODO
+    openwifi9!SetColorRequest->
+    CP_b12()
+    []
+    wifi5!SetColorRequest->
+    CP_b12();
+    
+CP_b12()=
+    openwifi10?Success2->
+    CP_b11()
+    []
+    wifi6?Success2->
+    CP_b11();
+
+CP_b13()=
+    wifi3!SetPowerRequest->
+    CP_b10()
+    []
+    wifi5!SetColorRequest->
+    CP_b12()
+    []
+    wifi7!GetLights->
+    CP_b8();
+
+//////////////////////////////////////////////////
+///Smart Device Model
+//////////////////////////////////////////////////
+
+SmartDevice()=SD_b0();
+
+SD_b0()=
+    wifio1!chromecastWifiBeacon1->//We assume chromecastWifiBeacon1==chromecastWifiBeacon
+    wifio1!ssid1->//Ditto
+    wifio1!bssid1->//Ditto
+    SD_b1();
+
+SD_b1()=
+    wifio1!chromecastWifiBeacon1->
+    wifio1!ssid1->
+    wifio1!bssid1->
+    SD_b1()
+    []
+    wifio2?ssid1->
+    wifio2?OpenSystemAuthenticationRequest->
+    SD_b2();
+
+SD_b2()=
+	wifio3!AssocResponse->
+	SD_b3();
+
+SD_b3()=
+    openwifi1?GetService1->
+    SD_b4();
+
+SD_b4()=
+    openwifi2!StateService->
+    openwifi2!udp->
+    openwifi2!Port->
+    SD_b5()
+    []
+    wifi2!StateService->
+    wifi2!Config->
+    wifi2!Port2->
+    SD_b15();
+
+SD_b5()=
+    openwifi1?GetService->
+    SD_b3()
+    []
+    openwifi3?Station->//assume ==
+    openwifi3?x->//WTF does x, y mean?
+    openwifi3?y->
+    SD_b6()
+    []
+    openwifi7?SetPowerRequest->
+    SD_b10()
+    []
+    openwifi5?GetLights->
+    SD_b8()
+    []
+    openwifi9!SetColorRequest->
+    SD_b13();
+
+SD_b6()=
+    openwifi4!Station->
+    openwifi4!x->
+    openwifi4!EncryptedPasswd1->
+    SD_b7();
+
+SD_b7()=
+    wifi1?GetService->
+    SD_b3();
+
+SD_b8()=
+    openwifi6!LightState1->
+    SD_b9()
+    []
+    wifi8!LightState1->
+    SD_b9();
+
+SD_b9()=
+    openwifi5?GetLights->
+    SD_b8()
+    []
+    wifi7?GetLights->
+    SD_b8();
+
+//TODO
+SD_b10()=
+    // SetPowerRequest->SD_b11();
+    SD_b11();//Note: Not know if exec(SetPowerRequest) can be represented like this.
+
+SD_b11()=
+    openwifi8!Success->
+    SD_b12()
+    []
+    wifi4!Success->
+    SD_b12();
+
+SD_b12()=
+    openwifi7?SetPowerRequest->
+    SD_b10()
+    []
+    wifi3?SetPowerRequest->
+    SD_b10();
+
+//TODO
+SD_b13()=
+    // SetColorRequest->SD_b14();
+    SD_b14();//Note: Not know if exec(SetColorRequest) can be represented like this.
+
+SD_b14()=
+    openwifi10!Success->
+    SD_b12()
+    []
+    wifi6!Success->
+    SD_b12();
+
+SD_b15()=
+    wifi3?SetPowerRequest->
+    CP_b10()
+    []
+    wifi5?SetColorRequest->
+    CP_b13()
+    []
+    wifi7?GetLights->
+    CP_b8();
+
+//////////////////////////////////////////////////
+///Attacker Model
+//////////////////////////////////////////////////
+
+MaliciousControlPoint()=Skip;
+MaliciousSmartDevice()=Skip;
+
+//Attacker can do:
+//  * repeat msg
+//  * mod msg
+//  * send any msg
+
+//Attacker want to:
+
+// * set color: reach SD_b10() with malicious request
+// * set power: reach SD_b13() with malicious request
+// * get wifi credentials
+// Any more?

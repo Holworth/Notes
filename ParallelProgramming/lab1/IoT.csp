@@ -1,0 +1,130 @@
+﻿channel wifio 0;
+channel wifi 1;
+channel openwifi 2;
+
+enum{WifiBeancon, ssid, bssid, OpenSystemAuthenticationRequest,
+ AssocResponse, GetService, StateService, udp, Port,
+ Station, EncryptedPasswd, GetLight, SetColorRequest, 
+ SetPowerRequest, Success, LightState, SetPowerRequest,
+ Config, Password, Homessid, EncryptedPasswd,
+ SD, CP, Attacker};
+ 
+ var Success = true;
+ var Failure = false; 
+ 
+//Recursion Case currently not available:
+ 
+// ControlPoint
+//Discovery:
+	//SD -> WifiBEacon, ssid, bssid -> CP
+	//CP -> ssid, OpenAuthenticationRequest -> SD
+	
+//Authentication: Control enabling
+	//CP -> Station, Homessid, Password -> SD (open wifi)
+	//SD -> Station, x, EncryptedPasswd -> CP (home wifi)
+
+//Control:
+	//administration commands
+	//CP -> GetService -> SD
+	//SD -> StateService, port, upd/Config -> CP
+	
+	//CP -> GetLight  -> SD 
+	//SD -> LightState -> CP
+	
+	//[]	
+	
+	//CP->	SetPowerRequest, SetColourRequest -> SD  // control commands
+	//SD -> executeCommand, SetPower/ColourRequest, Success -> CP
+	
+	//send:?
+	//receive:!
+	
+ControlProc() = ControlPointDiscovery();
+ControlPointDiscovery() = 
+	//b0
+	wifio?WifiBeacon ->
+	wifio?ssid ->
+	wifio?bssid->
+ 	//b1 recursion time is setted once only: for exchange the password
+ 	wifio?WifiBeacon ->
+	wifio?ssid ->
+	wifio?bssid->
+	//
+	wifio!ssid ->
+	wifio!OpenSystemAuthenticationRequest ->
+	//b2
+	wifio?AssocResponse ->
+	//b3
+	openwifi!GetService ->
+	ControlPointAuthentication();
+
+//b4 multiple branches
+ControlPointServiceSetUp() = 
+	openwifi?StateService ->  //whether should add CP.udp???? = = 
+	openwifi?udp ->
+	openwifi?Port -> 
+	[]
+	ControlPointAuthentication()
+	wifi?StateService ->
+	wifi? Config ->
+	wifi? Port ->
+	//b15 todo;
+	
+	
+ControlPointAuthentication() = 
+	//b4
+ 	ControlPointServiceSetUp() ->
+ 	//b5: notice! b5 has 4 branches 
+ 	ControlPointControl();
+ 
+ 
+ //b5 multiple branches 
+ CPServices() = 
+ 	openwifi!GetService -> ControlPointServiceSetUp()
+ 	[]
+ 	openwifi!SetColorRequest -> SetColor()
+ 	[]
+ 	openwifi!SetPowerRequest -> CommandExecution()
+ 	[]
+ 	openwifi!GetLight -> LightFunction();
+ 	
+ControlPointControl(x) = 
+	CPServices() ->
+	//b6
+	openwifi!x.y ->//what should be the x, y parameters here??? = =  todo
+	//b7
+ 	openwifi?x.EncryptedPasswd -> ControlPointServiceSetUp();
+ 	
+ //? channel optional?
+ LightFunction() = 
+ 	//b8
+ 	openwifi?LightState ->
+ 	//b9
+ 	openwifi!GetLight -> LightFunction(); //self loop??
+ 
+ CommandExecution() = 
+ 	//b10
+ 	//how to call executeCommand??
+ 	//b11: channel optional issues
+ 	openwifi!Success -> 
+ 	ReceiveSetRequest();
+ 	
+ 
+ ReceiveSetRequest() =
+ 	//b12
+ 	openwifi!SetPowerRequest -> CommandExecution()
+ 	[]
+ 	openwifi!SetColorRequest -> SetColor();
+ 	
+SetColor() = //b13 command execution
+ 	executeCommand(setColorRequest ) ->
+ 	ReceiveSetRequest(); 
+ 	
+SetRequest() = 
+	//b15
+	wifi!SetColorRequest -> SetColor()
+	[]
+	wifi!SetPowerRequest -> ControlPointServiceSetUp()
+	[]
+	wifi!GetLight -> LightFunction();
+	

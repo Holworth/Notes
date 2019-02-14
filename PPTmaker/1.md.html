@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>reveal.js</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+
+                <section id="themes">
+                    <h2>Settings</h2>
+                    <h6>Original code from reveal.js</h6>
+                    <h6>Converter by AW</h6>
+                    <h6>ESC to show general view.</h6>
+                    <h6>S to use speecher's mode.</h6>
+                    <p>
+                        You can select from different transitions, like: <br>
+                        <a href="?transition=none#/transitions">None</a> -
+                        <a href="?transition=fade#/transitions">Fade</a> -
+                        <a href="?transition=slide#/transitions">Slide</a> -
+                        <a href="?transition=convex#/transitions">Convex</a> -
+                        <a href="?transition=concave#/transitions">Concave</a> -
+                        <a href="?transition=zoom#/transitions">Zoom</a>
+                    </p>
+                </section>
+                <section>
+                <section data-markdown>
+                    <textarea data-template>
+Power Overwhelming
+==================
+
+* multi-player Magic Duel
+* Group 4, CS3247
+
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Summary
+
+<!-- You should present a high level description of the theme, goal of the game, the main characters, the flow of the -->
+<!-- game, what makes the game unique (use the LENSes to describe), key selling/marketing points and the primary -->
+<!-- actions the player take.  -->
+
+* A game players use magic to fight with each other.
+* Generally, the goal of this game is to fight as you like. The only way to win in this game is conquer other players.
+* Basically, 2 players are supported, we may try to extend it for mare players. The more players, the more fun.
+* May also include PVE levels for testing and practicing your skills.
+* Further plan: different maps/goals
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Background and Story
+
+Useless.
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Game Mechanics
+
+## Game Mechanics: Magic System
+
+* Use different elements to cast different magics.
+* Various ways to combine elements: the seq, the number of different elements, the hand you use, etc.
+* Magic from different players can also interact with each other.
+* Support magic included. Encourage co-op in multi-player (>2) games.
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+## Game Mechanics: Interaction with Objects
+
+* Objects in the scene are destroyable/useable
+* Throw a giant stone in map to your op seems cooooool.
+* Objects also interact with elements.
+
+
+                </textarea>
+                </section>
+                <section data-markdown>
+                <textarea data-template>
+                
+
+## Game Mechanics: Players
+
+* No MP limits.
+* Can equip weapons: different weapons enhance different elements/offer special skills.
+* No difference in basic attributes.
+* (Somehow using a melee weapon is cool, so we decided to enable close fights).
+* Winner in a game get new equipments into is connection.
+* Choose different equipment in different scene: (Eg: magic 300% more powerful but casted at only 50% speed). 
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Interact Design
+
+TBD
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Emotions
+
+<!-- # Emotion and Lens -->
+
+
+* Fight with other player is interesting enough.
+* Full control of different elements, different choices in fight
+* Use Objects in map to help you win in a fight.
+* Co-op or fight with other players, as you wish. 
+
+
+        </textarea>
+        </section>
+        </section>
+        <section>
+        <section data-markdown>
+        <textarea data-template>
+        
+# Key technical/content
+
+* Game AI: dummy/summoned element creatures
+* Game Physics: magic interaction engine
+* Game Assets: Multi-func objs, magic effects
+* Special Interface to control elements
+                        
+                    </textarea>
+                </section>
+                </section>
+                
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
+</html>

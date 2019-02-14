@@ -1,0 +1,17 @@
+Men, women and the society
+=========================
+
+Hello guys,
+
+In former posts you have made interesting and thought-provoking ideas about the movie. This movie, Planet of the Apes, uses social stratification in the apes' society to reflect racial problems in 1960s American society. This movie makes its audience to think of the long lasted WASPS dominance in the society, also calls on people to think about the proposition of social fair by puting a typically WASP man into the lowest level of Apes' society. The way that Apes' society works remind people of the long history of US racism. Besides, the movie also illustrated the worry among American society about Vit War and the Cold War. I think the reference paper and YU QI's post had already make a clear picture on these things.
+
+By reading the posts above, I took notice of the female characters in this movie, whose importance in this movie was not realized by myself when I was watching this movie for th first time. Among the three movies we have seen in this topic, this movie put the most time and scene on female characters. As YU HUI's statement and LIM YEN THEME's final question suggests, female characters in this movie are more stereoscopic and highly related to the topic.
+
+The main female characters in the three movies, excepts Bullitt's wife, whom I think is not a well illustrated character and is purposed to reflect the isolated character of Bullitt, both contributes to the movies' topic. For Etta in Butch Cassidy And The Sundance Kid, her existence suggests that females in 1960s America is being less constrained by the social traditional in American society, and females have already start to awake, to chase what they really want rather than always be constrained by males or traditional social rules. She knows what she like and what she hates, and are willing to set out of comfort zone to look for change. 
+
+As for Planet of the Apes, the female characters in it are much more complected. Stuart only shows up at the very beginning of this movie, represents WASPs desire of dominance. Zira, an Ape scientist, represents those who are trying to remove the canyon between different races. On one hand, the resistance she encountered symbolizes the resistance by the old thoughts in the real society. On the other hand, Zira's activity can be seen as the first attempt to fix the crack between different races. As for Nova, personally I think this is the most interesting character. She was chased only for the Astronaut's sexual desire. My question is, what do you think of the relation between the Astronaut and Nova, what do you think that relationship represents? Does this relationship is another form of enslaving, or is just self-indulgence, the proof that Taylor finally gives up his priority as a WASP?
+
+The female characters of Etta, Zira and Nova make the audience to think about female's position in American society. We can seen from the movie that women in 1960s were not Novas, the seed of fair has taken a place in their heart. They were trying to express themselves, set out for their ideal life without dependency, and stand out to speak for what they think is right. In this perspective, these movies marked the collapsing of WASP-man centered society, reflected the turbulent of social movements, and suggested the forming of a new, fairer society. 
+
+As for LIM YEN THEME's final question, sorry for not being able to answer it now. I think, probably, it is only trying to draw the audiences attention to the main characters.
+

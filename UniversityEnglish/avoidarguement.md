@@ -11,8 +11,6 @@ highlightTheme: "darkula"
 
 ---
 
-## Why peoples can not win an argument.
-
 * What is win an argument?
 * Negative instance
 * Positive instance
