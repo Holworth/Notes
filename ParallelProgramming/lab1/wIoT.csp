@@ -1,5 +1,5 @@
 //Author: Wang Huaqiang
-//Version: 0.2: no grammar problems, attacker tbd
+//Version: 1.0: model finished
 //Based on first version by NiCoLe
 
 //////////////////////////////////////////////////
@@ -40,8 +40,8 @@ enum{WifiBeancon, ssid, bssid, OpenSystemAuthenticationRequest,
   SetPowerRequest1, LightState, SetPowerRequest, SetColorRequest,
   Config, Password, Homessid, GetService, Homessid1, EncryptedPasswd1,
   SD, CP, Attacker, Success1, Success2, LightState1, chromecastWifiBeacon1,
-  Success, 
-  x,y //not knowing what's for x, y? 
+  Success,
+  CPsrc, SDsrc, MCPsrc, MSDsrc, Null
   };
 
 ///Results define 
@@ -55,14 +55,28 @@ enum{WifiBeancon, ssid, bssid, OpenSystemAuthenticationRequest,
 
 // val attacker_get_wifiCredentials=false???;
 
-// #define AttackerGotwifiCredentials attacker_get_wifiCredentials == true; 
-// #assert System() reaches AttackerGotwifiCredentials; 
+var setPowerRequestSrc = Null;
+var setColorRequestSrc = Null;
+var attackerCaptureMessage = false;
+var attackerGetCredentials = false;
+var attackerChangeCommand = false;
 
+#define AttackerGotwifiCredentials attackerGetCredentials == true; 
+#define AttackerCaptureMessage attackerCaptureMessage == true;
+#define AttackerControlColor setColorRequestSrc == MCPsrc; 
+#define AttackerControlPower setPowerRequestSrc == MCPsrc;
+#define AttackerChangeCommand  attackerChangeCommand == true;
+#assert System() reaches AttackerGotwifiCredentials;
+#assert System() reaches AttackerCaptureMessage; 
+#assert System() reaches AttackerControlColor; 
+#assert System() reaches AttackerControlPower;
+#assert System() reaches AttackerChangeCommand; 
 //////////////////////////////////////////////////
 //Test
 //////////////////////////////////////////////////
 
-System()=ControlPoint()||SmartDevice();//TODO: add mCP, mSD
+System()=ControlPoint()||SmartDevice()||Attacker_a1()||Attacker_a2();
+//System()=ControlPoint()||SmartDevice()||MaliciousControlPoint()||MaliciousSmartDevice();//TODO: add mCP, mSD
 
 //////////////////////////////////////////////////
 ///Control Point Model
@@ -71,119 +85,106 @@ System()=ControlPoint()||SmartDevice();//TODO: add mCP, mSD
 ControlPoint()=CP_b0();
 
 CP_b0()=
-    wifio1?chromecastWifiBeacon1->
-    wifio1?ssid1->
-    wifio1?bssid1->
+    wifio1?msgsrc.chromecastWifiBeacon1.ssid1.bssid1->
     CP_b1();
 
 CP_b1()=
-    wifio1?chromecastWifiBeacon1->
-    wifio1?ssid1->
-    wifio1?bssid1->
+    wifio1?msgsrc.chromecastWifiBeacon1.ssid1.bssid1->
     CP_b1()
     []
-    wifio2!ssid1->
-    wifio2!OpenSystemAuthenticationRequest->
+    wifio2!CPsrc.ssid1.OpenSystemAuthenticationRequest->
     CP_b2();
 
 CP_b2()=
-	wifio3?AssocResponse->
+	wifio3?msgsrc.AssocResponse->
 	CP_b3();
 
 CP_b3()=
-    openwifi1!GetService1->
+    openwifi1!CPsrc.GetService1->
     CP_b4();
 
 CP_b4()=
-    openwifi2?StateService->
-    openwifi2?udp->
-    openwifi2?Port->
+    openwifi2?msgsrc.StateService.udp.Port->
     CP_b5()
     []
-    wifi2?StateService->
-    wifi2?Config->
-    wifi2?Port2->
+    wifi2?msgsrc.StateService.Config.Port2->
     CP_b13();
 
 CP_b5()=
-    openwifi1!GetService->
+    openwifi1!CPsrc.GetService->
     CP_b3()
     []
-    openwifi3!Station->
-    openwifi3!Homessid->
-    openwifi3!Password->
+    openwifi3!CPsrc.Station.Homessid.Password->
     CP_b6()
     []
-    openwifi7!SetPowerRequest->
+    openwifi7!CPsrc.SetPowerRequest->
     CP_b10()
     []
-    openwifi5!GetLights->
+    openwifi5!CPsrc.GetLights->
     CP_b8()
     []
-    openwifi9!SetColorRequest->
+    openwifi9!CPsrc.SetColorRequest->
     CP_b12();
 
 CP_b6()=
-    openwifi4?Station->
-    openwifi4?Homessid1->
-    openwifi4?EncryptedPasswd1->
+    openwifi4?msgsrc.Station.Homessid1.EncryptedPasswd1->
     CP_b7();
 
 CP_b7()=
-    wifi1?GetService->
+    wifi1?msgsrc.GetService->
     CP_b3();
 
 CP_b8()=
-    openwifi6?LightState1->
+    openwifi6?msgsrc.LightState1->
     CP_b9()
     []
-    wifi8?LightState1->
+    wifi8?msgsrc.LightState1->
     CP_b9();
 
 CP_b9()=
-    openwifi5!GetLights->
+    openwifi5!CPsrc.GetLights->
     CP_b8()
     []
-    wifi7!GetLights->
+    wifi7!CPsrc.GetLights->
     CP_b8();
 
 CP_b10()=
-    openwifi8?Success1->
+    openwifi8?msgsrc.Success1->
     CP_b11()
     []
-    wifi4?Success1->
+    wifi4?msgsrc.Success1->
     CP_b11();
 
 CP_b11()=
-    openwifi7!SetPowerRequest->
+    openwifi7!CPsrc.SetPowerRequest->
     CP_b10()
     []
-    wifi3!SetPowerRequest->
+    wifi3!CPsrc.SetPowerRequest->
     CP_b10()
     []
     //Note: the graph lacks an arrow. We assume the line is from b11 to b12;
     //TODO
-    openwifi9!SetColorRequest->
+    openwifi9!CPsrc.SetColorRequest->
     CP_b12()
     []
-    wifi5!SetColorRequest->
+    wifi5!CPsrc.SetColorRequest->
     CP_b12();
     
 CP_b12()=
-    openwifi10?Success2->
+    openwifi10?msgsrc.Success2->
     CP_b11()
     []
-    wifi6?Success2->
+    wifi6?msgsrc.Success2->
     CP_b11();
 
 CP_b13()=
-    wifi3!SetPowerRequest->
+    wifi3!CPsrc.SetPowerRequest->
     CP_b10()
     []
-    wifi5!SetColorRequest->
+    wifi5!CPsrc.SetColorRequest->
     CP_b12()
     []
-    wifi7!GetLights->
+    wifi7!CPsrc.GetLights->
     CP_b8();
 
 //////////////////////////////////////////////////
@@ -193,129 +194,342 @@ CP_b13()=
 SmartDevice()=SD_b0();
 
 SD_b0()=
-    wifio1!chromecastWifiBeacon1->//We assume chromecastWifiBeacon1==chromecastWifiBeacon
-    wifio1!ssid1->//Ditto
-    wifio1!bssid1->//Ditto
+    wifio1!SDsrc.chromecastWifiBeacon1.ssid1.bssid1->
     SD_b1();
 
 SD_b1()=
-    wifio1!chromecastWifiBeacon1->
-    wifio1!ssid1->
-    wifio1!bssid1->
+    wifio1!SDsrc.chromecastWifiBeacon1.ssid1.bssid1->
     SD_b1()
     []
-    wifio2?ssid1->
-    wifio2?OpenSystemAuthenticationRequest->
+    wifio2?msgsrc.ssid1.OpenSystemAuthenticationRequest->
     SD_b2();
 
 SD_b2()=
-	wifio3!AssocResponse->
+	wifio3!SDsrc.AssocResponse->
 	SD_b3();
 
 SD_b3()=
-    openwifi1?GetService1->
+    openwifi1?msgsrc.GetService1->
     SD_b4();
 
 SD_b4()=
-    openwifi2!StateService->
-    openwifi2!udp->
-    openwifi2!Port->
+    openwifi2!SDsrc.StateService.udp.Port->
     SD_b5()
     []
-    wifi2!StateService->
-    wifi2!Config->
-    wifi2!Port2->
+    wifi2!SDsrc.StateService.Config.Port2->
     SD_b15();
 
 SD_b5()=
-    openwifi1?GetService->
+    openwifi1?msgsrc.GetService->
     SD_b3()
     []
-    openwifi3?Station->//assume ==
-    openwifi3?x->//WTF does x, y mean?
-    openwifi3?y->
-    SD_b6()
+    openwifi3?msgsrc.Station.x.y->//assume ==
+    SD_b6(x)
     []
-    openwifi7?SetPowerRequest->
-    SD_b10()
+    openwifi7?msgsrc.SetPowerRequest->
+    SD_b10(msgsrc)
     []
-    openwifi5?GetLights->
-    SD_b8()
+    openwifi5?msgsrc.GetLights->
+    SD_b8(msgsrc)
     []
-    openwifi9!SetColorRequest->
-    SD_b13();
+    openwifi9?msgsrc.SetColorRequest->
+    SD_b13(msgsrc);
 
-SD_b6()=
-    openwifi4!Station->
-    openwifi4!x->
-    openwifi4!EncryptedPasswd1->
+SD_b6(x)=
+    openwifi4!SDsrc.Station.x.EncryptedPasswd1->
     SD_b7();
 
 SD_b7()=
-    wifi1?GetService->
+    wifi1?msgsrc.GetService->
     SD_b3();
 
-SD_b8()=
-    openwifi6!LightState1->
+SD_b8(src)=
+    openwifi6!SDsrc.LightState1->
     SD_b9()
     []
-    wifi8!LightState1->
+    wifi8!SDsrc.LightState1->
     SD_b9();
 
 SD_b9()=
-    openwifi5?GetLights->
-    SD_b8()
+    openwifi5?msgsrc.GetLights->
+    SD_b8(msgsrc)
     []
-    wifi7?GetLights->
-    SD_b8();
+    wifi7?msgsrc.GetLights->
+    SD_b8(msgsrc);
 
 //TODO
-SD_b10()=
-    // SetPowerRequest->SD_b11();
-    SD_b11();//Note: Not know if exec(SetPowerRequest) can be represented like this.
+SD_b10(src)=
+    setPower{setPowerRequestSrc=src}->
+    exec.SetPowerRequest->
+    SD_b11();
+    //Note: Not know if exec(SetPowerRequest) can be represented like this.
 
 SD_b11()=
-    openwifi8!Success->
+    openwifi8!SDsrc.Success->
     SD_b12()
     []
-    wifi4!Success->
+    wifi4!SDsrc.Success->
     SD_b12();
 
 SD_b12()=
-    openwifi7?SetPowerRequest->
-    SD_b10()
+    openwifi7?msgsrc.SetPowerRequest->
+    SD_b10(msgsrc)
     []
-    wifi3?SetPowerRequest->
-    SD_b10();
+    wifi3?msgsrc.SetPowerRequest->
+    SD_b10(msgsrc);
 
 //TODO
-SD_b13()=
-    // SetColorRequest->SD_b14();
+SD_b13(src)=
+	setColor{setColorRequestSrc=src}->
+    exec.SetColorRequest->
     SD_b14();//Note: Not know if exec(SetColorRequest) can be represented like this.
 
 SD_b14()=
-    openwifi10!Success->
+    openwifi10!SDsrc.Success->
     SD_b12()
     []
-    wifi6!Success->
+    wifi6!SDsrc.Success->
     SD_b12();
 
 SD_b15()=
-    wifi3?SetPowerRequest->
-    CP_b10()
+    wifi3?msgsrc.SetPowerRequest->
+    SD_b10(msgsrc)
     []
-    wifi5?SetColorRequest->
-    CP_b13()
+    wifi5?msgsrc.SetColorRequest->
+    SD_b13(msgsrc)
     []
-    wifi7?GetLights->
-    CP_b8();
+    wifi7?msgsrc.GetLights->
+    SD_b8(msgsrc);
 
 //////////////////////////////////////////////////
 ///Attacker Model
 //////////////////////////////////////////////////
 
-MaliciousControlPoint()=Skip;
-MaliciousSmartDevice()=Skip;
+MaliciousControlPoint()=MCP_b0();
+
+MCP_b0()=
+    wifio1?msgsrc.chromecastWifiBeacon1.ssid1.bssid1->
+    MCP_b1();
+
+MCP_b1()=
+    wifio1?msgsrc.chromecastWifiBeacon1.ssid1.bssid1->
+    MCP_b1()
+    []
+    wifio2!MCPsrc.ssid1.OpenSystemAuthenticationRequest->
+    MCP_b2();
+
+MCP_b2()=
+	wifio3?msgsrc.AssocResponse->
+	MCP_b3();
+
+MCP_b3()=
+    openwifi1!MCPsrc.GetService1->
+    MCP_b4();
+
+MCP_b4()=
+    openwifi2?msgsrc.StateService.udp.Port->
+    MCP_b5()
+    []
+    
+    wifi2?msgsrc.StateService.Config.Port2->
+    MCP_b13();
+
+MCP_b5()=
+    openwifi1!MCPsrc.GetService->
+    MCP_b3()
+    []
+    if(attackerGetCredentials){
+        openwifi3!MCPsrc.Station.Homessid.Password->
+        MCP_b6()
+    }else{
+        MCP_b5()
+    }
+    []
+    openwifi7!MCPsrc.SetPowerRequest->
+    MCP_b10()
+    []
+    openwifi5!MCPsrc.GetLights->
+    MCP_b8()
+    []
+    openwifi9!MCPsrc.SetColorRequest->
+    MCP_b12();
+
+MCP_b6()=
+    openwifi4?msgsrc.Station.Homessid1.EncryptedPasswd1->
+    MCP_b7();
+
+MCP_b7()=
+    wifi1?msgsrc.GetService->
+    MCP_b3();
+
+MCP_b8()=
+    openwifi6?msgsrc.LightState1->
+    MCP_b9()
+    []
+    wifi8?msgsrc.LightState1->
+    MCP_b9();
+
+MCP_b9()=
+    openwifi5!MCPsrc.GetLights->
+    MCP_b8()
+    []
+    wifi7!MCPsrc.GetLights->
+    MCP_b8();
+
+MCP_b10()=
+    openwifi8?msgsrc.Success1->
+    MCP_b11()
+    []
+    wifi4?msgsrc.Success1->
+    MCP_b11();
+
+MCP_b11()=
+    openwifi7!MCPsrc.SetPowerRequest->
+    MCP_b10()
+    []
+    wifi3!MCPsrc.SetPowerRequest->
+    MCP_b10()
+    []
+    //Note: the graph lacks an arrow. We assume the line is from b11 to b12;
+    //TODO
+    openwifi9!MCPsrc.SetColorRequest->
+    MCP_b12()
+    []
+    wifi5!MCPsrc.SetColorRequest->
+    MCP_b12();
+    
+MCP_b12()=
+    openwifi10?msgsrc.Success2->
+    MCP_b11()
+    []
+    wifi6?msgsrc.Success2->
+    MCP_b11();
+
+MCP_b13()=
+    wifi3!MCPsrc.SetPowerRequest->
+    MCP_b10()
+    []
+    wifi5!MCPsrc.SetColorRequest->
+    MCP_b12()
+    []
+    wifi7!MCPsrc.GetLights->
+    MCP_b8();
+
+//////////////////////////////////////////////////
+///Smart Device Attacker Model
+//////////////////////////////////////////////////
+
+MaliciousSmartDevice()=MSD_b0();
+
+MSD_b0()=
+    wifio1!MSDsrc.chromecastWifiBeacon1.ssid1.bssid1->
+    MSD_b1();
+
+MSD_b1()=
+    wifio1!MSDsrc.chromecastWifiBeacon1.ssid1.bssid1->
+    MSD_b1()
+    []
+    wifio2?msgsrc.ssid1.OpenSystemAuthenticationRequest->
+    MSD_b2();
+
+MSD_b2()=
+	wifio3!MSDsrc.AssocResponse->
+	MSD_b3();
+
+MSD_b3()=
+    openwifi1?msgsrc.GetService1->
+    MSD_b4();
+
+MSD_b4()=
+    openwifi2!MSDsrc.StateService.udp.Port->
+    MSD_b5()
+    []
+    wifi2!MSDsrc.StateService.Config.Port2->
+    MSD_b15();
+
+MSD_b5()=
+    openwifi1?msgsrc.GetService->
+    MSD_b3()
+    []
+    openwifi3?msgsrc.Station.x.y->//assume ==
+    getPasswd{if(y==Password)attackerGetCredentials=true;}->
+    MSD_b6(x)
+    []
+    openwifi7?msgsrc.SetPowerRequest->
+    MSD_b10(msgsrc)
+    []
+    openwifi5?msgsrc.GetLights->
+    MSD_b8(msgsrc)
+    []
+    openwifi9?msgsrc.SetColorRequest->
+    MSD_b13(msgsrc);
+
+MSD_b6(x)=
+    openwifi4!MSDsrc.Station.x.EncryptedPasswd1->
+    //openwifi4!MSDsrc.Station.x.EncryptedPasswd-> //no valid passwd
+    MSD_b7();
+
+MSD_b7()=
+    wifi1?msgsrc.GetService->
+    MSD_b3();
+
+MSD_b8(src)=
+    openwifi6!MSDsrc.LightState1->
+    MSD_b9()
+    []
+    wifi8!MSDsrc.LightState1->
+    MSD_b9();
+
+MSD_b9()=
+    openwifi5?msgsrc.GetLights->
+    MSD_b8(msgsrc)
+    []
+    wifi7?msgsrc.GetLights->
+    MSD_b8(msgsrc);
+
+//TODO
+MSD_b10(src)=
+    //-- SetPower{setPowerRequestSrc=src}->
+    exec.SetPowerRequest->
+    MSD_b11();
+    //Note: Not know if exec(SetPowerRequest) can be represented like this.
+
+MSD_b11()=
+    openwifi8!MSDsrc.Success->
+    MSD_b12()
+    []
+    wifi4!MSDsrc.Success->
+    MSD_b12();
+
+MSD_b12()=
+    openwifi7?msgsrc.SetPowerRequest->
+    MSD_b10(msgsrc)
+    []
+    wifi3?msgsrc.SetPowerRequest->
+    MSD_b10(msgsrc);
+
+//TODO
+MSD_b13(src)=
+	//-- SetColor{setColorRequestSrc=src}->
+    exec.SetColorRequest->
+    MSD_b14();//Note: Not know if exec(SetColorRequest) can be represented like this.
+
+MSD_b14()=
+    openwifi10!MSDsrc.Success->
+    MSD_b12()
+    []
+    wifi6!MSDsrc.Success->
+    MSD_b12();
+
+MSD_b15()=
+    wifi3?msgsrc.SetPowerRequest->
+    MSD_b10(msgsrc)
+    []
+    wifi5?msgsrc.SetColorRequest->
+    MSD_b13(msgsrc)
+    []
+    wifi7?msgsrc.GetLights->
+    MSD_b8(msgsrc);
 
 //Attacker can do:
 //  * repeat msg
@@ -323,8 +537,31 @@ MaliciousSmartDevice()=Skip;
 //  * send any msg
 
 //Attacker want to:
-
 // * set color: reach SD_b10() with malicious request
 // * set power: reach SD_b13() with malicious request
 // * get wifi credentials
 // Any more?
+
+
+Attacker_a1() = 
+    openwifi3?src.station.x.y ->
+    aGetInfo{
+        if(src==CPsrc && y==Password && x==Homessid && station==Station)
+            attackerGetCredentials=true;
+        }->
+        Skip;
+
+Attacker_a2() = 
+    openwifi7?src.request->    aGetReq{
+        if(src == CPsrc && request == SetPowerRequest){
+            attackerChangeCommand = true;
+        }
+    } ->  openwifi7!MCPsrc.SetColorRequest->
+    Attacker_a2()
+    []
+    wifi3?src.request->    aGetReq{
+        if(src == CPsrc && request == SetPowerRequest){
+            attackerChangeCommand = true;
+        }
+    } ->  wifi3!MCPsrc.SetColorRequest->
+    Attacker_a2();
