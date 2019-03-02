@@ -328,3 +328,44 @@ George Takei (Captain Nghiem)
 
 
 ## V)	Conclusion
+
+
+# Lecture 5: “It’s an Insane Asylum, and It’s Your Fault”: MASH
+
+A/P Ian Gordon
+
+## I)	Introduction: 
+
+MASH in American culture
+
+
+## II)	Beyond The Green Berets
+
+The Tet Offensive January 1968
+
+Anti-War Movement
+
+The Draft
+
+	Draft Dodgers
+
+Vietnam Veterans Against the War
+
+Walter Cronkite
+
+International Protest
+
+
+## III)	MASH (1970)
+
+Set during the Korean War
+
+Richard Hooker 
+
+Dr. H. Richard Hornberger
+
+Frat Boys 
+
+
+## IV)	Conclusion
+Why make a film about Vietnam using the Korean War?

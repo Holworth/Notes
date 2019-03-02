@@ -14,7 +14,6 @@
             "label": "access-server",
             "type": "shell",
             "command": ".\\server-carch.bat"
-            
         },
         {
             "label": "access-server-linux",
@@ -29,7 +28,7 @@
                 "${file}",
                 "-o",
                 "${file}.exe"
-            ], // 编译命令参数`r
+            ],
             "problemMatcher": {
                 "owner": "c",
                 "fileLocation": [
@@ -55,7 +54,7 @@
                 "-o",
                 "${file}.exe",
                 "-std=c++11"
-            ], // 编译命令参数
+            ],
             "problemMatcher": {
                 "owner": "cpp",
                 "fileLocation": [
