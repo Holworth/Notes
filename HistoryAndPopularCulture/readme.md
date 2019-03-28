@@ -369,3 +369,159 @@ Frat Boys
 
 ## IV)	Conclusion
 Why make a film about Vietnam using the Korean War?
+
+
+
+# Lecture 6: “Well, I Would Say That I’m Just Drifting”: The Graduate
+
+## I)	Introduction 
+Suburbia, Conformity, and American Ideals
+
+## II) Suburbanization
+
+## III) Television
+ 
+## IV) The Sixties
+
+## V) Ennui
+
+Nothing to do, lack of interest in suburb. 
+
+## VI) The Graduate (1967)
+
+## VII) Things to think about
+
+
+# Lecture 7: “Getting Old Is Such a Drag”: Wild in the Streets
+
+A/P Timothy P. Barnard
+
+## I)	Introduction: American Youth in the Late 1960s
+Baby Boom, Suburbs and Prosperity
+
+The Graduate
+
+
+
+## II)	Youth Culture
+
+popular culture begins to reflect the needs of the youth: outlets are out of their parents culture
+
+### a)	Music
+Markets, Radios and Automobiles
+
+As the market grows(the baby boom grow older and get money to buy music)
+
+Buffalo Springfield – “For What It’s Worth”
+The Who – “My Generation”
+
+The Monkees TV Series
+	“Steppin’ Stone”
+
+### a+)TV and Film
+
+market cater to it to appeal the youth
+
+## b)	Hippies
+
+"Make love, not money"
+
+A general stereotype that everyone was a "hippie"
+
+Beatniks
+
+Greenwich Village and San Francisco
+	“Human Be-In” (January 1967)
+
+But in general, dress and fashion did begin to change: Long hair on man, more relaxed clothes.
+
+## c)	Drugs
+Marijuana
+
+LSD (Lysergic Acid Diethylamid)
+	1938/CIA/1968
+
+Ken Kesey/Timothy Leary
+
+To escape from the suburb: Journey/LSD
+
+## d)	26th Amendment
+“Young Enough to Fight, Old Enough to Vote”
+
+
+## III)	Exploitation Films and Youth
+Drive-Ins and Low Budgets
+
+
+#Wild in the Streets (1968)
+
+
+Christopher Jones (Max Frost/Max Flatlow, Jr.)
+Shelley Winters (Mrs. Max Flatlow/Frost)
+Hal Holbrook (Senator Fergus)
+Diane Varsi (Sally LeRoy)
+Richard Pryor (Stanley X)
+Kevin Coughlin (Billy Cage)
+
+
+
+
+IV)	Conclusion
+
+Voting age
+Military Draft
+Fundamently 
+
+# Lecture 8: They’re Not Scared of You. They’re Scared of What You Represent To Them”
+
+Easy Rider (1969)
+Ian Gordon
+
+## I)	Introduction: 
+
+
+## II)	Mobility as Solution
+
+a)	Manifest Destiny
+
+b)	Huckleberry Finn
+
+c)	The Cowboy
+John Wayne Stagecoach
+
+d)	Car Culture
+On the Road  (1957)
+Jack Kerouac 
+
+e)	San Francisco 
+“All across the nation
+Such a strange vibration
+People in motion
+There's a whole generation”
+
+
+## III)	Appealing to the Youth Market
+
+a)	The Monkees TV Series to Film
+
+
+b)	Rock music as soundtrack
+
+
+c) Drugs: Marijuana, Cocaine, Heroin
+
+## IV)	Easy Rider
+
+Director: Dennis Hopper
+
+Peter Fonda		Wyatt
+Dennis Hopper 	Billy
+Phil Spector 		Connection
+Jack Nicholson 	George Hanson
+Toni Basil 		Mary
+Karen Black 		Karen
+
+
+## V)	Conclusion
+
+
