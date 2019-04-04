@@ -524,4 +524,76 @@ Karen Black 		Karen
 
 ## V)	Conclusion
 
+---
+
+# Lecture 9: “It Doesn’t Matter a Damn What We Think”: Guess Who’s Coming to Dinner
+
+A/P Timothy P. Barnard
+
+## I)	Introduction: American History – Race and Space
+
+Manifest Destiny
+
+**Race**
+
+Slavery
+	Bondage and Enslavement
+
+The eco system: labor from Africa were used. By 1800 concentrated in South: agricultural society.
+
+## II)	The Civil War (1861-65) and Its Aftermath
+
+By 1860 4/31 million people were slaves.
+
+The Civil War (1861-1865)
+
+13th Amendment (abolish slavery)
+
+Reconstruction (1865-77)
+
+Jim Crow
+
+“Separate but Equal”: racial segregation, "white only", paralleled societies and schools, facilities. eg. "colored wash room"
+
+The Great Migration and Black Communities
+* Move north for jobs (for jobs in industrial towns, like Detroit)
+* Black communities begin to develop in neighborhoods in the north, and entire towns in the South.	
+
+	Mary McLeod Bethune (1875-1955)
+
+-> Black developed their own societies.
+
+
+## III)	Civil Rights
+
+World War II and Executive Order 9981: abolishes racial discrimination in the Armed Forces
+
+1954/1955: civil rights movement begins (1954-1968)
+1955: black people start to refuse to give up their seats on buses
+
+Brown v. the Board of Education and Rosa Parks
+
+Martin Luther King, Jr (1929-68): Non-Violent Protest, "I have a dream"
+
+Malcolm X (1925-65)
+
+The Civil Rights Act, 1964
+* prohibits discrimination based on race, color, religion, sex, or national origin.
+
+Assimilation and Integration
+	Inter-racial Marriage
+
+	“Miscegenation”
+
+
+## IV)	“I Think of Myself as a Man”
+Guess Who’s Coming to Dinner (1967)
+
+Spencer Tracy (Matt Drayton)
+Sidney Poitier (John Prentice)
+Katharine Hepburn (Christina Drayton)
+Katharine Houghton (“Joey” Drayton)
+
+## V)	Conclusion
+
 
