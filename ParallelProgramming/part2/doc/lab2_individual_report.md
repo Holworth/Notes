@@ -1,7 +1,7 @@
 CS3211 Part2 Individual Report
 =============================
 
-* Wang Huaqiang
+* (c) 2019 Wang Huaqiang
 
 ---
 
@@ -37,8 +37,6 @@ Because we have other programs running on the machine, we run the test script mu
 ## 1.3. Task 3
 
 > Record and interpret your table. What do the rows and columns tell you? Can you relate any discontinuities in the results tabulated to things you might know or discover about the processor?
-
-TBD
 
 ![origin_data.png](origin_data.png)
 ![origin_data2.png](origin_data2.png)
@@ -77,7 +75,10 @@ For the cluster support more than 8 threads, so the time will be further shorten
 ![cluster_time_in_total.png](cluster_time_in_total.png)
 ![cluster_time_per_unit.png](cluster_time_per_unit.png)
 
-What is interesting is, though the cluster support up to 40 threads, the timing result for this program hardly changes after 30-32 threads. It   
+
+The same as the result on PC: the result for matrix size 256 and 128 are not stable, is is because of the fact the data size is too small for too many parallel threads. Also, we can learn from the graph that the 256-size matrix can make use of more threads than 128-size matrix.
+
+What is interesting is, though the cluster support up to 40 threads, the timing result for this program hardly changes after 30-32 threads. It may because of 1) the difference is just not significant or 2) the cluster do not support so many threads.  
 
 ## 1.5. Task 5
 
@@ -164,16 +165,35 @@ Above is only a roughly estimate. The real cache size and *cache level* may be q
 
 Unfortunately, we do not have the permission to use perf on the cluster, and perf does not support Windows Subsystem of Linux. The following test was based on a VM, and as a sequence the result could be different from running perf on a normal linux. 
 
-TBD
+<!-- TBD -->
+
+Update: perf is able to work correctly on lab computer. The data below is tested on PC in lab.
 
 ## 1.8. Task 8
 
 > Use perf to measure (L1 and L3) cache loads and misses for different sizes of array. Tabulate and interpret the results.
 
-array size|L1 load|L1 miss|L3 load|L3 miss
--|-|-|-|-
+array size(kb)|L1d load|L1d miss|L1i miss|cache miss|cache reference
+-|-|-|-|-|-
+4|405,746,474|21,576|54,847|31,509|85,767
+8|402,664,671|14,928|42,710|23,994|79,681
+16|405,687,255|178,288|35,386|30,194|141,430      
+32|403,003,206|1,185,088|64,122|26,809|161,015      
+64|403,395,399|67,661,705|50,310|37,814|154,295      
+128|404,492,124|67,155,288|48,122|38,344|792,055      
+256|402,956,914|66,853,531|43,392|36,797|69,822,383      
+512|404,075,270|67,148,640|49,578|27,597|122,057,291      
+1024|405,196,380|66,977,566|45,674|41,647|132,987,320      
+2048|407,500,623|66,777,332|51,388|69,222|133,590,015      
+4096|411,726,363|66,408,510|57,559|384,611|130,047,320      
+8192|408,327,091|66,815,889|64,269|15,271,015|130,400,717      
+16384|409,444,839|67,824,857|73,831|47,592,262|119,528,173      
+32768|412,063,179|67,732,654|65,126|61,635,793|113,824,704      
+65536|421,580,375|67,927,086|120,984|68,718,136|111,266,562      
+131072|438,044,280|67,623,431|269,110|72,152,173|110,704,566      
+262144|471,126,403|68,676,788|774,682|71,893,236|109,007,143      
 
-TBD
+From the table above we can learn that from 8kb, l1 miss start to rise. After 256kb, the total reference of L3 cache goes up. And after 4096kb, cache miss begin to rise greatly. Theses are critical points that L1 cache is fully used, L2 cache (or something like that) is fully used, and the processor has run out of its on-chip L3 cache.
 
 ---
 
@@ -263,14 +283,7 @@ Final sum is 3068418.000000
 Final sum is 3068418.000000
 Final sum is 3068417.750000
 Final sum is 3068418.000000
-
-Adding 100000 randomly generated floating point numbers using 8 threads
-
-Final sum is 3057618.000000
-Final sum is 3057617.750000
-Final sum is 3057618.000000
-Final sum is 3057618.000000
-Final sum is 3057617.750000
+....
 ```
 
 The reason is almost the same. But in this case, for each thread, add operations have a sequence, it will not influence the result of this thread. The different in results comes from the sequence of thread joining: the threads finish their work in random sequence, so their results will be joined in random sequence. As mentioned above, the sequence of float op will influence the final result. So that is the reason. 

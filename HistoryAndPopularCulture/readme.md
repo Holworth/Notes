@@ -597,3 +597,55 @@ Katharine Houghton (“Joey” Drayton)
 ## V)	Conclusion
 
 
+# Lecture 10: “They Call Me Mister Tibbs!”: In the Heat of the Night
+
+A/P Ian Gordon
+
+
+## I)	Introduction: 
+
+Great Migration
+
+From boys to men (a band)
+
+at that time, young black were called "boys"
+
+## II)	Motown
+
+
+
+## III)	Martin, Malcolm and Muhammad Ali
+
+
+
+## IV)	Tommie Smith and John Carlos 
+
+Peter Norman
+
+
+## V)	Black Power 
+
+<!-- POWWWWWWWWWWWER! -->
+
+### Black_Panther_Party
+
+ref: wiki
+James Brown
+
+Angela Davis
+
+The Black Panthers
+Huey Newton
+Bobby Seale
+Eldridge Cleaver
+
+Blaxploitation 
+
+
+## VI)	Conclusion
+
+In the Heat of the Night (1967)
+
+Sidney Poitier 	... 	Virgil Tibbs
+Rod Steiger 	... 	Gillespie
+Warren Oates 		Sam Wood

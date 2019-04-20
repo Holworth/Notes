@@ -1,0 +1,220 @@
+Array size: 4 kB and time taken is 0.088368 secs
+
+ Performance counter stats for './testmem_size 10':
+
+            16,359      L1-dcache-load-misses                                       
+            39,537      L1-icache-load-misses                                       
+            30,867      cache-misses              #   42.925 % of all cache refs    
+            71,909      cache-references                                            
+
+       0.088902230 seconds time elapsed
+
+Array size: 8 kB and time taken is 0.086734 secs
+
+ Performance counter stats for './testmem_size 11':
+
+            14,893      L1-dcache-load-misses                                       
+            29,719      L1-icache-load-misses                                       
+            10,045      cache-misses              #   17.718 % of all cache refs    
+            56,695      cache-references                                            
+
+       0.087153734 seconds time elapsed
+
+Array size: 16 kB and time taken is 0.087564 secs
+
+ Performance counter stats for './testmem_size 12':
+
+            60,205      L1-dcache-load-misses                                       
+            35,991      L1-icache-load-misses                                       
+            18,152      cache-misses              #   18.955 % of all cache refs    
+            95,765      cache-references                                            
+
+       0.088013543 seconds time elapsed
+
+Array size: 32 kB and time taken is 0.089161 secs
+
+ Performance counter stats for './testmem_size 13':
+
+         1,299,696      L1-dcache-load-misses                                       
+            35,516      L1-icache-load-misses                                       
+            24,311      cache-misses              #   32.544 % of all cache refs    
+            74,702      cache-references                                            
+
+       0.089585093 seconds time elapsed
+
+Array size: 64 kB and time taken is 0.098400 secs
+
+ Performance counter stats for './testmem_size 14':
+
+        67,113,723      L1-dcache-load-misses                                       
+            34,389      L1-icache-load-misses                                       
+            23,325      cache-misses              #   26.426 % of all cache refs    
+            88,267      cache-references                                            
+
+       0.098860725 seconds time elapsed
+
+Array size: 128 kB and time taken is 0.095839 secs
+
+ Performance counter stats for './testmem_size 15':
+
+        67,115,367      L1-dcache-load-misses                                       
+            34,185      L1-icache-load-misses                                       
+            17,255      cache-misses              #    1.611 % of all cache refs    
+         1,070,903      cache-references                                            
+
+       0.096264090 seconds time elapsed
+
+Array size: 256 kB and time taken is 0.111046 secs
+
+ Performance counter stats for './testmem_size 16':
+
+        67,126,671      L1-dcache-load-misses                                       
+            34,016      L1-icache-load-misses                                       
+            21,408      cache-misses              #    0.033 % of all cache refs    
+        65,003,881      cache-references                                            
+
+       0.111518439 seconds time elapsed
+
+Array size: 512 kB and time taken is 0.111269 secs
+
+ Performance counter stats for './testmem_size 17':
+
+        67,131,707      L1-dcache-load-misses                                       
+            38,784      L1-icache-load-misses                                       
+            33,425      cache-misses              #    0.027 % of all cache refs    
+       125,611,625      cache-references                                            
+
+       0.111735692 seconds time elapsed
+
+Array size: 1024 kB and time taken is 0.111025 secs
+
+ Performance counter stats for './testmem_size 18':
+
+        67,130,618      L1-dcache-load-misses                                       
+            34,932      L1-icache-load-misses                                       
+            39,038      cache-misses              #    0.030 % of all cache refs    
+       128,768,614      cache-references                                            
+
+       0.111585826 seconds time elapsed
+
+Array size: 2048 kB and time taken is 0.111404 secs
+
+ Performance counter stats for './testmem_size 19':
+
+        67,136,795      L1-dcache-load-misses                                       
+            36,936      L1-icache-load-misses                                       
+            72,402      cache-misses              #    0.056 % of all cache refs    
+       128,350,042      cache-references                                            
+
+       0.111944009 seconds time elapsed
+
+Array size: 4096 kB and time taken is 0.117307 secs
+
+ Performance counter stats for './testmem_size 20':
+
+        67,181,826      L1-dcache-load-misses                                       
+           155,027      L1-icache-load-misses                                       
+           212,678      cache-misses              #    0.161 % of all cache refs    
+       132,141,229      cache-references                                            
+
+       0.117946726 seconds time elapsed
+
+Array size: 8192 kB and time taken is 0.171107 secs
+
+ Performance counter stats for './testmem_size 21':
+
+        67,293,597      L1-dcache-load-misses                                       
+            56,432      L1-icache-load-misses                                       
+        11,921,840      cache-misses              #    9.473 % of all cache refs    
+       125,852,307      cache-references                                            
+
+       0.171833339 seconds time elapsed
+
+Array size: 16384 kB and time taken is 0.261813 secs
+
+ Performance counter stats for './testmem_size 22':
+
+        67,338,508      L1-dcache-load-misses                                       
+            74,667      L1-icache-load-misses                                       
+        50,819,443      cache-misses              #   42.563 % of all cache refs    
+       119,399,286      cache-references                                            
+
+       0.262635216 seconds time elapsed
+
+Array size: 32768 kB and time taken is 0.304765 secs
+
+ Performance counter stats for './testmem_size 23':
+
+        67,379,310      L1-dcache-load-misses                                       
+            65,266      L1-icache-load-misses                                       
+        64,999,641      cache-misses              #   57.340 % of all cache refs    
+       113,358,219      cache-references                                            
+
+       0.305917589 seconds time elapsed
+
+Array size: 65536 kB and time taken is 0.318501 secs
+
+ Performance counter stats for './testmem_size 24':
+
+        67,517,018      L1-dcache-load-misses                                       
+           163,709      L1-icache-load-misses                                       
+        69,048,773      cache-misses              #   61.954 % of all cache refs    
+       111,451,735      cache-references                                            
+
+       0.320264378 seconds time elapsed
+
+Array size: 131072 kB and time taken is 0.344937 secs
+
+ Performance counter stats for './testmem_size 25':
+
+        67,675,427      L1-dcache-load-misses                                       
+            66,159      L1-icache-load-misses                                       
+        71,099,670      cache-misses              #   64.762 % of all cache refs    
+       109,785,516      cache-references                                            
+
+       0.347945459 seconds time elapsed
+
+Array size: 262144 kB and time taken is 0.390739 secs
+
+ Performance counter stats for './testmem_size 26':
+
+        68,066,215      L1-dcache-load-misses                                       
+            86,660      L1-icache-load-misses                                       
+        72,288,925      cache-misses              #   66.265 % of all cache refs    
+       109,091,004      cache-references                                            
+
+       0.396164930 seconds time elapsed
+
+Array size should be power of 2 between 10 and 26!
+
+ Performance counter stats for './testmem_size 27':
+
+            11,259      L1-dcache-load-misses                                       
+            20,667      L1-icache-load-misses                                       
+             7,833      cache-misses              #   18.807 % of all cache refs    
+            41,649      cache-references                                            
+
+       0.000410970 seconds time elapsed
+
+Array size should be power of 2 between 10 and 26!
+
+ Performance counter stats for './testmem_size 28':
+
+            11,266      L1-dcache-load-misses                                       
+            21,564      L1-icache-load-misses                                       
+             7,977      cache-misses              #   18.881 % of all cache refs    
+            42,248      cache-references                                            
+
+       0.000402969 seconds time elapsed
+
+Array size should be power of 2 between 10 and 26!
+
+ Performance counter stats for './testmem_size 29':
+
+            11,415      L1-dcache-load-misses                                       
+            20,998      L1-icache-load-misses                                       
+            10,166      cache-misses              #   23.863 % of all cache refs    
+            42,601      cache-references                                            
+
+       0.000401078 seconds time elapsed
+

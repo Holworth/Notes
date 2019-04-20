@@ -3,6 +3,10 @@ import re
 
 # scp -r  ../01 e0389042@xcna0:lab01
 
+# e0389042@xcna0.comp.nus.edu.sg
+
+# scp e0389042@xcna0.comp.nus.edu.sg:lab01/serverlog.log ./serverlog.log 
+
 def run(cmd):
     return os.popen(cmd).read()
 
