@@ -15,59 +15,55 @@ import x10.util.*;
 public class waterman_parallel_diagonal {
 
 	static val letterValue = new HashMap[Char,Long]();
-	static val A = 10;
-	static val B = 5;
 
 	//=================================================================================================
 
 	// build the Blosum dict;
 
 	public static def buildBlosum(inputBlosum: String):Array_2[Long]{
+		val blosum = new Array_2[Long](50, 50,0);
+		try {
+			var counter:Long = 0;
+			val input = new File(inputBlosum);
+			for (line in input.lines()) {
+				if (line.indexOf("#")== (-1 as Int)){
+					if(counter == 0){   // first line
+						var letterIndex:Long = 0;
+						val preline:String = line.trim();
+						val tokens:Rail[String] = preline.split(" ");
+						for(i in 0..(tokens.size-1) as Int){
+							if (tokens(i).trim().length()!=0 as Int)
+								letterValue.put(tokens(i).trim().charAt(0 as Int), letterIndex);
+							letterIndex++;
+						}
+					}
+					else {
+						var letterIndex:Long = 0;
+						val preline:String = line.trim();
+						val tokens:Rail[String] = preline.split(" ");
+						for(i in 1..(tokens.size-1) as Int){
+							if (tokens(i).trim().length()!=0 as Int){
+								blosum(counter-1, letterIndex) = Long.parse(tokens(i).trim());
+								letterIndex++;
+							}		
+						}
+					}
+					
+					counter++;
+				}
 
-		// TODO build a real parser;
-		
-		val blosum = new Array_2[Long](4, 4);
-		letterValue.put('A',0);
-		letterValue.put('B',1);
-		letterValue.put('G',2);
-		letterValue.put('T',3);
+				
+			}
+			return blosum;
+		}
 
-		// A:0 C:1 G:2 T:3
+		catch (e: IOException) { 
 
-		blosum(0,0) = 4;
+			Console.OUT.println(e);  
 
-		blosum(0,1) = 0;
+		}
 
-		blosum(0,2) = 0;
-
-		blosum(0,3) = 0;
-
-		blosum(1,0) = 0;
-
-		blosum(1,1) = 9;
-
-		blosum(1,2) = -3;
-
-		blosum(1,3) = -1;
-
-		blosum(2,0) = 0;
-
-		blosum(2,1) = -3;
-
-		blosum(2,2) = 6;
-
-		blosum(2,3) = -2;
-
-		blosum(3,0) = 0;
-
-		blosum(3,1) = -1;
-
-		blosum(3,2) = -2;
-
-		blosum(3,3) = 5;
-
-		return blosum;
-
+		return null;
 	};
 
 	//=================================================================================================
@@ -163,7 +159,7 @@ public class waterman_parallel_diagonal {
    // calculate the score matrix;
 
 
-   public static def thread_task(r:Long, c:Long, scoreMatrix: Array_2[Long], input1:Rail[Char],input2:Rail[Char],blosum:Array_2[Long], current_position:Array_1[Long]): Long{
+   public static def thread_task(r:Long, c:Long, scoreMatrix: Array_2[Long], input1:Rail[Char],input2:Rail[Char],blosum:Array_2[Long], current_position:Array_1[Long],A:Long,B:Long): Long{
 	   //r, c -> start position
 
 	   // start new task
@@ -176,11 +172,11 @@ public class waterman_parallel_diagonal {
 
 	if((c+1)<=input2.size)
 	{
-		async thread_task(r, c+1, scoreMatrix, input1, input2, blosum, current_position);
+		async thread_task(r, c+1, scoreMatrix, input1, input2, blosum, current_position,A,B);
 	}else{
 		if((r+1)<=input1.size)
 		{
-			async thread_task(r+1, c, scoreMatrix, input1, input2, blosum, current_position);
+			async thread_task(r+1, c, scoreMatrix, input1, input2, blosum, current_position,A,B);
 		}
 	}
 
@@ -203,11 +199,11 @@ public class waterman_parallel_diagonal {
 		}
 
         var maxScore:Long = 0;
-        val maxR:Long = maxRowScore(r_inner,c_inner,scoreMatrix);
+        val maxR:Long = maxRowScore(r_inner,c_inner,scoreMatrix,A,B);
         if(maxR>maxScore){
             maxScore = maxR;
         }
-        val maxC:Long = maxColumnScore(r_inner,c_inner,scoreMatrix);
+        val maxC:Long = maxColumnScore(r_inner,c_inner,scoreMatrix,A,B);
         if(maxC>maxScore){
             maxScore = maxC;
         }
@@ -230,7 +226,7 @@ public class waterman_parallel_diagonal {
     return 0;
 }
 
-public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2:Rail[Char],blosum:Array_2[Long]): Array_2[Long]{
+public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2:Rail[Char],blosum:Array_2[Long],A:Long,B:Long): Array_2[Long]{
     val current_position = new Array_1[Long](input1.size+1,0);
 
     // for (var r:Long = 1;r<=input1.size;r++){
@@ -243,7 +239,7 @@ public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2
         // async thread_task(r, scoreMatrix, input1, input2, blosum, current_position);        
         // r=r+1;
     // }
-    finish thread_task(1, 1, scoreMatrix, input1, input2, blosum, current_position);        
+    finish thread_task(1, 1, scoreMatrix, input1, input2, blosum, current_position,A,B);        
     return scoreMatrix;
 }
 
@@ -255,7 +251,7 @@ public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2
 
    // find the max value in Row;
 
-   public static def maxRowScore(row: Long, column:Long, scoreMatrix:Array_2[Long]): Long{
+   public static def maxRowScore(row: Long, column:Long, scoreMatrix:Array_2[Long],A:Long,B:Long): Long{
 	   var maxScore:Long = 0;
 	   for (var c:Long = 0;c<column;c++){
 		   var tempScore:Long = scoreMatrix(row,c)-penalty(A,B,column-c);
@@ -279,7 +275,7 @@ public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2
 
    // find the max value in Column;
 
-   public static def maxColumnScore(row: Long, column:Long, scoreMatrix:Array_2[Long]): Long{
+   public static def maxColumnScore(row: Long, column:Long, scoreMatrix:Array_2[Long],A:Long,B:Long): Long{
 	   var maxScore:Long = 0;
 	   for (var r:Long = 0;r<row;r++){
 		   var tempScore:Long = scoreMatrix(r,column)-penalty(A,B,row-r);
@@ -484,56 +480,46 @@ public static def calculate(scoreMatrix: Array_2[Long], input1:Rail[Char],input2
    //main function
 
     public static def main(args: Rail[String]) {
-    	val date1 = new Date();
-    	
-    	val starttime = date1.getTime();
-    	
-    	val charList1:Rail[Char] = parseInput("./AF043946.1");
+    //AF043946.1 AF043947.1 BLOSUM62 10 5
+    val input1:String = args(0);
+    val input2:String = args(1);
+    val blosumFile:String = args(2);
+    val A:Long = Long.parse(args(3));
+    val B:Long = Long.parse(args(4));
 
-    	val charList2:Rail[Char] = parseInput("./AF043947.1");
+    val date1 = new Date();
+    
+    val starttime = date1.getTime();
+    
+    val charList1:Rail[Char] = parseInput(input1);
 
-    	Console.OUT.println("first input: "+ charList1.toString());  
+    val charList2:Rail[Char] = parseInput(input2);
 
-    	Console.OUT.println("second input: "+charList2.toString()); 
+    //Console.OUT.println("first input: "+ charList1.toString());  
 
-    	val blosum = buildBlosum("not inplemented yet");
+    //Console.OUT.println("second input: "+charList2.toString()); 
 
-    	Console.OUT.println("blosum: "+blosum.toString()); 
+    val blosum = buildBlosum(blosumFile);
 
-    	Console.OUT.println("blosum[1,1]: "+blosum(1,1)); //用这种方法来调用blosum的分数，例如[A,A]的分数就是blosum(0,0)
+    //Console.OUT.println("blosum: "+blosum.toString()); 
 
-    	
+    val n:Long = charList1.size + 1; // the row length of score matrix;
 
-    	val n:Long = charList1.size + 1; // the row length of score matrix;
+    val m:Long = charList2.size + 1; // the column length of score matrix;
 
-    	val m:Long = charList2.size + 1; // the column length of score matrix;
+    val scoreMatrix = new Array_2[Long](n, m, 0); // build a n x m matrix and initialize everything to 0, no need to initialize the first row and column;
 
-    	Console.OUT.println("n: "+n); 
+    calculate(scoreMatrix,charList1,charList2,blosum,A,B); // calculate the score matrix
 
-    	Console.OUT.println("m: "+m); 
+    val sequence:Rail[Rail[Long]] = traceback(scoreMatrix,charList1,charList2,blosum); // trace back and give out the sequence;
 
-    	
+    val date2 = new Date();
+    val endtime = date2.getTime();
+    
+    Console.OUT.println("Running Time: "+(endtime-starttime) +"  milliseconds."); 
+    
 
-    	
-
-    	val scoreMatrix = new Array_2[Long](n, m, 0); // build a n x m matrix and initialize everything to 0, no need to initialize the first row and column;
-
-    	calculate(scoreMatrix,charList1,charList2,blosum); // calculate the score matrix
-
-    	val sequence:Rail[Rail[Long]] = traceback(scoreMatrix,charList1,charList2,blosum); // trace back and give out the sequence;
-    	// for (var i:Long = 0;i<sequence.size;i++){
-    	// 	Console.OUT.println(sequence(i)); 
-    	// }
-    	//暂时查看结果的坐标
-
-    	//printResult(sequence); // print the result;
-    	val date2 = new Date();
-    	val endtime = date2.getTime();
-    	
-    	Console.OUT.println("Running Time: "+(endtime-starttime) +"  milliseconds."); 
-    	
-
-    	
+    
 
     	
 

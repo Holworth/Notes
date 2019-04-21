@@ -18,16 +18,24 @@ struct match
     double value;
 };
 
-double match_score_table[4][4] = {
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}};
+// double match_score_table[4][4] = {
+//     {1, 0, 0, 0},
+//     {0, 1, 0, 0},
+//     {0, 0, 1, 0},
+//     {0, 0, 0, 1}};
+
+// double match_score(char in1, char in2)
+// {
+//     return match_score_table[in1][in2];
+// }
+
+double match_score_table[26][26];
 
 double match_score(char in1, char in2)
 {
     return match_score_table[in1][in2];
 }
+
 
 int max3select(double in1, double in2, double in3)
 {
@@ -60,8 +68,8 @@ inline double gap_match_penalty(int pos1, int pos2, double A, double B)
     switch(gap)
     {
         case 0: return 0;
-        case 1: return B;
-        default: return (gap-1)*A+B;
+        case 1: return A;
+        default: return (gap-1)*B+A;
     }
 }
 
@@ -98,10 +106,15 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
     {
         for (int b = 1; b < (len2 + 1); b++)
         {
-            struct match normal_match = {0, array[a - 1][b - 1]};
+            struct match normal_match = {0, array[a - 1][b - 1]+match_score(src1[a-1],src2[b-1])};
             struct match row_match;
             struct match col_match;
-
+            // std::cout
+            //         <<a<<" "
+            //         <<b<<" "
+            //         <<normal_match.value<<" "
+            //         <<row_match.value<<" "
+            //         <<col_match.value<<" "<<std::endl;
             //row match
             double max = 0;
             int max_position = 0;
@@ -173,6 +186,7 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
     //match finished
 
     //for debug: print the whole array
+#ifdef DEBUG
     std::cout << "Match array:" << std::endl;
     for (int a = 0; a < (len1 + 1); a++)
     {
@@ -193,6 +207,7 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
         }
         std::cout << std::endl;
     }
+#endif
     //back trace
     //do gap, match count here
     //build match str

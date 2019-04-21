@@ -20,16 +20,33 @@ struct match
     double value;
 };
 
-double match_score_table[4][4] = {
-    {1, 0, 0, 0},
-    {0, 1, 0, 0},
-    {0, 0, 1, 0},
-    {0, 0, 0, 1}};
+// double match_score_table[4][4] = {
+//     {1, 0, 0, 0},
+//     {0, 1, 0, 0},
+//     {0, 0, 1, 0},
+//     {0, 0, 0, 1}};
+
+// double match_score(char in1, char in2)
+// {
+//     return match_score_table[in1][in2];
+// }
+
+double match_score_table[26][26];
 
 double match_score(char in1, char in2)
 {
     return match_score_table[in1][in2];
 }
+
+// int set_match_score_table(double src[26][26])
+// {
+//     for0(a,1,26){
+//         for0(b,1,26){
+//             match_score_table[a][b]=src[a][b];
+//         }
+//     }
+//     return 0;
+// }
 
 int max3select(double in1, double in2, double in3)
 {
@@ -118,7 +135,7 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
             }
             // std::cout<<omp_get_thread_num()<<std::endl;
 
-            struct match normal_match = {0, array[a - 1][b - 1]};
+            struct match normal_match = {0, array[a - 1][b - 1]+match_score(src1[a-1],src2[b-1])};
             struct match row_match;
             struct match col_match;
 
@@ -195,6 +212,7 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
     //match finished
 
     //for debug: print the whole array
+#ifdef DEBUG
     std::cout << "Match array:" << std::endl;
     for (int a = 0; a < (len1 + 1); a++)
     {
@@ -204,7 +222,7 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
         }
         std::cout << std::endl;
     }
-
+// 
     std::cout << "Back Trace array:" << std::endl;
     for (int a = 0; a < (len1 + 1); a++)
     {
@@ -215,6 +233,8 @@ struct sw_result smith_waterman(std::vector<char> src1, std::vector<char> src2, 
         }
         std::cout << std::endl;
     }
+#endif
+
     //back trace
     //do gap, match count here
     //build match str

@@ -14,6 +14,9 @@
 #define nT 2
 #define nG 3
 
+#define for0(a,b,c) for(int a=0;a<c;a+=b)
+#define for1(a,b,c) for(int a=1;a<=c;a+=b)
+
 namespace smith_waterman
 {
 
