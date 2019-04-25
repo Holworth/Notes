@@ -130,7 +130,7 @@ int main(int argc, char *argv[], char *envp[])
         // std::chrono::duration<double> duration =  time2-time1;
         auto duration = chrono::duration_cast<chrono::milliseconds>(time2-time1);
         cout << "Score:" <<res.score << endl;
-        cout << "Time:" << double(duration.count()*1000) << endl;
+        cout << "Running Time: " << double(duration.count()) <<"  milliseconds."<< endl;
 
         return 0;
     }
