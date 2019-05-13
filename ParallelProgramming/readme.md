@@ -3,14 +3,22 @@ Parallel Programming
 
 This course is taken in NUS.
 
-<!-- [TOC] -->
-
 <!-- TOC -->
 - [1. 拾遗](#1-拾遗)
 - [2. CSP# cheatsheet](#2-csp-cheatsheet)
     - [2.1. CSP](#21-csp)
     - [2.2. CSP](#22-csp)
+        - [2.2.1. CSP# Grammar](#221-csp-grammar)
+        - [2.2.2. CSP# assertion](#222-csp-assertion)
+            - [2.2.2.1. Deadlock-freeness](#2221-deadlock-freeness)
+            - [2.2.2.2. Divergence-free](#2222-divergence-free)
+            - [2.2.2.3. Deterministic](#2223-deterministic)
+            - [2.2.2.4. Nonterminating](#2224-nonterminating)
+            - [2.2.2.5. Reachability](#2225-reachability)
+            - [2.2.2.6. Linear Temporal Logic (LTL)](#2226-linear-temporal-logic-ltl)
+            - [2.2.2.7. Refinement/ Equivalence](#2227-refinement-equivalence)
     - [2.3. CSP Examples](#23-csp-examples)
+    - [2.4. Labeled Transition System](#24-labeled-transition-system)
 - [3. X10 cheatsheet](#3-x10-cheatsheet)
 - [4. Parallel Programming](#4-parallel-programming)
     - [4.1. Lect 7: Introduction to x10.](#41-lect-7-introduction-to-x10)
@@ -63,75 +71,223 @@ This course is taken in NUS.
 - [5. CUDA (for reference)](#5-cuda-for-reference)
 - [6. MPI (for reference)](#6-mpi-for-reference)
 - [7. UNUM (for reference)](#7-unum-for-reference)
-- [8. Others (for reference)](#8-others-for-reference)autoauto<!-- /TOC -->
+- [8. Others (for reference)](#8-others-for-reference)<!-- /TOC -->
 
 # 1. 拾遗
-
-Flynn taxonomy
-
-SISD
-SIMD
-MISD
-MIMD
-
-FFT
-
-fixed-time speedup
-fixed-size speedup (Amdahl)
-
-Float add: return the same result : many reasons??!!
-least error ? 
-
-CSP parallel
-
-deadlock free : judge: how to use process algebra laws?
-nontermination deadlock free
-assertions!!!
-
-CSP model: a property to be checked
-
-Spectral methods ??? 2017 1.6
-
-MPI ??? scan ???
-
-CSP MPI ???
-
-semaphore
-
-monitor???
-
-1516 1.10: CSP shared events in MPI
-
-Cannon's algorithm
-Cartesian topologies
-
-All the algorithms talked about in class (IMP) eg: even-odd bubble sort.
-
-LTL expressions???
-
-x10 time problems?
-
-degree of parallelism?
-
-computing grid/cluster?
-
-CSP# / CSP
-
-Skip() & Stop()
-
-4D hypercube ???
-
-file:///C:/Users/AW/Downloads/L4-2019csp-and-tutorial.pdf
-
-TQ1
 
 # 2. CSP# cheatsheet
 
 ## 2.1. CSP 
 
+See https://en.wikipedia.org/wiki/Communicating_sequential_processes
+
+and CSP# part.
+
 ## 2.2. CSP#
 
+ref: https://pat.comp.nus.edu.sg/wp-source/resources/OnlineHelp/htm/index.htm
+
+### 2.2.1. CSP# Grammar
+
+```cpp
+#include "c:\example.csp";
+#define max 5;
+
+enum {red, blue, green}; //#define red 0; #define blue 1; ...
+
+var knight = 0;
+hvar difference;
+var board = [3, 5, 6, 0, 2, 7, 8, 4, 1];
+var leader[3];
+var leader[N] : {..N-1}; //where N is a constant defined.
+var matrix[3*N][10]; 
+// you can not assign multi-dimensional array constant to multi-dimensional arrays variables
+// you have to do it explicitly.
+
+P() = a { matrix[1][9] = 0 } -> Skip;
+
+channel c 5;
+channel c[4] 5;
+
+if (goal) { P } else { Q };
+
+//macro with parameters 
+#define multi(i,j) i*j;
+System  = if (call(multi, 3,4) >12 ) { a -> Skip } else { b -> Skip };
+
+//Process def
+P(x1, x2, ..., xn) = Exp;
+VM() = insertcoin -> coffee -> VM();
+add{x = x+1;} -> Stop; //where x is a global variable.
+//Note: process arguments and channel input variables can only be used without being updated in data operations in PAT
+
+//Deadlock process
+Stop
+
+//Process which terminates immediately
+Skip
+
+//Event prefixing
+e -> P
+
+//Invisible Events
+{x=x+1;} -> Stop
+tau{x=x+1;} -> Stop
+
+//Channel output/input
+channel c 0; //or channel c 1; 
+c!a.b -> P                          -- channel output
+c?x.y -> P                         -- channel input
+c?1 -> P                            -- channel input with expected value
+c?[x+y+9>10]x.y-> P      -- channel input with guard expression
+P = c!x{ x = 2 }-> P;
+
+//Channel operations
+call(cfull, c) //could be cfull, cempty, ccount, csize, cpeek
+
+//Sequential composition
+P; Q
+
+//General/External/Internal choice
+P [] Q //General
+//The choice operator [] states that either P or Q may execute. If P performs an event first, then P takes control. Otherwise, Q takes control. Notice that the semantic is a bit different from the external choice below.
+P [*] Q
+//External choice is resolved by the environment, e.g., the observation of a visible event (i.e., not tau event). Notice that if the first event of both P and Q is visible, then P[]Q and P[*]Q are equivalent.
+P <> Q
+//Internal choice introduces non-determinism explicitly. In this model, either P or Q may execute. The choice is made internally and non-deterministically. 
+
+//The generalized form of choice, parallel, etc
+[] x:{1..n}@ P(x)    
+
+//Conditional Choice
+if (cond1) { P } else if (cond2) { Q }  else { M }
+//ifa, ifb: see manual
+
+//Parallel composition
+P || Q
+//Parallel composition of two processes with barrier synchronization.
+
+//Specify the alphabet of a process manually
+//Otherwise, it will be automatically reduced
+#alphabet P {a.X};
+//Different alphabet for the same process in different place
+    Q1() = P();
+    #alphabet Q1 {x};
+    Q2() = P();
+    #alphabet Q2 {y};
+
+//Interrupt
+//Process P interrupt Q behaves as specified by P until the first visible event of Q is engaged which could be at any execution point of process P, and then the control transfers to Q. An execution trace of process P interrupt Q is just a trace of P up to an arbitrary point when the interrupt occurs, followed by any trace of Q.
+Err() = exception -> Err();
+Routine() = routine -> Routine();
+ExceptionHandling()  = Routine() interrupt exception -> ExceptionHandling() ;
+System = Err() || ExceptionHandling();
+
+//Hiding
+dashPhil() = Phil() \ {getfork.1, getfork.2, putfork.1, putfork.2};
+//By hiding those events, the rest of the system can not observe those hidden events. We remark that hiding is often used to prevent unwanted synchronization in parallel composition. 
+dashPhil() = Phil() \ { x:{1..2} @ getfork.x, y:{1..2} @  putfork.y} ;
+//Note: The syntax sugar indexed event list can be used for defining a set of events with the same prefix. For example, the definition for process dashPhil() can be rewritten as the following.
+
+//Atomic Process
+P = atomic { a -> ch!0 -> b -> c -> Skip};
+//The sequence is to be executed as one super-step, not to be interleaved by other processes.
+//Once an atomic process is enabled, it immeidately gains a higher priority. It continues to execute until it is disabled
+
+//Recursion
+P(i) = a.i -> Q(i);
+Q(i) = b.i -> P(i);
+System() = P(1) || Q(2);
+//Note: DO NOT USED DEFINED STRUCTURE AS PARAMETER
+
+//Assert
+P = assert(x > 0); e{x = x-1;} -> P;
+
+//System define
+System() =  (||| i:{0..2}@Sender(i) ) ||| Receiver();
+```
+
+### 2.2.2. CSP# assertion
+
+#### 2.2.2.1. Deadlock-freeness
+
+```
+#assert P() deadlockfree;
+```
+
+> PAT's model checker performs Depth-First-Search or Breath-First-Search algorithm to repeatedly explore unvisited states until a deadlock state (i.e., a state with no further move except for successfully terminated state) is found or all states have been visited.
+
+#### 2.2.2.2. Divergence-free
+
+```
+#assert P() divergencefree;
+```
+
+> Given a process, it may perform internal transitions forever without engaging any useful events, e.g., P = (a -> P) \ {a};,  In this case, P is said to be divergent. Divergent system is usually undesirable.
+
+#### 2.2.2.3. Deterministic
+
+```
+#assert P() deterministic;
+```
+
+> Given a process, if it is deterministic, then for any state, there is no two out-going transitions leading to different states but with same events. E.g, the following process is not deterministic.
+
+```
+P = a -> Stop [] a -> Skip;
+```
+
+#### 2.2.2.4. Nonterminating
+
+```
+#assert P() nonterminating;
+```
+
+```
+//will terminate
+P = a -> Skip;
+```
+
+#### 2.2.2.5. Reachability
+
+```
+#define cond x==0
+#assert P() reaches cond;
+```
+
+> PAT allows user to find the minimum value or maximum value of some expressions in all reachable traces
+
+```
+#assert P() reaches goal with min(weight);
+```
+
+#### 2.2.2.6. Linear Temporal Logic (LTL)
+
+```
+#assert P() |= F;
+//where F is LTL formula
+```
+
+略
+
+#### 2.2.2.7. Refinement/ Equivalence
+
+```
+#assert P() refines Q() -whether P() refines Q() in the trace semantics;
+#assert P() refines<F> Q() -whether P() refines Q() in the stable failures semantics;
+#assert P() refines<FD> Q() -whether P() refines Q() in the failures divergence semantics;
+```
+
+Keyword: subset relationship
+
+
 ## 2.3. CSP Examples
+
+略
+
+## 2.4. Labeled Transition System
+
+TODO
 
 # 3. X10 cheatsheet
 
@@ -274,10 +430,8 @@ Console.OUT.printf("%1.3f seconds.\n", ((stop-start) as double)/1e9);
 Name|Content|Problem|Solution
 -|-|-|-
 Dense Linear Algebra|Patterns of parallel algorithmic solutions.(Nearby node communication)|Solving large systems of linear equations..|Distribute data
-Spectral methods|Patterns of parallel algorithmic solutions.(All to all communication)|Wave simulation. Use FFT in a different domain.|Butterfly networks,
-all-to-all distribution.
-Structured grid|Patterns of parallel algorithmic solutions. (Specific node communication)| Weather simulation. Use 2D/3D space.|Nodes compute local area, communicate with
-nearby ones. The use of stencils is common.
+Spectral methods|Patterns of parallel algorithmic solutions.(All to all communication)|Wave simulation. Use FFT in a different domain.|Butterfly networks, all-to-all distribution.
+Structured grid|Patterns of parallel algorithmic solutions. (Specific node communication)| Weather simulation. Use 2D/3D space.|Nodes compute local area, communicate with nearby ones. The use of stencils is common.
 
 * FFT Transpose operation results in all-to-all communication
 * Butterfly Network: This is one of the most complex connections of the nodes. There are nodes which are connected and arranged in terms of their ranks. They are arranged in the form of a matrix. See: https://en.wikipedia.org/wiki/Butterfly_network#Components and https://en.wikipedia.org/wiki/Multistage_interconnection_networks .
