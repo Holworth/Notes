@@ -1,0 +1,45 @@
+
+main:     file format elf32-tradlittlemips
+
+
+Disassembly of section .text:
+
+00000000 <_start>:
+   0:	27bdffd0 	addiu	sp,sp,-48
+   4:	afbf002c 	sw	ra,44(sp)
+   8:	afbe0028 	sw	s8,40(sp)
+   c:	03a0f021 	move	s8,sp
+  10:	3c030000 	lui	v1,0x0
+  14:	8c640080 	lw	a0,128(v1)
+  18:	24620080 	addiu	v0,v1,128
+  1c:	8c450004 	lw	a1,4(v0)
+  20:	24620080 	addiu	v0,v1,128
+  24:	8c460008 	lw	a2,8(v0)
+  28:	24620080 	addiu	v0,v1,128
+  2c:	8c47000c 	lw	a3,12(v0)
+  30:	24620080 	addiu	v0,v1,128
+  34:	8c420010 	lw	v0,16(v0)
+  38:	afc40014 	sw	a0,20(s8)
+  3c:	afc50018 	sw	a1,24(s8)
+  40:	afc6001c 	sw	a2,28(s8)
+  44:	afc70020 	sw	a3,32(s8)
+  48:	afc20024 	sw	v0,36(s8)
+  4c:	3c028007 	lui	v0,0x8007
+  50:	3442b980 	ori	v0,v0,0xb980
+  54:	afc20010 	sw	v0,16(s8)
+  58:	27c20014 	addiu	v0,s8,20
+  5c:	8fc30010 	lw	v1,16(s8)
+  60:	00402021 	move	a0,v0
+  64:	0060f809 	jalr	v1
+  68:	00000000 	nop
+  6c:	0800001b 	j	6c <_start+0x6c>
+  70:	00000000 	nop
+	...
+  80:	20676942 	addi	a3,v1,26946
+  84:	756e6f42 	jalx	5b9bd08 <_gp+0x5b93c08>
+  88:	75532073 	jalx	54c81cc <_gp+0x54c00cc>
+  8c:	65656363 	daddiu	a1,t3,25443
+  90:	000a2164 	0xa2164
+	...
+  a0:	e00000fc 	sc	zero,252(zero)
+	...
