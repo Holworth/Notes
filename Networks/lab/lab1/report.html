@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="file:///c:\Users\AW\.vscode-insiders\extensions\shd101wyy.markdown-preview-enhanced-0.4.3\node_modules\@shd101wyy\mume\dependencies\katex\katex.min.css">
+    
+    
+
+    
+    
+    
+    
+    
+    
+
+    <style>
+    /**
+* prism.js Github theme based on GitHub's theme.
+* @author Sam Clarke
+*/
+code[class*="language-"],
+pre[class*="language-"] {
+color: #333;
+background: none;
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+text-align: left;
+white-space: pre;
+word-spacing: normal;
+word-break: normal;
+word-wrap: normal;
+line-height: 1.4;
+
+-moz-tab-size: 8;
+-o-tab-size: 8;
+tab-size: 8;
+
+-webkit-hyphens: none;
+-moz-hyphens: none;
+-ms-hyphens: none;
+hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+padding: .8em;
+overflow: auto;
+/* border: 1px solid #ddd; */
+border-radius: 3px;
+/* background: #fff; */
+background: #f5f5f5;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+padding: .1em;
+border-radius: .3em;
+white-space: normal;
+background: #f5f5f5;
+}
+
+.token.comment,
+.token.blockquote {
+color: #969896;
+}
+
+.token.cdata {
+color: #183691;
+}
+
+.token.doctype,
+.token.punctuation,
+.token.variable,
+.token.macro.property {
+color: #333;
+}
+
+.token.operator,
+.token.important,
+.token.keyword,
+.token.rule,
+.token.builtin {
+color: #a71d5d;
+}
+
+.token.string,
+.token.url,
+.token.regex,
+.token.attr-value {
+color: #183691;
+}
+
+.token.property,
+.token.number,
+.token.boolean,
+.token.entity,
+.token.atrule,
+.token.constant,
+.token.symbol,
+.token.command,
+.token.code {
+color: #0086b3;
+}
+
+.token.tag,
+.token.selector,
+.token.prolog {
+color: #63a35c;
+}
+
+.token.function,
+.token.namespace,
+.token.pseudo-element,
+.token.class,
+.token.class-name,
+.token.pseudo-class,
+.token.id,
+.token.url-reference .token.variable,
+.token.attr-name {
+color: #795da3;
+}
+
+.token.entity {
+cursor: help;
+}
+
+.token.title,
+.token.title .token.punctuation {
+font-weight: bold;
+color: #1d3e81;
+}
+
+.token.list {
+color: #ed6a43;
+}
+
+.token.inserted {
+background-color: #eaffea;
+color: #55a532;
+}
+
+.token.deleted {
+background-color: #ffecec;
+color: #bd2c00;
+}
+
+.token.bold {
+font-weight: bold;
+}
+
+.token.italic {
+font-style: italic;
+}
+
+
+/* JSON */
+.language-json .token.property {
+color: #183691;
+}
+
+.language-markup .token.tag .token.punctuation {
+color: #333;
+}
+
+/* CSS */
+code.language-css,
+.language-css .token.function {
+color: #0086b3;
+}
+
+/* YAML */
+.language-yaml .token.atrule {
+color: #63a35c;
+}
+
+code.language-yaml {
+color: #183691;
+}
+
+/* Ruby */
+.language-ruby .token.function {
+color: #333;
+}
+
+/* Markdown */
+.language-markdown .token.url {
+color: #795da3;
+}
+
+/* Makefile */
+.language-makefile .token.symbol {
+color: #795da3;
+}
+
+.language-makefile .token.variable {
+color: #183691;
+}
+
+.language-makefile .token.builtin {
+color: #0086b3;
+}
+
+/* Bash */
+.language-bash .token.keyword {
+color: #0086b3;
+}
+
+/* highlight */
+pre[data-line] {
+position: relative;
+padding: 1em 0 1em 3em;
+}
+pre[data-line] .line-highlight-wrapper {
+position: absolute;
+top: 0;
+left: 0;
+background-color: transparent;
+display: block;
+width: 100%;
+}
+
+pre[data-line] .line-highlight {
+position: absolute;
+left: 0;
+right: 0;
+padding: inherit 0;
+margin-top: 1em;
+background: hsla(24, 20%, 50%,.08);
+background: linear-gradient(to right, hsla(24, 20%, 50%,.1) 70%, hsla(24, 20%, 50%,0));
+pointer-events: none;
+line-height: inherit;
+white-space: pre;
+}
+
+pre[data-line] .line-highlight:before, 
+pre[data-line] .line-highlight[data-end]:after {
+content: attr(data-start);
+position: absolute;
+top: .4em;
+left: .6em;
+min-width: 1em;
+padding: 0 .5em;
+background-color: hsla(24, 20%, 50%,.4);
+color: hsl(24, 20%, 95%);
+font: bold 65%/1.5 sans-serif;
+text-align: center;
+vertical-align: .3em;
+border-radius: 999px;
+text-shadow: none;
+box-shadow: 0 1px white;
+}
+
+pre[data-line] .line-highlight[data-end]:after {
+content: attr(data-end);
+top: auto;
+bottom: .4em;
+}html body{font-family:"Helvetica Neue",Helvetica,"Segoe UI",Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ul,html body>ol{margin-bottom:16px}html body ul,html body ol{padding-left:2em}html body ul.no-list,html body ol.no-list{padding:0;list-style-type:none}html body ul ul,html body ul ol,html body ol ol,html body ol ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:bold;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:bold}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em !important;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::before,html body code::after{letter-spacing:-0.2em;content:"\00a0"}html body pre>code{padding:0;margin:0;font-size:.85em !important;word-break:normal;white-space:pre;background:transparent;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;font-size:.85em !important;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:before,html body pre tt:before,html body pre code:after,html body pre tt:after{content:normal}html body p,html body blockquote,html body ul,html body ol,html body dl,html body pre{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body pre,html body code{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview .pagebreak,.markdown-preview .newpage{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center !important}.markdown-preview:not([for="preview"]) .code-chunk .btn-group{display:none}.markdown-preview:not([for="preview"]) .code-chunk .status{display:none}.markdown-preview:not([for="preview"]) .code-chunk .output-div{margin-bottom:16px}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0}@media screen and (min-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode]) .markdown-preview{font-size:14px !important;padding:1em}}@media print{html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for="html-export"]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,0.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,0.66);border:4px solid rgba(150,150,150,0.66);background-clip:content-box}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{padding:0 1.6em;margin-top:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc li{margin-bottom:.8em}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc ul{list-style-type:none}html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% -  300px);padding:2em calc(50% - 457px -  150px);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for="html-export"]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for="html-export"]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+    </style>
+  </head>
+  <body for="html-export" >
+    <div class="mume markdown-preview  "  >
+    <h2>&#x8BA1;&#x7B97;&#x673A;&#x7F51;&#x7EDC;&#x5B9E;&#x9A8C;&#x62A5;&#x544A;</h2>
+<h1>&#x5B9E;&#x9A8C;&#x4E00;</h1>
+<ul>
+<li>&#x738B;&#x534E;&#x5F3A;</li>
+<li>2016K8009929035</li>
+</ul>
+<hr>
+<ul>
+<li><a href="#%E4%BA%92%E8%81%94%E7%BD%91%E5%8D%8F%E8%AE%AE%E5%AE%9E%E9%AA%8C">&#x4E92;&#x8054;&#x7F51;&#x534F;&#x8BAE;&#x5B9E;&#x9A8C;</a>
+<ul>
+<li><a href="#%E5%85%B3%E9%94%AE%E5%8D%8F%E8%AE%AE%E8%AF%B4%E6%98%8E">&#x5173;&#x952E;&#x534F;&#x8BAE;&#x8BF4;&#x660E;</a></li>
+<li><a href="#%E4%B8%8B%E8%BD%BD%E9%A1%B5%E9%9D%A2%E7%9A%84%E6%95%B4%E4%B8%AA%E8%BF%87%E7%A8%8B">&#x4E0B;&#x8F7D;&#x9875;&#x9762;&#x7684;&#x6574;&#x4E2A;&#x8FC7;&#x7A0B;</a></li>
+</ul>
+</li>
+<li><a href="#%E6%B5%81%E5%AE%8C%E6%88%90%E6%97%B6%E9%97%B4%E5%AE%9E%E9%AA%8C">&#x6D41;&#x5B8C;&#x6210;&#x65F6;&#x95F4;&#x5B9E;&#x9A8C;</a>
+<ul>
+<li><a href="#%E6%95%B0%E6%8D%AE%E6%95%B4%E7%90%86">&#x6570;&#x636E;&#x6574;&#x7406;</a></li>
+<li><a href="#%E5%AE%9E%E9%AA%8C%E7%8E%B0%E8%B1%A1">&#x5B9E;&#x9A8C;&#x73B0;&#x8C61;</a></li>
+<li><a href="#%E8%A7%A3%E9%87%8A%E8%AF%B4%E6%98%8E">&#x89E3;&#x91CA;&#x8BF4;&#x660E;</a></li>
+</ul>
+</li>
+<li><a href="#%E9%99%84%E4%BB%B6-%E5%AE%8C%E6%95%B4%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C">&#x9644;&#x4EF6;: &#x5B8C;&#x6574;&#x5B9E;&#x9A8C;&#x7ED3;&#x679C;</a>
+<ul>
+<li><a href="#wireshark%E6%8A%93%E5%8C%85%E7%BB%93%E6%9E%9C">wireshark&#x6293;&#x5305;&#x7ED3;&#x679C;</a></li>
+</ul>
+</li>
+</ul>
+<h1 class="mume-header" id="%E4%BA%92%E8%81%94%E7%BD%91%E5%8D%8F%E8%AE%AE%E5%AE%9E%E9%AA%8C">&#x4E92;&#x8054;&#x7F51;&#x534F;&#x8BAE;&#x5B9E;&#x9A8C;</h1>
+
+<h2 class="mume-header" id="%E5%85%B3%E9%94%AE%E5%8D%8F%E8%AE%AE%E8%AF%B4%E6%98%8E">&#x5173;&#x952E;&#x534F;&#x8BAE;&#x8BF4;&#x660E;</h2>
+
+<p>&#x8BBF;&#x95EE;&#x7F51;&#x7AD9;&#x7684;&#x8FC7;&#x7A0B;&#x4E2D;&#x4E3B;&#x8981;&#x6D89;&#x53CA;&#x4EE5;&#x4E0B;&#x51E0;&#x79CD;&#x534F;&#x8BAE;:</p>
+<p>ARP, DNS, TCP, HTTP</p>
+<p>ARP: &#x5730;&#x5740;&#x89E3;&#x6790;&#x534F;&#x8BAE;, &#x6839;&#x636E;IP&#x5730;&#x5740;&#x83B7;&#x53D6;&#x7269;&#x7406;&#x5730;&#x5740;(mac&#x5730;&#x5740;)<br>
+DNS: &#x57DF;&#x540D;&#x89E3;&#x6790;&#x534F;&#x8BAE;, &#x63D0;&#x4F9B;&#x57DF;&#x540D;&#x5230;IP&#x5730;&#x5740;&#x7684;&#x6620;&#x5C04;<br>
+TCP: &#x4F20;&#x8F93;&#x63A7;&#x5236;&#x534F;&#x8BAE;, &#x652F;&#x6301;&#x5728;&#x4E0D;&#x53EF;&#x9760;&#x7684;&#x7F51;&#x7EDC;&#x4E0A;&#x8FDB;&#x884C;&#x53EF;&#x9760;&#x7684;&#x4F20;&#x8F93;<br>
+HTTP: &#x8D85;&#x6587;&#x672C;&#x4F20;&#x8F93;&#x534F;&#x8BAE;, &#x65E0;&#x72B6;&#x6001;&#x7684;&#x8BF7;&#x6C42;-&#x54CD;&#x5E94;&#x534F;&#x8BAE;, &#x652F;&#x6301;WWW&#x670D;&#x52A1;&#x5668;&#x4E0E;&#x6D4F;&#x89C8;&#x5668;&#x4E4B;&#x95F4;&#x7684;&#x4FE1;&#x606F;&#x4F20;&#x8F93;</p>
+<p><s>&#x8BE6;&#x7EC6;&#x8BF4;&#x660E;&#x4E5F;&#x6CA1;&#x4EC0;&#x4E48;&#x597D;&#x8BB2;&#x7684;, just ctrl-C from wiki</s></p>
+<h2 class="mume-header" id="%E4%B8%8B%E8%BD%BD%E9%A1%B5%E9%9D%A2%E7%9A%84%E6%95%B4%E4%B8%AA%E8%BF%87%E7%A8%8B">&#x4E0B;&#x8F7D;&#x9875;&#x9762;&#x7684;&#x6574;&#x4E2A;&#x8FC7;&#x7A0B;</h2>
+
+<p>wireshark&#x62A5;&#x544A;&#x4E2D;&#x7684;&#x5173;&#x952E;&#x90E8;&#x5206;&#x5982;&#x4E0B;:</p>
+<pre data-role="codeBlock" data-info class="language-"><code>&#x901A;&#x8FC7;ARP&#x534F;&#x8BAE;&#x5BFB;&#x627E;IP&#x5730;&#x5740;&#x5BF9;&#x5E94;&#x7684;mac&#x5730;&#x5740;
+---
+
+&#x672C;&#x5730;&#x5BA2;&#x6237;&#x7AEF;&#x5411;DNS&#x670D;&#x52A1;&#x5668;&#x53D1;&#x9001;DNS&#x8BF7;&#x6C42;, &#x67E5;&#x627E;&#x57DF;&#x540D;&quot;www.qq.com&quot;&#x5BF9;&#x5E94;&#x7684;ip&#x5730;&#x5740;
+&quot;1&quot;,&quot;0.000000000&quot;,&quot;10.0.0.1&quot;,&quot;1.2.4.8&quot;,&quot;DNS&quot;,&quot;72&quot;,&quot;Standard query 0x252b A www.qq.com&quot;
+
+DNS&#x670D;&#x52A1;&#x5668;&#x56DE;&#x590D;DNS&#x67E5;&#x8BE2;&#x7ED3;&#x679C;
+&quot;4&quot;,&quot;0.008529927&quot;,&quot;1.2.4.8&quot;,&quot;10.0.0.1&quot;,&quot;DNS&quot;,&quot;153&quot;,&quot;Standard query response 0x252b A www.qq.com CNAME public.sparta.mig.tencent-cloud.net A 
+
+TCP&#x94FE;&#x63A5;&#x5EFA;&#x7ACB;&#x7684;&#x4E09;&#x6B21;&#x63E1;&#x624B;, &#x6267;&#x884C;&#x5B8C;&#x6210;&#x540E;&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;&#x4E4B;&#x95F4;&#x5EFA;&#x7ACB;TCP&#x94FE;&#x63A5;
+&quot;5&quot;,&quot;0.008731634&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;76&quot;,&quot;57538  &gt;  80 [SYN] Seq=0 Win=42340 Len=0 MSS=1460 SACK_PERM=1 TSval=977480750 TSecr=0 WS=512&quot;
+&quot;6&quot;,&quot;0.016290606&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;60&quot;,&quot;80  &gt;  57538 [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1460&quot;
+&quot;7&quot;,&quot;0.016310539&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;57538  &gt;  80 [ACK] Seq=1 Ack=1 Win=42340 Len=0&quot;
+
+----------------------&#x6B64;&#x540E;TCP&#x94FE;&#x63A5;&#x5DF2;&#x5EFA;&#x7ACB;--------------------------
+&#x672C;&#x5730;&#x8BA1;&#x7B97;&#x673A;&#x901A;&#x8FC7;TCP&#x534F;&#x8BAE;(&#x4EE5;&#x4E0B;&#x7701;&#x7565;)&#x5411;&#x670D;&#x52A1;&#x5668;&#x53D1;&#x9001;HTTP-GET&#x8BF7;&#x6C42; (HTTP&#x534F;&#x8BAE;)
+&quot;8&quot;,&quot;0.016395624&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;HTTP&quot;,&quot;193&quot;,&quot;GET / HTTP/1.1 &quot;
+
+&#x670D;&#x52A1;&#x5668;&#x54CD;&#x5E94;&#x8BF7;&#x6C42;
+&quot;10&quot;,&quot;0.026757676&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;HTTP&quot;,&quot;397&quot;,&quot;HTTP/1.1 302 Moved Temporarily  (text/html)&quot;
+......
+
+&#x5B89;&#x5168;&#x4F20;&#x8F93;&#x5C42;&#x534F;&#x8BAE;TLS&#x63E1;&#x624B;&#x5F00;&#x59CB;, &#x7528;&#x4E8E;&#x5904;&#x7406;&quot;www.qq.com&quot;&#x4E0A;&#x8D26;&#x53F7;&#x767B;&#x9646;&#x7B49;&#x529F;&#x80FD;
+&quot;15&quot;,&quot;0.043728235&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TLSv1.2&quot;,&quot;251&quot;,&quot;Client Hello&quot;
+&quot;17&quot;,&quot;0.052984455&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;2896&quot;,&quot;Server Hello&quot;
+.......
+</code></pre><h1 class="mume-header" id="%E6%B5%81%E5%AE%8C%E6%88%90%E6%97%B6%E9%97%B4%E5%AE%9E%E9%AA%8C">&#x6D41;&#x5B8C;&#x6210;&#x65F6;&#x95F4;&#x5B9E;&#x9A8C;</h1>
+
+<h2 class="mume-header" id="%E6%95%B0%E6%8D%AE%E6%95%B4%E7%90%86">&#x6570;&#x636E;&#x6574;&#x7406;</h2>
+
+<p>&#x6279;&#x91CF;&#x6D4B;&#x8BD5;&#x7684;&#x7ED3;&#x679C;&#x5982;&#x4E0B;:</p>
+<pre data-role="codeBlock" data-info class="language-"><code>aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 10 10ms
+(&apos;1mb totally cost&apos;, 0.04372382164001465)
+(&apos;10mb totally cost&apos;, 8.870406150817871)
+(&apos;100mb totally cost&apos;, 88.52204585075378)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 10 100ms
+(&apos;1mb totally cost&apos;, 2.1163368225097656)
+(&apos;10mb totally cost&apos;, 9.894367933273315)
+(&apos;100mb totally cost&apos;, 89.29427790641785)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 50 10ms
+(&apos;1mb totally cost&apos;, 0.04538893699645996)
+(&apos;10mb totally cost&apos;, 1.9112670421600342)
+(&apos;100mb totally cost&apos;, 18.24047303199768)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 50 100ms
+(&apos;1mb totally cost&apos;, 1.8329260349273682)
+(&apos;10mb totally cost&apos;, 3.2963380813598633)
+(&apos;100mb totally cost&apos;, 19.404229879379272)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 100 10ms
+(&apos;1mb totally cost&apos;, 0.046257972717285156)
+(&apos;10mb totally cost&apos;, 1.047043800354004)
+(&apos;100mb totally cost&apos;, 9.374485969543457)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 100 100ms
+(&apos;1mb totally cost&apos;, 1.8440830707550049)
+(&apos;10mb totally cost&apos;, 2.6419339179992676)
+(&apos;100mb totally cost&apos;, 10.86581802368164)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 500 10ms
+(&apos;1mb totally cost&apos;, 0.04406595230102539)
+(&apos;10mb totally cost&apos;, 0.3939189910888672)
+(&apos;100mb totally cost&apos;, 2.1100170612335205)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 500 100ms
+(&apos;1mb totally cost&apos;, 1.8207671642303467)
+(&apos;10mb totally cost&apos;, 2.2744178771972656)
+(&apos;100mb totally cost&apos;, 4.563926935195923)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 1000 10ms
+(&apos;1mb totally cost&apos;, 0.04427504539489746)
+(&apos;10mb totally cost&apos;, 0.38527703285217285)
+(&apos;100mb totally cost&apos;, 1.356823205947876)
+aw@aw-VirtualBox:~$ sudo python ./fct_exp.py 1000 100ms
+(&apos;1mb totally cost&apos;, 1.8226890563964844)
+(&apos;10mb totally cost&apos;, 2.2638978958129883)
+(&apos;100mb totally cost&apos;, 4.501029014587402)
+</code></pre><p>&#x6574;&#x7406;&#x540E;&#x7684;&#x6570;&#x636E;&#x53CA;&#x56FE;&#x8868;&#x8BF7;&#x53C2;&#x89C1;<code>/data/wget.xlsx</code></p>
+<h2 class="mume-header" id="%E5%AE%9E%E9%AA%8C%E7%8E%B0%E8%B1%A1">&#x5B9E;&#x9A8C;&#x73B0;&#x8C61;</h2>
+
+<p>&#x4E0D;&#x96BE;&#x770B;&#x51FA;, &#x5BF9;&#x4E8E;&#x8F83;&#x5C0F;&#x7684;&#x6587;&#x4EF6;&#x5927;&#x5C0F;, &#x5EF6;&#x8FDF;&#x5BF9;&#x4E8E;&#x603B;&#x4F20;&#x8F93;&#x65F6;&#x95F4;&#x7684;&#x5F71;&#x54CD;&#x5F88;&#x5927;. &#x5BF9;&#x4E8E;&#x8F83;&#x5927;&#x7684;&#x6587;&#x4EF6;&#x5927;&#x5C0F;, &#x5E26;&#x5BBD;&#x7684;&#x5F71;&#x54CD;&#x66F4;&#x5927;.</p>
+<p>&#x4ECE;<code>wget</code>&#x663E;&#x793A;&#x51FA;&#x7684;&#x4F20;&#x8F93;&#x901F;&#x7387;&#x53EF;&#x4EE5;&#x770B;&#x51FA;, &#x4F20;&#x8F93;&#x7684;&#x901F;&#x7387;&#x7531;0&#x5F00;&#x59CB;&#x9010;&#x6E10;&#x589E;&#x5927;. &#x5E26;&#x5BBD;&#x51B3;&#x5B9A;&#x4E86;&#x4F20;&#x8F93;&#x901F;&#x7387;&#x7684;&#x4E0A;&#x9650;, &#x800C;&#x5EF6;&#x8FDF;&#x51B3;&#x5B9A;&#x4E86;&#x4F20;&#x8F93;&#x901F;&#x7387;&#x7684;&#x589E;&#x957F;&#x901F;&#x5EA6;.</p>
+<h2 class="mume-header" id="%E8%A7%A3%E9%87%8A%E8%AF%B4%E6%98%8E">&#x89E3;&#x91CA;&#x8BF4;&#x660E;</h2>
+
+<p>TCP&#x534F;&#x8BAE;&#x7684;&#x8BE6;&#x7EC6;&#x7EC6;&#x8282;&#x4ECE;&#x7565;.</p>
+<p>&#x4F20;&#x8F93;&#x901F;&#x7387;&#x7684;&#x589E;&#x957F;&#x6A21;&#x5F0F;&#x6765;&#x6E90;&#x4E8E;TCP&#x4F20;&#x8F93;&#x62E5;&#x585E;&#x7B97;&#x6CD5;&#x4E0E;&#x6162;&#x542F;&#x52A8;&#x673A;&#x5236;. &#x6162;&#x542F;&#x52A8;&#x673A;&#x5236;&#x662F;&#x4E3A;&#x4E86;&#x9632;&#x6B62;&#x5728;&#x8FDE;&#x63A5;&#x542F;&#x52A8;&#x65F6;&#x53D1;&#x9001;&#x65B9;&#x7A97;&#x53E3;&#x8F83;&#x5927;&#x5BFC;&#x81F4;&#x5927;&#x91CF;&#x6570;&#x636E;&#x540C;&#x65F6;&#x53D1;&#x9001;&#x963B;&#x585E;&#x7F51;&#x7EDC;. &#x9996;&#x5148;, TCP&#x534F;&#x8BAE;&#x53D1;&#x9001;&#x65B9;&#x5904;&#x5B58;&#x5728;&#x62E5;&#x585E;&#x7A97;&#x53E3;. &#x5728;&#x94FE;&#x63A5;&#x521A;&#x521A;&#x5EFA;&#x7ACB;&#x7684;&#x60C5;&#x51B5;&#x4E0B;, &#x62E5;&#x585E;&#x7A97;&#x53E3;&#x5F88;&#x5C0F;, &#x968F;&#x7740;&#x5305;&#x7684;&#x6210;&#x529F;&#x4F20;&#x8F93;&#x786E;&#x8BA4;&#x62E5;&#x585E;&#x7A97;&#x53E3;&#x6307;&#x6570;&#x589E;&#x957F;, &#x5728;&#x8D85;&#x65F6;&#x51FA;&#x73B0;&#x540E;&#x8BBE;&#x7F6E;&#x6162;&#x542F;&#x52A8;&#x9608;&#x503C;, &#x51CF;&#x5C0F;&#x62E5;&#x585E;&#x7A97;&#x53E3;&#x5927;&#x5C0F;&#x540E;&#x8FDB;&#x884C;&#x6307;&#x6570;(&#x6162;&#x542F;&#x52A8;&#x9608;&#x503C;&#x524D;)-&#x7EBF;&#x6027;(&#x6162;&#x542F;&#x52A8;&#x9608;&#x503C;&#x540E;)&#x589E;&#x957F;, &#x5982;&#x6B64;&#x53CD;&#x590D;(&#x62E5;&#x585E;&#x7A97;&#x53E3;&#x5927;&#x5C0F;&#x9010;&#x6E10;&#x8D8B;&#x4E8E;&#x7A33;&#x5B9A;). &#x5E26;&#x5BBD;&#x7684;&#x5927;&#x5C0F;&#x6700;&#x7EC8;&#x7269;&#x7406;&#x4E0A;&#x9650;&#x5236;&#x4E86;&#x4F20;&#x8F93;&#x901F;&#x5EA6;&#x7684;&#x5CF0;&#x503C;. &#x800C;&#x8F83;&#x5927;&#x7684;&#x5EF6;&#x8FDF;&#x5BFC;&#x81F4;&#x542F;&#x52A8;&#x9636;&#x6BB5;&#x7ECF;&#x5E38;&#x8D85;&#x65F6;, &#x7A97;&#x53E3;&#x589E;&#x5927;&#x7F13;&#x6162;, &#x5F71;&#x54CD;&#x4F20;&#x8F93;&#x6548;&#x7387;&#x7684;&#x589E;&#x957F;&#x901F;&#x5EA6;.</p>
+<p>&#x5728;&#x6587;&#x4EF6;&#x8F83;&#x5C0F;&#x65F6;, &#x53EF;&#x4EE5;&#x770B;&#x51FA;, &#x4F20;&#x8F93;&#x5E76;&#x6CA1;&#x6709;&#x8FBE;&#x5230;&#x5CF0;&#x503C;&#x901F;&#x5EA6;&#x5373;&#x505C;&#x6B62;. &#x589E;&#x5927;&#x5E26;&#x5BBD;&#x53EF;&#x4EE5;&#x63D0;&#x9AD8;&#x5CF0;&#x503C;&#x901F;&#x5EA6;, &#x4F46;&#x5BF9;&#x4E8E;&#x8F83;&#x5C0F;&#x7684;&#x6587;&#x4EF6;&#x5374;&#x65E0;&#x80FD;&#x4E3A;&#x529B;, &#x4F20;&#x8F93;&#x901F;&#x5EA6;&#x4E0E;&#x5E26;&#x5BBD;&#x4E0D;&#x6210;&#x7EBF;&#x6027;&#x5173;&#x7CFB;, &#x5728;&#x5E26;&#x5BBD;&#x589E;&#x5927;&#x5230;&#x4E00;&#x5B9A;&#x7A0B;&#x5EA6;&#x540E;&#x589E;&#x957F;&#x7F13;&#x6162;. &#x5728;&#x6587;&#x4EF6;&#x53D8;&#x5927;&#x4EE5;&#x540E;, TCP&#x9010;&#x6E10;&#x8FBE;&#x5230;&#x5CF0;&#x503C;&#x901F;&#x5EA6;, &#x5E26;&#x5BBD;&#x5BF9;&#x4E8E;&#x4F20;&#x8F93;&#x901F;&#x5EA6;&#x7684;&#x5F71;&#x54CD;&#x663E;&#x793A;&#x51FA;&#x6765;, &#x5E26;&#x5BBD;&#x589E;&#x957F;&#x4E0E;&#x901F;&#x5EA6;&#x589E;&#x957F;&#x8D8B;&#x5411;&#x4E8E;&#x7EBF;&#x6027;&#x5173;&#x7CFB;.</p>
+<p>&#x6BD4;&#x8F83;delay=10/100ms&#x7684;&#x7ED3;&#x679C;&#x53EF;&#x4EE5;&#x770B;&#x51FA;, delay&#x8F83;&#x9AD8;&#x65F6;, &#x4F1A;&#x5F71;&#x54CD;&#x4F20;&#x8F93;&#x7684;&#x5CF0;&#x503C;&#x901F;&#x5EA6;.</p>
+<h1 class="mume-header" id="%E9%99%84%E4%BB%B6-%E5%AE%8C%E6%95%B4%E5%AE%9E%E9%AA%8C%E7%BB%93%E6%9E%9C">&#x9644;&#x4EF6;: &#x5B8C;&#x6574;&#x5B9E;&#x9A8C;&#x7ED3;&#x679C;</h1>
+
+<h2 class="mume-header" id="wireshark%E6%8A%93%E5%8C%85%E7%BB%93%E6%9E%9C">wireshark&#x6293;&#x5305;&#x7ED3;&#x679C;</h2>
+
+<pre data-role="codeBlock" data-info class="language-"><code>&quot;No.&quot;,&quot;Time&quot;,&quot;Source&quot;,&quot;Destination&quot;,&quot;Protocol&quot;,&quot;Length&quot;,&quot;Info&quot;
+&quot;1&quot;,&quot;0.000000000&quot;,&quot;10.0.0.1&quot;,&quot;1.2.4.8&quot;,&quot;DNS&quot;,&quot;72&quot;,&quot;Standard query 0x252b A www.qq.com&quot;
+&quot;2&quot;,&quot;0.001818464&quot;,&quot;10.0.0.1&quot;,&quot;1.2.4.8&quot;,&quot;DNS&quot;,&quot;72&quot;,&quot;Standard query 0xab31 AAAA www.qq.com&quot;
+&quot;3&quot;,&quot;0.007015807&quot;,&quot;1.2.4.8&quot;,&quot;10.0.0.1&quot;,&quot;DNS&quot;,&quot;177&quot;,&quot;Standard query response 0xab31 AAAA www.qq.com CNAME public.sparta.mig.tencent-cloud.net AAAA 2402:4e00:8010::155 AAAA 2402:4e00:8010::154&quot;
+&quot;4&quot;,&quot;0.008529927&quot;,&quot;1.2.4.8&quot;,&quot;10.0.0.1&quot;,&quot;DNS&quot;,&quot;153&quot;,&quot;Standard query response 0x252b A www.qq.com CNAME public.sparta.mig.tencent-cloud.net A 220.194.111.148 A 220.194.111.149&quot;
+&quot;5&quot;,&quot;0.008731634&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;76&quot;,&quot;57538  &gt;  80 [SYN] Seq=0 Win=42340 Len=0 MSS=1460 SACK_PERM=1 TSval=977480750 TSecr=0 WS=512&quot;
+&quot;6&quot;,&quot;0.016290606&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;60&quot;,&quot;80  &gt;  57538 [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1460&quot;
+&quot;7&quot;,&quot;0.016310539&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;57538  &gt;  80 [ACK] Seq=1 Ack=1 Win=42340 Len=0&quot;
+&quot;8&quot;,&quot;0.016395624&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;HTTP&quot;,&quot;193&quot;,&quot;GET / HTTP/1.1 &quot;
+&quot;9&quot;,&quot;0.016916762&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;80  &gt;  57538 [ACK] Seq=1 Ack=138 Win=65535 Len=0&quot;
+&quot;10&quot;,&quot;0.026757676&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;HTTP&quot;,&quot;397&quot;,&quot;HTTP/1.1 302 Moved Temporarily  (text/html)&quot;
+&quot;11&quot;,&quot;0.026763809&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;57538  &gt;  80 [ACK] Seq=138 Ack=342 Win=41999 Len=0&quot;
+&quot;12&quot;,&quot;0.034062475&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;76&quot;,&quot;39870  &gt;  443 [SYN] Seq=0 Win=42340 Len=0 MSS=1460 SACK_PERM=1 TSval=977480775 TSecr=0 WS=512&quot;
+&quot;13&quot;,&quot;0.043496357&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;60&quot;,&quot;443  &gt;  39870 [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1460&quot;
+&quot;14&quot;,&quot;0.043512391&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=1 Ack=1 Win=42340 Len=0&quot;
+&quot;15&quot;,&quot;0.043728235&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TLSv1.2&quot;,&quot;251&quot;,&quot;Client Hello&quot;
+&quot;16&quot;,&quot;0.044089005&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;443  &gt;  39870 [ACK] Seq=1 Ack=196 Win=65535 Len=0&quot;
+&quot;17&quot;,&quot;0.052984455&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;2896&quot;,&quot;Server Hello&quot;
+&quot;18&quot;,&quot;0.052990433&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=196 Ack=2841 Win=41180 Len=0&quot;
+&quot;19&quot;,&quot;0.053495244&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;1312&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=2841 Ack=196 Win=65535 Len=1256 [TCP segment of a reassembled PDU]&quot;
+&quot;20&quot;,&quot;0.053513734&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=196 Ack=4097 Win=41180 Len=0&quot;
+&quot;21&quot;,&quot;0.055538062&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;1416&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=4097 Ack=196 Win=65535 Len=1360 [TCP segment of a reassembled PDU]&quot;
+&quot;22&quot;,&quot;0.055542642&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=196 Ack=5457 Win=41180 Len=0&quot;
+&quot;23&quot;,&quot;0.060599797&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;760&quot;,&quot;Certificate, Server Key Exchange, Server Hello Done&quot;
+&quot;24&quot;,&quot;0.060608029&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=196 Ack=6161 Win=41180 Len=0&quot;
+&quot;25&quot;,&quot;0.061716498&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TLSv1.2&quot;,&quot;174&quot;,&quot;Client Key Exchange, Change Cipher Spec, Encrypted Handshake Message&quot;
+&quot;26&quot;,&quot;0.062513209&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;443  &gt;  39870 [ACK] Seq=6161 Ack=314 Win=65535 Len=0&quot;
+&quot;27&quot;,&quot;0.070809318&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;306&quot;,&quot;New Session Ticket, Change Cipher Spec, Encrypted Handshake Message&quot;
+&quot;28&quot;,&quot;0.071215976&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TLSv1.2&quot;,&quot;214&quot;,&quot;Application Data&quot;
+&quot;29&quot;,&quot;0.071673622&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;443  &gt;  39870 [ACK] Seq=6411 Ack=472 Win=65535 Len=0&quot;
+&quot;30&quot;,&quot;0.085325314&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;2776&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=6411 Ack=472 Win=65535 Len=2720 [TCP segment of a reassembled PDU]&quot;
+&quot;31&quot;,&quot;0.085333197&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=9131 Win=41180 Len=0&quot;
+&quot;32&quot;,&quot;0.086777832&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;10936&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=9131 Ack=472 Win=65535 Len=10880 [TCP segment of a reassembled PDU]&quot;
+&quot;33&quot;,&quot;0.086796531&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=20011 Win=41180 Len=0&quot;
+&quot;34&quot;,&quot;0.092987751&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;1416&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=20011 Ack=472 Win=65535 Len=1360 [TCP segment of a reassembled PDU]&quot;
+&quot;35&quot;,&quot;0.095559134&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;11416&quot;,&quot;Application Data [TCP segment of a reassembled PDU]&quot;
+&quot;36&quot;,&quot;0.095583341&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=32731 Win=35500 Len=0&quot;
+&quot;37&quot;,&quot;0.095689998&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;57538  &gt;  80 [FIN, ACK] Seq=138 Ack=342 Win=41999 Len=0&quot;
+&quot;38&quot;,&quot;0.096049691&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;2296&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=32731 Ack=472 Win=65535 Len=2240 [TCP segment of a reassembled PDU]&quot;
+&quot;39&quot;,&quot;0.096056512&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=34971 Win=41180 Len=0&quot;
+&quot;40&quot;,&quot;0.096050699&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;80  &gt;  57538 [ACK] Seq=342 Ack=139 Win=65535 Len=0&quot;
+&quot;41&quot;,&quot;0.102879153&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;80  &gt;  57538 [FIN, ACK] Seq=342 Ack=139 Win=65535 Len=0&quot;
+&quot;42&quot;,&quot;0.102901809&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;57538  &gt;  80 [ACK] Seq=139 Ack=343 Win=41999 Len=0&quot;
+&quot;43&quot;,&quot;0.105690422&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;5496&quot;,&quot;Application Data [TCP segment of a reassembled PDU]&quot;
+&quot;44&quot;,&quot;0.105708429&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=40411 Win=38340 Len=0&quot;
+&quot;45&quot;,&quot;0.108075249&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;10936&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=40411 Ack=472 Win=65535 Len=10880 [TCP segment of a reassembled PDU]&quot;
+&quot;46&quot;,&quot;0.108090047&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=51291 Win=41180 Len=0&quot;
+&quot;47&quot;,&quot;0.112198889&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;1416&quot;,&quot;443  &gt;  39870 [PSH, ACK] Seq=51291 Ack=472 Win=65535 Len=1360 [TCP segment of a reassembled PDU]&quot;
+&quot;48&quot;,&quot;0.113516248&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TLSv1.2&quot;,&quot;1216&quot;,&quot;Application Data&quot;
+&quot;49&quot;,&quot;0.113521307&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=472 Ack=53811 Win=46860 Len=0&quot;
+&quot;50&quot;,&quot;0.114224161&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [FIN, ACK] Seq=472 Ack=53811 Win=46860 Len=0&quot;
+&quot;51&quot;,&quot;0.116137006&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;443  &gt;  39870 [ACK] Seq=53811 Ack=473 Win=65535 Len=0&quot;
+&quot;52&quot;,&quot;0.123670915&quot;,&quot;220.194.111.148&quot;,&quot;10.0.0.1&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;443  &gt;  39870 [FIN, ACK] Seq=53811 Ack=473 Win=65535 Len=0&quot;
+&quot;53&quot;,&quot;0.123693403&quot;,&quot;10.0.0.1&quot;,&quot;220.194.111.148&quot;,&quot;TCP&quot;,&quot;56&quot;,&quot;39870  &gt;  443 [ACK] Seq=473 Ack=53812 Win=46860 Len=0&quot;
+</code></pre>
+    </div>
+    
+    
+  </body>
+  
+  
+  
+  
+  
+  
+  
+</html>

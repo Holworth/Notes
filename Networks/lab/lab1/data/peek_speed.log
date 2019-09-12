@@ -1,0 +1,197 @@
+# BW=10, delay=10
+
+1MB.dat.1           100%[===================>]   1.00M  1.13MB/s    in 0.9s    
+
+2019-09-05 09:27:46 (1.13 MB/s) - ‘1MB.dat.1’ saved [1048576/1048576]
+
+mininet> h2 dd if=/dev/zero of=10MB.dat bs=10M count=1
+10.0.0.1 - - [05/Sep/2019 09:27:45] "GET /1MB.dat HTTP/1.1" 200 -
+1+0 records in
+1+0 records out
+10485760 bytes (10 MB, 10 MiB) copied, 0.0124942 s, 839 MB/s
+mininet> h2 dd if=/dev/zero of=100MB.dat bs=100M count=1
+1+0 records in
+1+0 records out
+104857600 bytes (105 MB, 100 MiB) copied, 0.284837 s, 368 MB/s
+mininet> h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:30:00--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.1’
+
+10MB.dat.1          100%[===================>]  10.00M  1.14MB/s    in 8.8s    
+
+2019-09-05 09:30:09 (1.14 MB/s) - ‘10MB.dat.1’ saved [10485760/10485760]
+
+mininet> h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:30:16--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.1’
+
+100MB.dat.1          59%[==========>         ]  59.38M  1.14MB/s    eta 36s    ^C
+
+# BW=10, delay=100
+1MB.dat.3           100%[===================>]   1.00M   681KB/s    in 1.5s    
+
+2019-09-05 09:36:25 (681 KB/s) - ‘1MB.dat.3’ saved [1048576/1048576]
+
+mininet> h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:36:30--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.3’
+
+10MB.dat.3           86%[================>   ]   8.68M  1.14MB/s    eta 1s     ^C
+mininet> h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:36:42--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.4’
+
+100MB.dat.4           6%[>                   ]   6.16M  1.14MB/s    eta 92s    ^C
+mininet> 
+
+# BW=100, delay=10
+# --2019-09-05 09:38:21--  http://10.0.0.2/1MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1048576 (1.0M) [application/octet-stream]
+Saving to: ‘1MB.dat.4’
+
+1MB.dat.4           100%[===================>]   1.00M  6.39MB/s    in 0.2s
+
+2019-09-05 09:38:21 (6.39 MB/s) - ‘1MB.dat.4’ saved [1048576/1048576]
+
+mininet> h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:38:27--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.4’
+
+10MB.dat.4          100%[===================>]  10.00M  10.4MB/s    in 1.0s
+
+2019-09-05 09:38:28 (10.4 MB/s) - ‘10MB.dat.4’ saved [10485760/10485760]
+
+mininet> h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:38:33--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.5’
+
+100MB.dat.5         100%[===================>] 100.00M  11.3MB/s    in 8.9s
+
+2019-09-05 09:38:42 (11.2 MB/s) - ‘100MB.dat.5’ saved [104857600/104857600]
+
+mininet>
+
+# BW=100, delay=100
+
+aw@aw-VirtualBox:~$ sudo python fct_exp.py
+mininet> h1 wget http://10.0.0.2/1MB.dat
+--2019-09-05 09:39:56--  http://10.0.0.2/1MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1048576 (1.0M) [application/octet-stream]
+Saving to: ‘1MB.dat.5’
+
+1MB.dat.5           100%[===================>]   1.00M   843KB/s    in 1.2s
+
+2019-09-05 09:39:58 (843 KB/s) - ‘1MB.dat.5’ saved [1048576/1048576]
+
+mininet> h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:40:03--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.5’
+
+10MB.dat.5          100%[===================>]  10.00M  4.60MB/s    in 2.2s
+
+2019-09-05 09:40:06 (4.60 MB/s) - ‘10MB.dat.5’ saved [10485760/10485760]
+
+mininet> h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:40:14--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.6’
+
+100MB.dat.6         100%[===================>] 100.00M  11.2MB/s    in 10s
+
+2019-09-05 09:40:24 (9.85 MB/s) - ‘100MB.dat.6’ saved [104857600/104857600]
+
+mininet>
+
+# BW=1000, delay=10
+
+Length: 1048576 (1.0M) [application/octet-stream]
+Saving to: ‘1MB.dat.7’
+
+1MB.dat.7           100%[===================>]   1.00M  --.-KB/s    in 0.1s    
+
+2019-09-05 09:43:04 (7.98 MB/s) - ‘1MB.dat.7’ saved [1048576/1048576]
+
+mininet> h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:43:08--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.7’
+
+10MB.dat.7          100%[===================>]  10.00M  32.9MB/s    in 0.3s    
+
+2019-09-05 09:43:08 (32.9 MB/s) - ‘10MB.dat.7’ saved [10485760/10485760]
+
+mininet> h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:43:10--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.10’
+
+100MB.dat.10        100%[===================>] 100.00M  79.6MB/s    in 1.3s    
+
+2019-09-05 09:43:12 (79.6 MB/s) - ‘100MB.dat.10’ saved [104857600/104857600]
+
+mininet> 
+
+# BW=1000, delay=100
+
+Length: 1048576 (1.0M) [application/octet-stream]
+Saving to: ‘1MB.dat.6’
+
+1MB.dat.6           100%[===================>]   1.00M   851KB/s    in 1.2s    
+
+2019-09-05 09:41:36 (851 KB/s) - ‘1MB.dat.6’ saved [1048576/1048576]
+
+mininet>  h1 wget http://10.0.0.2/10MB.dat
+--2019-09-05 09:41:41--  http://10.0.0.2/10MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 10485760 (10M) [application/octet-stream]
+Saving to: ‘10MB.dat.6’
+
+10MB.dat.6          100%[===================>]  10.00M  5.41MB/s    in 1.8s    
+
+2019-09-05 09:41:43 (5.41 MB/s) - ‘10MB.dat.6’ saved [10485760/10485760]
+
+mininet>  h1 wget http://10.0.0.2/100MB.dat
+--2019-09-05 09:41:48--  http://10.0.0.2/100MB.dat
+Connecting to 10.0.0.2:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 104857600 (100M) [application/octet-stream]
+Saving to: ‘100MB.dat.8’
+
+100MB.dat.8         100%[===================>] 100.00M  24.5MB/s    in 4.1s    
+
+2019-09-05 09:41:53 (24.5 MB/s) - ‘100MB.dat.8’ saved [104857600/104857600]
+
+mininet> 
+
